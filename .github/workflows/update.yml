@@ -39,7 +39,7 @@ jobs:
           echo "📨 完成している schedule.json の中身をそのまま Google Apps Script へ直接送信中..."
           
           # 💡 すでに完璧なJSON構造なので、加工（jq）を挟まずにそのままRAWテキストとして叩き込みます
-          curl -L -X POST "https://script.google.com/macros/s/AKfycbzB1HDi-YsA74jYKMAekBq-PWXYLuJonRBQ_-Btse92yUuWFj2xJ2xbRNMUVcG0HyU/exec" \
+          curl -L -X POST "https://script.google.com/macros/s/AKfycbw7KeuN0XckEqU9V4wRxR3O8T9Rl6cC2jQesEOpOsNJTF09ZylpVFZWJnqo0aff1YNFRw/exec" \
                -H "Content-Type: text/plain" \
                --data-raw "$(cat schedule.json)"
                
