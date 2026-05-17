@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>公式スケジュールカレンダー</title>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f0f2f5; margin: 0; padding: 10px; }
+        .container { max-width: 700px; margin: 0 auto; background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .nav-links { text-align: center; margin-bottom: 15px; display: flex; justify-content: center; gap: 20px; }
+        .nav-links a { color: #1a73e8; text-decoration: none; font-size: 0.9rem; font-weight: bold; }
+        #calendar { margin-top: 10px; }
+        /* カレンダー内のイベントのデザイン微調整 */
+        .fc-event { cursor: pointer; padding: 2px 5px; font-size: 0.85rem; border-radius: 4px; background-color: #1a73e8 !important; border: none !important; }
+        .loading { text-align: center; color: #666; padding: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2 style="text-align: center; color: #333; margin-top: 0; font-size: 1.3rem;">📅 スケジュールカレンダー</h2>
+    <div class="nav-links">
+        <a href="index.html">➕ 手動入力フォーム</a>
+        <a href="dashboard.html">📊 ダッシュボード</a>
+    </div>
+
+    <div id="loading" class="loading">公式スケジュールを読み込み中...</div>
+    <div id="calendar"></div>
+</div>
+
+<script>
+// ★重要：GASのURLを貼り付けてください
+const GAS_URL = 'あなたの新しいGASデプロイURL';
+
+document.addEventListener('DOMContentLoaded', async function() {
+    const calendarEl = document.getElementById('calendar');
+    const loadingEl = document.getElementById('loading');
+
+    try {
+        // GASから公式スケジュールデータを取得
+        const response = await fetch(GAS_URL + "?action=read_schedule");
+        const resData = await response.json();
+        
+        loadingEl.style.display = 'none';
+
+        if (resData.result === "success") {
+            // FullCalendarが読み込める形式にイベントデータを変換
+            const events = resData.data.map(item => ({
+                title: `【${item.venue}】${item.title}`,
+                start: item.date,
+                // クリックしたときにデータを受け渡すためのカスタム属性
+                extendedProps: {
+                    rawTitle: item.title,
+                    venue: item.venue,
+                    date: item.date
+                }
+            }));
+
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: 'ja',
+                headerToolbar: {
+                    left: 'prev',
+                    center: 'title',
+                    right: 'next'
+                },
+                events: events,
+                // イベントをクリックしたときの動き
+                eventClick: function(info) {
+                    const props = info.event.extendedProps;
+                    // URLパラメータを作成して、入力画面(index.html)にデータを引き継いでジャンプ
+                    const targetUrl = `index.html?date=${props.date}&event=${encodeURIComponent(props.rawTitle)}&location=${encodeURIComponent(props.venue)}`;
+                    
+                    if (confirm(`選択した現場を記録しますか？\n\n現場：${props.rawTitle}\n会場：${props.venue}`)) {
+                        window.location.href = targetUrl;
+                    }
+                }
+            });
+            calendar.render();
+        }
+    } catch (e) {
+        loadingEl.innerText = "スケジュールデータの取得に失敗しました。Pythonから同期を行ってください。";
+    }
+});
+</script>
+</body>
+</html>
