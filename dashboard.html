@@ -40,110 +40,118 @@
         h2 { margin: 0; font-size: 18px; font-weight: 700; letter-spacing: 2px; color: #fff; text-shadow: 0 0 8px rgba(255, 107, 157, 0.4); }
         .container { max-width: 600px; margin: 0 auto; padding: 16px; box-sizing: border-box; }
         
+        /* モード切替（STATS vs CALENDAR） */
+        .view-mode-toggle { display: flex; gap: 4px; justify-content: center; margin-bottom: 16px; background: var(--input-bg); padding: 4px; border-radius: 10px; border: 1px solid var(--card-border); }
+        .mode-btn { flex: 1; padding: 10px; border: none; background: transparent; color: var(--text-muted); font-size: 12px; font-weight: bold; cursor: pointer; border-radius: 7px; transition: 0.2s; }
+        .mode-btn.active { background: var(--color-chumtoto); color: #fff; }
+
         /* フィルターコントロールエリア */
-        .filter-container {
-            background: rgba(0,0,0,0.2);
-            border: 1px solid var(--card-border);
-            padding: 12px;
-            border-radius: 12px;
-            margin-bottom: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
+        .filter-container { background: rgba(0,0,0,0.2); border: 1px solid var(--card-border); padding: 12px; border-radius: 12px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 10px; }
         .filter-tabs { display: flex; background: var(--input-bg); padding: 2px; border-radius: 8px; }
         .tab-btn { flex: 1; padding: 8px 0; background: transparent; border: none; color: var(--text-muted); font-size: 12px; font-weight: bold; cursor: pointer; border-radius: 6px; transition: all 0.2s; }
         .tab-btn.active { background: rgba(255, 107, 157, 0.2); color: #fff; text-shadow: 0 0 4px var(--color-chumtoto); }
 
+        .nav-controls { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+        .nav-btn { background: rgba(255, 107, 157, 0.15); border: none; color: #fff; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .current-display-title { font-size: 18px; font-weight: bold; color: #fff; letter-spacing: 1px; }
+
         .select-group { display: flex; gap: 10px; }
-        .filter-select {
-            flex: 1;
-            background: var(--input-bg);
-            border: 1px solid var(--card-border);
-            color: #fff;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: bold;
-            outline: none;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .filter-select:disabled { opacity: 0.2; cursor: not-allowed; }
-        .filter-select:focus { border-color: var(--color-chumtoto); }
+        .filter-select { flex: 1; background: var(--input-bg); border: 1px solid var(--card-border); color: #fff; padding: 10px; border-radius: 8px; font-size: 13px; font-weight: bold; outline: none; cursor: pointer; }
 
-        /* スタッツグリッド（2列表示） */
+        /* スタッツ表示 */
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-        .stats-card { background: var(--card-bg); border: 1px solid var(--card-border); padding: 16px; border-radius: 12px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-        .stats-card.full { grid-column: span 2; background: linear-gradient(135deg, rgba(255,107,157,0.12) 0%, rgba(255,255,255,0.01) 100%); border-color: rgba(255, 107, 157, 0.4); }
-        .stats-label { font-size: 11px; color: var(--text-muted); font-weight: bold; letter-spacing: 1px; margin-bottom: 6px; text-transform: uppercase; }
+        .stats-card { background: var(--card-bg); border: 1px solid var(--card-border); padding: 16px; border-radius: 12px; text-align: center; }
+        .stats-card.full { grid-column: span 2; background: linear-gradient(135deg, rgba(255,107,157,0.12) 0%, rgba(255,255,255,0.01) 100%); }
+        .stats-label { font-size: 11px; color: var(--text-muted); font-weight: bold; margin-bottom: 6px; }
         .stats-value { font-size: 22px; font-weight: 800; color: #fff; }
-        .stats-card.full .stats-value { font-size: 32px; color: var(--color-chumtoto); text-shadow: 0 0 10px rgba(255,107,157,0.4); }
-        
-        /* 💡 チェキ枚数専用のハイライト数値デザイン */
-        .cheki-count { color: var(--color-chumtoto) !important; text-shadow: 0 0 6px rgba(255,107,157,0.3); }
+        .stats-card.full .stats-value { font-size: 32px; color: var(--color-chumtoto); }
+        .cheki-count { color: var(--color-chumtoto) !important; }
 
-        .chart-box { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-        .loading { text-align: center; color: var(--color-chumtoto); padding: 40px; font-weight: bold; letter-spacing: 2px; text-shadow: 0 0 6px rgba(255,107,157,0.3); }
+        /* カレンダー表示 */
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; margin-bottom: 20px; }
+        .calendar-weekday { text-align: center; font-size: 10px; color: var(--text-muted); padding: 6px 0; font-weight: 600; }
+        .calendar-day { min-height: 52px; border-radius: 6px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.02); padding: 4px; cursor: pointer; position: relative; }
+        .calendar-day.empty { background: transparent; cursor: default; border: none; }
+        .calendar-day.selected { background: rgba(255, 107, 157, 0.15); border-color: rgba(255, 107, 157, 0.4); }
+        .calendar-day.is-today { border: 1.5px solid var(--color-chumtoto); }
+        .day-num { font-size: 11px; color: #ccc; text-align: center; margin-bottom: 4px; }
+        .dot-container { display: flex; flex-wrap: wrap; gap: 2px; justify-content: center; }
+        .dot { width: 6px; height: 6px; border-radius: 50%; }
+        .dot.attend { background: var(--color-chumtoto); box-shadow: 0 0 5px var(--color-chumtoto); }
+        .dot.absent { background: #555; }
+
+        /* イベント詳細カード */
+        .event-detail-card { background: var(--card-bg); border: 1px solid var(--card-border); border-left: 4px solid var(--color-chumtoto); border-radius: 8px; padding: 12px; margin-top: 8px; }
+        .event-detail-card.absent { border-left-color: #555; opacity: 0.7; }
+        .event-title { font-size: 14px; font-weight: bold; margin-bottom: 4px; }
+        .event-meta { font-size: 11px; color: var(--text-muted); }
+
+        .chart-box { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 16px; margin-top: 20px; }
+        .loading { text-align: center; color: var(--color-chumtoto); padding: 40px; font-weight: bold; letter-spacing: 2px; }
 
         /* 下部ナビゲーション */
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--header-gradient); border-top: 1px solid rgba(255, 107, 157, 0.15); display: flex; justify-content: space-around; padding: 10px 0; z-index: 100; backdrop-filter: blur(12px); }
-        .bottom-nav a { color: var(--text-muted); text-decoration: none; font-size: 10px; text-align: center; display: flex; flex-direction: column; gap: 4px; font-weight: bold; transition: color 0.2s; }
+        .bottom-nav a { color: var(--text-muted); text-decoration: none; font-size: 10px; text-align: center; display: flex; flex-direction: column; gap: 4px; font-weight: bold; }
         .bottom-nav a.active { color: var(--color-chumtoto); }
     </style>
 </head>
 <body>
 
 <header>
-    <h2>📊 FIELD STATS</h2>
+    <h2>📊 FIELD STATS & HISTORY</h2>
 </header>
 
 <div class="container">
-    <div class="filter-container">
+    <div class="view-mode-toggle">
+        <button class="mode-btn active" id="mode-stats" onclick="setViewMode('stats')">📊 STATS</button>
+        <button class="mode-btn" id="mode-calendar" onclick="setViewMode('calendar')">📅 HISTORY CALENDAR</button>
+    </div>
+
+    <div id="stats-filters" class="filter-container">
         <div class="filter-tabs">
-            <button class="tab-btn active" id="tab-all" onclick="setMode('all')">全期間</button>
-            <button class="tab-btn" id="tab-year" onclick="setMode('year')">年別表示</button>
-            <button class="tab-btn" id="tab-month" onclick="setMode('month')">月別表示</button>
+            <button class="tab-btn active" id="tab-all" onclick="setStatsPeriod('all')">全期間</button>
+            <button class="tab-btn" id="tab-year" onclick="setStatsPeriod('year')">年別表示</button>
+            <button class="tab-btn" id="tab-month" onclick="setStatsPeriod('month')">月別表示</button>
         </div>
-        
         <div class="select-group">
-            <select id="year-select" class="filter-select" onchange="onChangeFilter()" disabled>
-                <option value="">-- 年を選択 --</option>
-            </select>
-            <select id="month-select" class="filter-select" onchange="onChangeFilter()" disabled>
-                <option value="">-- 月を選択 --</option>
-            </select>
+            <select id="year-select" class="filter-select" onchange="renderStats()" disabled><option value="">-- 年 --</option></select>
+            <select id="month-select" class="filter-select" onchange="renderStats()" disabled><option value="">-- 月 --</option></select>
         </div>
+    </div>
+
+    <div id="calendar-nav" class="nav-controls" style="display: none;">
+        <button class="nav-btn" onclick="changeCalendarMonth(-1)">◀</button>
+        <div class="current-display-title" id="calendarMonthTitle">----年 --月</div>
+        <button class="nav-btn" onclick="changeCalendarMonth(1)">▶</button>
     </div>
 
     <div class="stats-grid">
         <div class="stats-card full">
-            <div class="stats-label" id="main-expense-label">Total Investment (累計支出)</div>
+            <div class="stats-label" id="main-expense-label">Total Investment</div>
             <div class="stats-value" id="total-main">¥0</div>
         </div>
         <div class="stats-card">
-            <div class="stats-label">Ticket Total (チケット代)</div>
-            <div class="stats-value" id="total-ticket">¥0</div>
-        </div>
-        <div class="stats-card">
-            <div class="stats-label">Attendance Rate (参戦率)</div>
-            <div class="stats-value" id="attendance-rate">0%</div>
-        </div>
-        
-        <div class="stats-card">
-            <div class="stats-label">Sign Cheki (サインチェキ数)</div>
+            <div class="stats-label">Sign Cheki</div>
             <div class="stats-value cheki-count" id="total-sign-cheki">0枚</div>
         </div>
         <div class="stats-card">
-            <div class="stats-label">White Cheki (白チェキ数)</div>
+            <div class="stats-label">White Cheki</div>
             <div class="stats-value cheki-count" id="total-white_cheki">0枚</div>
         </div>
     </div>
 
-    <div class="chart-box">
-        <h3 id="chart-title" style="font-size: 12px; color: var(--text-main); margin-top: 0; margin-bottom: 15px; letter-spacing: 1px;">月別支出推移 (¥)</h3>
-        <div id="loading-text" class="loading">ANALYZING FINANCIAL DATA...</div>
-        <canvas id="expenseChart" style="display: none;"></canvas>
+    <div id="loading-text" class="loading">ANALYZING DATA...</div>
+    
+    <div id="stats-view">
+        <div class="chart-box">
+            <h3 id="chart-title" style="font-size: 12px; color: var(--text-main); margin-top: 0; margin-bottom: 15px;">月別支出推移 (¥)</h3>
+            <canvas id="expenseChart"></canvas>
+        </div>
+    </div>
+
+    <div id="calendar-view" style="display: none;">
+        <div id="calendar-container"></div>
+        <div id="selected-day-details" style="margin-top: 20px;"></div>
     </div>
 </div>
 
@@ -155,12 +163,14 @@
 
 <script>
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbw7KeuN0XckEqU9V4wRxR3O8T9Rl6cC2jQesEOpOsNJTF09ZylpVFZWJnqo0aff1YNFRw/exec';
-
 const PRICES = { sign_cheki: 3000, white_cheki: 2000, tiktok: 3500, kakomi: 4000, item_sign: 4500, omiyokuri: 1500 };
 
 let rawData = [];
 let currentChart = null;
-let currentMode = 'all';
+let viewMode = 'stats'; // 'stats' or 'calendar'
+let statsPeriod = 'all'; 
+let calendarDate = new Date(); // カレンダー表示用の基準日
+let selectedCalDate = null;
 
 window.onload = async function() {
     try {
@@ -169,210 +179,181 @@ window.onload = async function() {
         if (resData.result === "success") {
             rawData = resData.data;
             document.getElementById('loading-text').style.display = 'none';
-            document.getElementById('expenseChart').style.display = 'block';
-            
             buildFilterOptions();
-            renderDashboard();
+            renderStats();
         }
     } catch (e) {
         document.getElementById('loading-text').innerText = "ERROR: FAILED TO LOAD DATA";
     }
 }
 
-function buildFilterOptions() {
-    const years = new Set();
-    const months = new Set();
-
-    rawData.forEach(row => {
-        if (!row.date) return;
-        const y = row.date.substring(0, 4);
-        const m = row.date.substring(0, 7);
-        years.add(y);
-        months.add(m);
-    });
-
-    const yearSelect = document.getElementById('year-select');
-    Array.from(years).sort().reverse().forEach(y => {
-        const opt = document.createElement('option');
-        opt.value = y;
-        opt.innerText = `${y}年`;
-        yearSelect.appendChild(opt);
-    });
-
-    const monthSelect = document.getElementById('month-select');
-    Array.from(months).sort().reverse().forEach(m => {
-        const opt = document.createElement('option');
-        opt.value = m;
-        const [yStr, mStr] = m.split('-');
-        opt.innerText = `${yStr}年${mStr}月`;
-        monthSelect.appendChild(opt);
-    });
+// ---------------------------------------------------------
+// 表示モード切替
+// ---------------------------------------------------------
+function setViewMode(mode) {
+    viewMode = mode;
+    document.getElementById('mode-stats').classList.toggle('active', mode === 'stats');
+    document.getElementById('mode-calendar').classList.toggle('active', mode === 'calendar');
+    
+    document.getElementById('stats-filters').style.display = (mode === 'stats') ? 'flex' : 'none';
+    document.getElementById('calendar-nav').style.display = (mode === 'calendar') ? 'flex' : 'none';
+    
+    document.getElementById('stats-view').style.display = (mode === 'stats') ? 'block' : 'none';
+    document.getElementById('calendar-view').style.display = (mode === 'calendar') ? 'block' : 'none';
+    
+    if (mode === 'stats') renderStats();
+    else renderCalendar();
 }
 
-function setMode(mode) {
-    currentMode = mode;
+// ---------------------------------------------------------
+// STATS モードロジック
+// ---------------------------------------------------------
+function setStatsPeriod(period) {
+    statsPeriod = period;
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-    document.getElementById(`tab-${mode}`).classList.add('active');
-
-    const yearSelect = document.getElementById('year-select');
-    const monthSelect = document.getElementById('month-select');
-
-    if (mode === 'all') {
-        yearSelect.disabled = true;
-        monthSelect.disabled = true;
-    } else if (mode === 'year') {
-        yearSelect.disabled = false;
-        monthSelect.disabled = true;
-        if (!yearSelect.value && yearSelect.options.length > 1) yearSelect.selectedIndex = 1;
-    } else if (mode === 'month') {
-        yearSelect.disabled = true;
-        monthSelect.disabled = false;
-        if (!monthSelect.value && monthSelect.options.length > 1) monthSelect.selectedIndex = 1;
-    }
-
-    renderDashboard();
+    document.getElementById(`tab-${period}`).classList.add('active');
+    document.getElementById('year-select').disabled = (period !== 'year');
+    document.getElementById('month-select').disabled = (period !== 'month');
+    renderStats();
 }
 
-function onChangeFilter() {
-    renderDashboard();
-}
-
-function renderDashboard() {
-    const yearSelect = document.getElementById('year-select');
-    const monthSelect = document.getElementById('month-select');
-
-    const filteredData = rawData.filter(row => {
+function renderStats() {
+    const yearVal = document.getElementById('year-select').value;
+    const monthVal = document.getElementById('month-select').value;
+    
+    const filtered = rawData.filter(row => {
         if (!row.date) return false;
-        if (currentMode === 'year') {
-            return yearSelect.value ? row.date.substring(0, 4) === yearSelect.value : true;
-        } else if (currentMode === 'month') {
-            return monthSelect.value ? row.date.substring(0, 7) === monthSelect.value : true;
-        }
+        if (statsPeriod === 'year') return row.date.substring(0, 4) === yearVal;
+        if (statsPeriod === 'month') return row.date.substring(0, 7) === monthVal;
         return true;
     });
 
-    let totalExpense = 0;
-    let totalTicket = 0;
-    let attendCount = 0;
-    let totalCount = filteredData.length;
-    
-    // 💡 チェキ枚数カウント用変数の初期化
-    let signChekiCount = 0;
-    let whiteChekiCount = 0;
+    updateSummaryCards(filtered, statsPeriod === 'all' ? '累計支出' : '期間内支出');
     
     const monthlyData = {};
-
-    filteredData.forEach(row => {
-        if (row.attendance === "参加") attendCount++;
-
-        let ticketFee = parseInt(row.ticket_fee) || 0;
-        totalTicket += ticketFee;
-
-        let rowTotal = ticketFee;
-        Object.keys(PRICES).forEach(key => {
-            let count = parseInt(row[key]) || 0;
-            rowTotal += count * PRICES[key];
-        });
-
-        totalExpense += rowTotal;
-
-        // 💡 スプシから取得したデータからそれぞれの枚数を加算
-        signChekiCount += parseInt(row.sign_cheki) || 0;
-        whiteChekiCount += parseInt(row.white_cheki) || 0;
-
-        const monthKey = row.date.substring(0, 7);
-        monthlyData[monthKey] = (monthlyData[monthKey] || 0) + rowTotal;
+    filtered.forEach(row => {
+        let total = (parseInt(row.ticket_fee) || 0) + Object.keys(PRICES).reduce((sum, key) => sum + (parseInt(row[key]) || 0) * PRICES[key], 0);
+        const mKey = row.date.substring(0, 7);
+        monthlyData[mKey] = (monthlyData[mKey] || 0) + total;
     });
 
-    if (currentMode === 'all') {
-        document.getElementById('main-expense-label').innerText = 'Total Investment (累計支出)';
-    } else if (currentMode === 'year') {
-        document.getElementById('main-expense-label').innerText = `${yearSelect.value || ''}年の年間支出`;
-    } else if (currentMode === 'month') {
-        const mVal = monthSelect.value;
-        const displayMonth = mVal ? `${mVal.split('-')[0]}年${mVal.split('-')[1]}月` : '';
-        document.getElementById('main-expense-label').innerText = `${displayMonth}の月間支出`;
-    }
-
-    document.getElementById('total-main').innerText = `¥${totalExpense.toLocaleString()}`;
-    document.getElementById('total-ticket').innerText = `¥${totalTicket.toLocaleString()}`;
-    document.getElementById('attendance-rate').innerText = totalCount > 0 ? `${Math.round((attendCount / totalCount) * 100)}%` : "0%";
+    const labels = Object.keys(monthlyData).sort();
+    const values = labels.map(k => monthlyData[k]);
     
-    // 💡 画面上のチェキカウント数値を更新
-    document.getElementById('total-sign-cheki').innerText = `${signChekiCount}枚`;
-    document.getElementById('total-white_cheki').innerText = `${whiteChekiCount}枚`;
-
-    if (currentMode === 'month') {
-        document.getElementById('chart-title').innerText = "選択月の支出内訳 (¥)";
-        renderBreakdownChart(filteredData);
+    if (currentChart) currentChart.destroy();
+    const ctx = document.getElementById('expenseChart').getContext('2d');
+    
+    if (statsPeriod === 'month' && filtered.length > 0) {
+        document.getElementById('chart-title').innerText = "期間内の支出内訳";
+        let tSum = filtered.reduce((s, r) => s + (parseInt(r.ticket_fee) || 0), 0);
+        let bSum = filtered.reduce((s, r) => s + Object.keys(PRICES).reduce((sum, k) => sum + (parseInt(r[k]) || 0) * PRICES[k], 0), 0);
+        currentChart = new Chart(ctx, { type: 'doughnut', data: { labels: ['チケット', '特典会'], datasets: [{ data: [tSum, bSum], backgroundColor: ['#6ba3ff', '#FF6B9D'], borderWidth: 0 }] }, options: { responsive: true, plugins: { legend: { labels: { color: '#f5f0f2' } } } } });
     } else {
-        const labels = Object.keys(monthlyData).sort();
-        const chartValues = labels.map(key => monthlyData[key]);
-        document.getElementById('chart-title').innerText = currentMode === 'year' ? "選択年の月別支出推移 (¥)" : "全期間の月別支出推移 (¥)";
-        renderTrendChart(labels, chartValues);
+        document.getElementById('chart-title').innerText = "月別支出推移 (¥)";
+        currentChart = new Chart(ctx, { type: 'bar', data: { labels, datasets: [{ label: '合計', data: values, backgroundColor: '#FF6B9D', borderRadius: 6 }] }, options: { scales: { x: { ticks: { color: '#9e8891' } }, y: { ticks: { color: '#9e8891' } } }, plugins: { legend: { display: false } } } });
     }
 }
 
-function renderTrendChart(labels, values) {
-    if (currentChart) currentChart.destroy();
-
-    const ctx = document.getElementById('expenseChart').getContext('2d');
-    currentChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: '支出合計',
-                data: values,
-                backgroundColor: '#FF6B9D',
-                borderRadius: 6,
-                borderWidth: 0
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { labels: { color: '#f5f0f2', font: { weight: 'bold' } } }
-            },
-            scales: {
-                x: { grid: { color: 'rgba(255, 107, 157, 0.05)' }, ticks: { color: '#9e8891' } },
-                y: { beginAtZero: true, grid: { color: 'rgba(255, 107, 157, 0.1)' }, ticks: { color: '#9e8891' } }
-            }
-        }
-    });
+// ---------------------------------------------------------
+// CALENDAR モードロジック
+// ---------------------------------------------------------
+function changeCalendarMonth(delta) {
+    calendarDate.setMonth(calendarDate.getMonth() + delta);
+    selectedCalDate = null;
+    renderCalendar();
 }
 
-function renderBreakdownChart(monthData) {
-    if (currentChart) currentChart.destroy();
+function renderCalendar() {
+    const y = calendarDate.getFullYear();
+    const m = calendarDate.getMonth();
+    document.getElementById('calendarMonthTitle').innerText = `${y}年 ${m + 1}月`;
+    
+    const filtered = rawData.filter(row => row.date && row.date.substring(0, 7) === `${y}-${String(m+1).padStart(2,'0')}`);
+    updateSummaryCards(filtered, '当月の支出');
 
-    let ticketSum = 0;
-    let benefitSum = 0;
+    const firstDay = new Date(y, m, 1).getDay();
+    const daysInMonth = new Date(y, m + 1, 0).getDate();
+    const todayStr = new Date().toISOString().substring(0, 10);
 
-    monthData.forEach(row => {
-        ticketSum += parseInt(row.ticket_fee) || 0;
-        Object.keys(PRICES).forEach(key => {
-            benefitSum += (parseInt(row[key]) || 0) * PRICES[key];
-        });
+    let html = '<div class="calendar-grid">';
+    ["日","月","火","水","木","金","土"].forEach(d => html += `<div class="calendar-weekday">${d}</div>`);
+    for(let i=0; i<firstDay; i++) html += '<div class="calendar-day empty"></div>';
+    
+    for(let d=1; d<=daysInMonth; d++) {
+        const dateKey = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        const dayEvents = rawData.filter(e => e.date === dateKey);
+        const isToday = (dateKey === todayStr);
+        
+        html += `
+            <div class="calendar-day ${selectedCalDate === dateKey?'selected':''} ${isToday?'is-today':''}" onclick="selectCalDate('${dateKey}')">
+                <div class="day-num">${d}</div>
+                <div class="dot-container">
+                    ${dayEvents.map(e => `<div class="dot ${e.attendance==='参加'?'attend':'absent'}"></div>`).join('')}
+                </div>
+            </div>
+        `;
+    }
+    html += '</div>';
+    document.getElementById('calendar-container').innerHTML = html;
+    renderCalDetails();
+}
+
+function selectCalDate(date) {
+    selectedCalDate = (selectedCalDate === date) ? null : date;
+    renderCalendar();
+}
+
+function renderCalDetails() {
+    const container = document.getElementById('selected-day-details');
+    if (!selectedCalDate) { container.innerHTML = ""; return; }
+    
+    const dayEvents = rawData.filter(e => e.date === selectedCalDate);
+    if (dayEvents.length === 0) { container.innerHTML = '<div style="text-align:center; font-size:12px; color:#555;">記録はありません</div>'; return; }
+    
+    container.innerHTML = dayEvents.map(ev => {
+        let total = (parseInt(ev.ticket_fee) || 0) + Object.keys(PRICES).reduce((sum, key) => sum + (parseInt(ev[key]) || 0) * PRICES[key], 0);
+        return `
+            <div class="event-detail-card ${ev.attendance!=='参加'?'absent':''}">
+                <div class="event-title">${ev.event_name} @ ${ev.location}</div>
+                <div class="event-meta">状態: ${ev.attendance} / 支出計: ¥${total.toLocaleString()}</div>
+                <div class="event-meta" style="margin-top:4px;">
+                    チケット: ¥${ev.ticket_fee} / 
+                    サチェ: ${ev.sign_cheki} / 白チェ: ${ev.white_cheki} / 
+                    TikTok: ${ev.tiktok} / 囲み: ${ev.kakomi}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// ---------------------------------------------------------
+// 共通補助関数
+// ---------------------------------------------------------
+function updateSummaryCards(data, label) {
+    let totalExpense = 0;
+    let signCount = 0;
+    let whiteCount = 0;
+    
+    data.forEach(row => {
+        let rowTotal = (parseInt(row.ticket_fee) || 0) + Object.keys(PRICES).reduce((sum, key) => sum + (parseInt(row[key]) || 0) * PRICES[key], 0);
+        totalExpense += rowTotal;
+        signCount += parseInt(row.sign_cheki) || 0;
+        whiteCount += parseInt(row.white_cheki) || 0;
     });
 
-    const ctx = document.getElementById('expenseChart').getContext('2d');
-    currentChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: ['チケット代', '特典会合計'],
-            datasets: [{
-                data: [ticketSum, benefitSum],
-                backgroundColor: ['#6ba3ff', '#FF6B9D'],
-                borderWidth: 0
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { labels: { color: '#f5f0f2', font: { weight: 'bold' } } }
-            }
-        }
-    });
+    document.getElementById('main-expense-label').innerText = label;
+    document.getElementById('total-main').innerText = `¥${totalExpense.toLocaleString()}`;
+    document.getElementById('total-sign-cheki').innerText = `${signCount}枚`;
+    document.getElementById('total-white_cheki').innerText = `${whiteCount}枚`;
+}
+
+function buildFilterOptions() {
+    const years = new Set(), months = new Set();
+    rawData.forEach(row => { if (row.date) { years.add(row.date.substring(0, 4)); months.add(row.date.substring(0, 7)); } });
+    const ySel = document.getElementById('year-select'), mSel = document.getElementById('month-select');
+    Array.from(years).sort().reverse().forEach(y => ySel.add(new Option(`${y}年`, y)));
+    Array.from(months).sort().reverse().forEach(m => mSel.add(new Option(`${m.split('-')[0]}年${m.split('-')[1]}月`, m)));
+    ySel.selectedIndex = 1; mSel.selectedIndex = 1;
 }
 </script>
 </body>
