@@ -14,6 +14,7 @@
             --text-muted: #9e8891;
             --card-bg: rgba(255, 107, 157, 0.05);
             --card-border: rgba(255, 107, 157, 0.2);
+            --input-bg: rgba(0, 0, 0, 0.4);
         }
 
         body {
@@ -39,10 +40,37 @@
         h2 { margin: 0; font-size: 18px; font-weight: 700; letter-spacing: 2px; color: #fff; text-shadow: 0 0 8px rgba(255, 107, 157, 0.4); }
         .container { max-width: 600px; margin: 0 auto; padding: 16px; box-sizing: border-box; }
         
-        /* 期間切り替えタブ */
-        .filter-tabs { display: flex; background: rgba(0,0,0,0.3); border: 1px solid var(--card-border); padding: 4px; border-radius: 8px; margin-bottom: 16px; }
+        /* フィルターコントロールエリア */
+        .filter-container {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--card-border);
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .filter-tabs { display: flex; background: var(--input-bg); padding: 2px; border-radius: 8px; }
         .tab-btn { flex: 1; padding: 8px 0; background: transparent; border: none; color: var(--text-muted); font-size: 12px; font-weight: bold; cursor: pointer; border-radius: 6px; transition: all 0.2s; }
         .tab-btn.active { background: rgba(255, 107, 157, 0.2); color: #fff; text-shadow: 0 0 4px var(--color-chumtoto); }
+
+        .select-group { display: flex; gap: 10px; }
+        .filter-select {
+            flex: 1;
+            background: var(--input-bg);
+            border: 1px solid var(--card-border);
+            color: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: bold;
+            outline: none;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .filter-select:disabled { opacity: 0.2; cursor: not-allowed; }
+        .filter-select:focus { border-color: var(--color-chumtoto); }
 
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
         .stats-card { background: var(--card-bg); border: 1px solid var(--card-border); padding: 16px; border-radius: 12px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
@@ -67,10 +95,21 @@
 </header>
 
 <div class="container">
-    <div class="filter-tabs">
-        <button class="tab-btn active" onclick="switchPeriod('all')">全期間</button>
-        <button class="tab-btn" onclick="switchPeriod('year')">今年</button>
-        <button class="tab-btn" onclick="switchPeriod('month')">今月</button>
+    <div class="filter-container">
+        <div class="filter-tabs">
+            <button class="tab-btn active" id="tab-all" onclick="setMode('all')">全期間</button>
+            <button class="tab-btn" id="tab-year" onclick="setMode('year')">年別表示</button>
+            <button class="tab-btn" id="tab-month" onclick="setMode('month')">月別表示</button>
+        </div>
+        
+        <div class="select-group">
+            <select id="year-select" class="filter-select" onchange="onChangeFilter()" disabled>
+                <option value="">-- 年を選択 --</option>
+            </select>
+            <select id="month-select" class="filter-select" onchange="onChangeFilter()" disabled>
+                <option value="">-- 月を選択 --</option>
+            </select>
+        </div>
     </div>
 
     <div class="stats-grid">
@@ -102,12 +141,14 @@
 </div>
 
 <script>
+// ★重要：ご自身のデプロイ版GASウェブアプリURL
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbw7KeuN0XckEqU9V4wRxR3O8T9Rl6cC2jQesEOpOsNJTF09ZylpVFZWJnqo0aff1YNFRw/exec';
 
 const PRICES = { sign_cheki: 3000, white_cheki: 2000, tiktok: 3500, kakomi: 4000, item_sign: 4500, omiyokuri: 1500 };
 
-let rawData = []; // GASから取得した生の全履歴データ
-let currentChart = null; // Chart.jsのインスタンス保持用
+let rawData = [];      // GASから取得した生の全履歴データ
+let currentChart = null; // Chart.jsインスタンス
+let currentMode = 'all'; // 'all', 'year', 'month'
 
 window.onload = async function() {
     try {
@@ -117,39 +158,104 @@ window.onload = async function() {
             rawData = resData.data;
             document.getElementById('loading-text').style.display = 'none';
             document.getElementById('expenseChart').style.display = 'block';
-            renderDashboard('all'); // 初期表示は全期間
+            
+            buildFilterOptions(); // データから年・月のドロップダウンを動的生成
+            renderDashboard();   // 初期表示
         }
     } catch (e) {
         document.getElementById('loading-text').innerText = "ERROR: FAILED TO LOAD DATA";
     }
 }
 
-function switchPeriod(period) {
-    // タブのactive状態の切り替え
-    const buttons = document.querySelectorAll('.tab-btn');
-    buttons.forEach(btn => btn.classList.remove('active'));
-    event.currentTarget.classList.add('active');
-    
-    renderDashboard(period);
+// スプシのデータから自動的に年・月の選択肢を作る
+function buildFilterOptions() {
+    const years = new Set();
+    const months = new Set();
+
+    rawData.forEach(row => {
+        if (!row.date) return;
+        const y = row.date.substring(0, 4);
+        const m = row.date.substring(0, 7); // "2026-05"
+        years.add(y);
+        months.add(m);
+    });
+
+    // 年セレクトボックス生成
+    const yearSelect = document.getElementById('year-select');
+    Array.from(years).sort().reverse().forEach(y => {
+        const opt = document.createElement('option');
+        opt.value = y;
+        opt.innerText = `${y}年`;
+        yearSelect.appendChild(opt);
+    });
+
+    // 月セレクトボックス生成
+    const monthSelect = document.getElementById('month-select');
+    Array.from(months).sort().reverse().forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m;
+        // 表示用に "2026年05月" に整形
+        const [yStr, mStr] = m.split('-');
+        opt.innerText = `${yStr}年${mStr}月`;
+        monthSelect.appendChild(opt);
+    });
 }
 
-function renderDashboard(period) {
-    const now = new Date();
-    const currentYearStr = String(now.getFullYear()); // "2026"
-    const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`; // "2026-05"
+// タブを切り替えたとき
+function setMode(mode) {
+    currentMode = mode;
+    
+    // アクティブなタブデザインの切り替え
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(`tab-${mode}`).classList.add('active');
 
-    // 1. 選択された期間でデータをフィルタリング
+    // モードに応じてドロップダウンの有効・無効をコントロール
+    const yearSelect = document.getElementById('year-select');
+    const monthSelect = document.getElementById('month-select');
+
+    if (mode === 'all') {
+        yearSelect.disabled = true;
+        monthSelect.disabled = true;
+    } else if (mode === 'year') {
+        yearSelect.disabled = false;
+        monthSelect.disabled = true;
+        // 未選択なら一番新しい年を自動選択
+        if (!yearSelect.value && yearSelect.options.length > 1) {
+            yearSelect.selectedIndex = 1;
+        }
+    } else if (mode === 'month') {
+        yearSelect.disabled = true;
+        monthSelect.disabled = false;
+        // 未選択なら一番新しい月を自動選択
+        if (!monthSelect.value && monthSelect.options.length > 1) {
+            monthSelect.selectedIndex = 1;
+        }
+    }
+
+    renderDashboard();
+}
+
+// ドロップダウンを変更したとき
+function onChangeFilter() {
+    renderDashboard();
+}
+
+function renderDashboard() {
+    const yearSelect = document.getElementById('year-select');
+    const monthSelect = document.getElementById('month-select');
+
+    // 1. データのフィルタリング
     const filteredData = rawData.filter(row => {
         if (!row.date) return false;
-        if (period === 'year') {
-            return row.date.substring(0, 4) === currentYearStr;
-        } else if (period === 'month') {
-            return row.date.substring(0, 7) === currentMonthStr;
+        if (currentMode === 'year') {
+            return yearSelect.value ? row.date.substring(0, 4) === yearSelect.value : true;
+        } else if (currentMode === 'month') {
+            return monthSelect.value ? row.date.substring(0, 7) === monthSelect.value : true;
         }
         return true; // 'all'
     });
 
-    // 2. 集計ロジックの実行
+    // 2. 集計処理
     let totalExpense = 0;
     let totalTicket = 0;
     let attendCount = 0;
@@ -170,33 +276,38 @@ function renderDashboard(period) {
 
         totalExpense += rowTotal;
 
-        // 月別集計（グラフ用）
         const monthKey = row.date.substring(0, 7);
         monthlyData[monthKey] = (monthlyData[monthKey] || 0) + rowTotal;
     });
 
-    // 3. UIのラベルと数値を更新
-    const labelMap = { 'all': 'Total Investment (累計支出)', 'year': 'This Year (今年の支出)', 'month': 'This Month (今月の支出)' };
-    document.getElementById('main-expense-label').innerText = labelMap[period];
+    // 3. 上部のカード情報を更新
+    if (currentMode === 'all') {
+        document.getElementById('main-expense-label').innerText = 'Total Investment (累計支出)';
+    } else if (currentMode === 'year') {
+        document.getElementById('main-expense-label').innerText = `${yearSelect.value || ''}年の年間支出`;
+    } else if (currentMode === 'month') {
+        const mVal = monthSelect.value;
+        const displayMonth = mVal ? `${mVal.split('-')[0]}年${mVal.split('-')[1]}月` : '';
+        document.getElementById('main-expense-label').innerText = `${displayMonth}の月間支出`;
+    }
+
     document.getElementById('total-main').innerText = `¥${totalExpense.toLocaleString()}`;
     document.getElementById('total-ticket').innerText = `¥${totalTicket.toLocaleString()}`;
     document.getElementById('attendance-rate').innerText = totalCount > 0 ? `${Math.round((attendCount / totalCount) * 100)}%` : "0%";
 
-    // 4. グラフの再描画
-    const labels = Object.keys(monthlyData).sort();
-    const chartValues = labels.map(key => monthlyData[key]);
-
-    if (period === 'month') {
-        document.getElementById('chart-title').innerText = "今月の支出内訳 (¥)";
-        // 今月のみ、月別ではなく「チケット代」や「特典（チェキ等）」の項目別内訳に変えると見やすいため切り替えます
+    // 4. グラフの分岐描画
+    if (currentMode === 'month') {
+        document.getElementById('chart-title').innerText = "選択月の支出内訳 (¥)";
         renderBreakdownChart(filteredData);
     } else {
-        document.getElementById('chart-title').innerText = period === 'year' ? "今年の月別支出推移 (¥)" : "月別支出推移 (¥)";
+        const labels = Object.keys(monthlyData).sort();
+        const chartValues = labels.map(key => monthlyData[key]);
+        document.getElementById('chart-title').innerText = currentMode === 'year' ? "選択年の月別支出推移 (¥)" : "全期間の月別支出推移 (¥)";
         renderTrendChart(labels, chartValues);
     }
 }
 
-// 【グラフパターンA】全期間・年別のときの「月別推移グラフ」
+// 【グラフA】棒グラフ（全期間・年別）
 function renderTrendChart(labels, values) {
     if (currentChart) currentChart.destroy();
 
@@ -213,11 +324,20 @@ function renderTrendChart(labels, values) {
                 borderWidth: 0
             }]
         },
-        options: getChartOptions()
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { labels: { color: '#f5f0f2', font: { weight: 'bold' } } }
+            },
+            scales: {
+                x: { grid: { color: 'rgba(255, 107, 157, 0.05)' }, ticks: { color: '#9e8891' } },
+                y: { beginAtZero: true, grid: { color: 'rgba(255, 107, 157, 0.1)' }, ticks: { color: '#9e8891' } }
+            }
+        }
     });
 }
 
-// 【グラフパターンB】今月を選んだとき専用の「アイテム別支出内訳グラフ」
+// 【グラフB】ドーナツグラフ（月別選択時専用）
 function renderBreakdownChart(monthData) {
     if (currentChart) currentChart.destroy();
 
@@ -233,9 +353,9 @@ function renderBreakdownChart(monthData) {
 
     const ctx = document.getElementById('expenseChart').getContext('2d');
     currentChart = new Chart(ctx, {
-        type: 'doughnut', // 内訳がパッと見で分かりやすいドーナツ型に変更
+        type: 'doughnut',
         data: {
-            labels: ['チケット代', '特典会（チェキ等）'],
+            labels: ['チケット代', '特典会合計'],
             datasets: [{
                 data: [ticketSum, benefitSum],
                 backgroundColor: ['#6ba3ff', '#FF6B9D'],
@@ -249,20 +369,6 @@ function renderBreakdownChart(monthData) {
             }
         }
     });
-}
-
-// グラフの共通ダークデザインオプション
-function getChartOptions() {
-    return {
-        responsive: true,
-        plugins: {
-            legend: { labels: { color: '#f5f0f2', font: { weight: 'bold' } } }
-        },
-        scales: {
-            x: { grid: { color: 'rgba(255, 107, 157, 0.05)' }, ticks: { color: '#9e8891' } },
-            y: { beginAtZero: true, grid: { color: 'rgba(255, 107, 157, 0.1)' }, ticks: { color: '#9e8891' } }
-        }
-    };
 }
 </script>
 </body>
