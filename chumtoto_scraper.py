@@ -18,6 +18,9 @@ def setup_driver():
     options.add_argument('--headless=new')
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
+    # 💡 GitHub Actions上のLinux環境でSeleniumを100%安定させるための必須オプションを追加
+    options.add_argument('--disable-gpu')
+    options.add_argument('--window-size=1920,1080')
     options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
     return webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
@@ -73,6 +76,7 @@ if __name__ == "__main__":
     print("🤖 ちゃむととのスケジュールを単独取得中...")
     try:
         driver.get(base_url)
+        # 画面サイズが確保されたので、これで要素を見つけられるようになります
         wait = WebDriverWait(driver, 15)
         wait.until(EC.presence_of_element_located((By.CLASS_NAME, "full-calendar-day")))
         
