@@ -2,9 +2,8 @@ name: ChumToto Schedule Auto Sync
 
 on:
   schedule:
-    # 日本時間の 0, 3, 6, 9, 12, 15, 18, 21 時に自動実行
     - cron: '0 0,3,6,9,12,15,18,21 * * *'
-  workflow_dispatch: # 手動実行ボタン
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -27,32 +26,33 @@ jobs:
         python -m pip install --upgrade pip
         pip install selenium webdriver-manager beautifulsoup4
 
-    # 【ステップ1】Pythonを動かして、ChumTotoのイベントをただスクレイピングして schedule.json を作成
+    # 【ステップ1】Pythonを動かして schedule.json を作成（安定・通信なし）
     - name: Run ChumToto Scraper
       run: |
         python chumtoto_scraper.py
 
-    # 【ステップ2】💡 生成された schedule.json を cURL コマンドでGAS（スプシ）へ物理分離してPOST送信
+    # 【ステップ2】💡 cURLのデータ送信形式をRAWテキストモードに変更して確実に届かせます
     - name: Upload Data to Google Sheets via cURL
       run: |
         if [ -f "schedule.json" ]; then
-          echo "🚀 schedule.json を元に、GAS専用のペイロードを組み立て中..."
+          echo "🚀 schedule.json からGAS専用のペイロードを組み立て中..."
           
-          # Linuxの標準機能(jq)を使い、GASが『公式スケジュール』シートを認識できる {"action": "sync_schedule", "events": [...]} の形にラップします
+          # GASが認識できる {"action": "sync_schedule", "events": [...]} の構造に成形
           jq '{action: "sync_schedule", events: .}' schedule.json > gas_payload.json
           
-          echo "📨 Google Apps Script へデータを直接送信中..."
+          echo "📨 Google Apps Script へRAWテキストとしてデータを直接送信中..."
+          # 💡 --data-raw を使用して、JSON文字列をそのままストレートにGASに叩き込みます
           curl -L -X POST "https://script.google.com/macros/s/AKfycbxTpsaay81w4DDRfjfui7pfmnlc4aDaOPJx_fy4Shf275gpnyUZ9R-ObhAWQOMVOwyP/exec" \
                -H "Content-Type: text/plain" \
-               -d @gas_payload.json
+               --data-raw "$(cat gas_payload.json)"
                
-          echo -e "\n🎉 スプレッドシート（公式スケジュール）への同期送信が完了しました！"
+          echo -e "\n🎉 スプレッドシート（公式スケジュール）への同期送信工程が完了しました！"
         else
           echo "⚠️ schedule.json が見つかりませんでした。"
           exit 1
         fi
 
-    # 【ステップ3】生成された schedule.json をリポジトリ内に永続保存（カレンダー表示用）
+    # 【ステップ3】生成された schedule.json をリポジトリ内に保存（カレンダー表示用）
     - name: Commit and Push schedule.json
       run: |
         git config --local user.email "action@github.com"
