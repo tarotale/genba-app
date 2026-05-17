@@ -14,74 +14,52 @@
             --card-bg: rgba(255, 107, 157, 0.05);
             --card-border: rgba(255, 107, 157, 0.2);
             --input-bg: rgba(0, 0, 0, 0.3);
+            --color-update: #2196F3;
         }
 
-        body {
-            margin: 0;
-            font-family: 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
-            background: var(--bg-gradient);
-            color: var(--text-main);
-            min-height: 100vh;
-            padding-bottom: 100px;
-        }
-
-        header {
-            background: var(--header-gradient);
-            border-bottom: 1px solid rgba(255, 107, 157, 0.15);
-            padding: 16px 20px 12px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            backdrop-filter: blur(12px);
-            text-align: center;
-        }
-
+        body { margin: 0; font-family: 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif; background: var(--bg-gradient); color: var(--text-main); min-height: 100vh; padding-bottom: 100px; }
+        header { background: var(--header-gradient); border-bottom: 1px solid rgba(255, 107, 157, 0.15); padding: 16px 20px 12px; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(12px); text-align: center; }
         h2 { margin: 0; font-size: 18px; font-weight: 700; letter-spacing: 2px; color: #fff; text-shadow: 0 0 8px rgba(255, 107, 157, 0.4); }
         .container { max-width: 500px; margin: 20px auto; padding: 0 16px; box-sizing: border-box; }
         .form-box { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
         .input-group { margin-bottom: 18px; }
         label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 6px; font-weight: bold; letter-spacing: 1px; }
 
-        input[type="date"], input[type="text"], input[type="number"] {
-            width: 100%; padding: 12px; background: var(--input-bg); border: 1px solid var(--card-border); border-radius: 8px; color: #fff; font-size: 14px; box-sizing: border-box; transition: all 0.2s;
-        }
+        input[type="date"], input[type="text"], input[type="number"] { width: 100%; padding: 12px; background: var(--input-bg); border: 1px solid var(--card-border); border-radius: 8px; color: #fff; font-size: 14px; box-sizing: border-box; transition: all 0.2s; }
         input:focus { outline: none; border-color: var(--color-chumtoto); box-shadow: 0 0 8px rgba(255, 107, 157, 0.3); }
 
         .checkbox-group { display: flex; align-items: center; gap: 10px; background: var(--input-bg); padding: 12px; border-radius: 8px; border: 1px solid var(--card-border); cursor: pointer; }
         .checkbox-group input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--color-chumtoto); cursor: pointer; }
         .checkbox-label { font-size: 14px; color: #fff; user-select: none; cursor: pointer; }
 
-        /* 特典カウンター */
         .benefit-row { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02); padding: 10px 14px; border-radius: 8px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.04); transition: opacity 0.3s; }
         .disabled-card { opacity: 0.3; pointer-events: none; }
         .benefit-name { font-size: 13px; font-weight: 600; }
         .counter-controls { display: flex; align-items: center; gap: 15px; }
         
-        .btn-count {
-            width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--card-border); background: rgba(255, 107, 157, 0.15); color: #fff; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s;
-        }
+        .btn-count { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--card-border); background: rgba(255, 107, 157, 0.15); color: #fff; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
         .btn-count:hover { background: var(--color-chumtoto); box-shadow: 0 0 8px var(--color-chumtoto); }
         .count-value { font-size: 16px; font-weight: bold; min-width: 20px; text-align: center; }
 
-        /* 総計表示 */
         .total-box { margin-top: 24px; background: linear-gradient(135deg, rgba(255,107,157,0.2) 0%, rgba(255,255,255,0.02) 100%); border: 1px solid var(--color-chumtoto); border-radius: 10px; padding: 14px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 0 10px rgba(255,107,157,0.1); }
         .total-label { font-size: 12px; font-weight: bold; color: var(--text-muted); letter-spacing: 1px; }
         .total-price { font-size: 24px; font-weight: 800; color: var(--color-chumtoto); text-shadow: 0 0 8px rgba(255,107,157,0.4); }
 
         .submit-btn { width: 100%; margin-top: 20px; padding: 14px; background: var(--color-chumtoto); border: none; border-radius: 8px; color: #fff; font-size: 15px; font-weight: bold; letter-spacing: 2px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 12px rgba(255,107,157,0.3); }
         .submit-btn:hover:not(:disabled) { opacity: 0.9; box-shadow: 0 4px 20px rgba(255,107,157,0.5); }
+        .submit-btn.edit-mode { background: var(--color-update); box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3); }
+        .submit-btn.edit-mode:hover:not(:disabled) { box-shadow: 0 4px 20px rgba(33, 150, 243, 0.5); }
         .submit-btn:disabled { background: #4a353c; color: #8a7078; box-shadow: none; cursor: not-allowed; }
 
-        /* 下部ナビゲーション */
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--header-gradient); border-top: 1px solid rgba(255, 107, 157, 0.15); display: flex; justify-content: space-around; padding: 10px 0; z-index: 100; backdrop-filter: blur(12px); }
-        .bottom-nav a { color: var(--text-muted); text-decoration: none; font-size: 10px; text-align: center; display: flex; flex-direction: column; gap: 4px; font-weight: bold; transition: color 0.2s; }
+        .bottom-nav a { color: var(--text-muted); text-decoration: none; font-size: 10px; text-align: center; display: flex; flex-direction: column; gap: 4px; font-weight: bold; }
         .bottom-nav a.active { color: var(--color-chumtoto); }
     </style>
 </head>
 <body>
 
 <header>
-    <h2>✍️ FIELD ENTRY</h2>
+    <h2 id="form-title">✍️ FIELD ENTRY</h2>
 </header>
 
 <div class="container">
@@ -185,35 +163,57 @@
 </div>
 
 <script>
-const PRICES = {
-    sign_cheki: { price: 3000 },
-    white_cheki: { price: 2000 },
-    tiktok: { price: 3500 },
-    kakomi: { price: 4000 },
-    item_sign: { price: 4500 },
-    omiyokuri: { price: 1500 }
-};
-
-// 💡 データの箱（counts）を最新のキー名に100%修正しました
+const PRICES = { sign_cheki: { price: 3000 }, white_cheki: { price: 2000 }, tiktok: { price: 3500 }, kakomi: { price: 4000 }, item_sign: { price: 4500 }, omiyokuri: { price: 1500 } };
 let counts = { sign_cheki: 0, white_cheki: 0, tiktok: 0, kakomi: 0, item_sign: 0, omiyokuri: 0 };
+
+let isEditMode = false;
+let editRowIndex = null;
 
 window.onload = function() {
     const params = new URLSearchParams(window.location.search);
-    if(params.get('date')) document.getElementById('date').value = params.get('date');
-    if(params.get('event')) document.getElementById('event_name').value = decodeURIComponent(params.get('event'));
-    if(params.get('location')) document.getElementById('location').value = decodeURIComponent(params.get('location'));
+    
+    // 💡 修正モード（edit）だった場合のデータの自動復元
+    if (params.get('mode') === 'edit') {
+        isEditMode = true;
+        editRowIndex = params.get('row_index');
+        
+        document.getElementById('form-title').innerText = "✏️ EDIT FIELD ENTRY";
+        const submitBtn = document.getElementById('submit-btn');
+        submitBtn.innerText = "UPDATE FIELD ENTRY (修正を保存)";
+        submitBtn.classList.add('edit-mode');
+        
+        // 既存の数値を入力欄にセット
+        document.getElementById('date').value = params.get('date');
+        document.getElementById('event_name').value = decodeURIComponent(params.get('event'));
+        document.getElementById('location').value = decodeURIComponent(params.get('location'));
+        document.getElementById('ticket_fee').value = params.get('ticket_fee');
+        
+        const isAttending = (decodeURIComponent(params.get('attendance')) === '参加');
+        document.getElementById('attendance').checked = isAttending;
+        
+        // チェキ枚数データの復元
+        Object.keys(counts).forEach(key => {
+            const countVal = parseInt(params.get(key)) || 0;
+            counts[key] = countVal;
+            document.getElementById(`val-${key}`).innerText = countVal;
+        });
+        
+        toggleAttendance(); // 暗転状態の見た目を連動
+    } else {
+        // 通常の新規登録モード
+        if(params.get('date')) document.getElementById('date').value = params.get('date');
+        if(params.get('event')) document.getElementById('event_name').value = decodeURIComponent(params.get('event'));
+        if(params.get('location')) document.getElementById('location').value = decodeURIComponent(params.get('location'));
+    }
     calc();
 }
 
 function toggleAttendance() {
     const isAttending = document.getElementById('attendance').checked;
     const label = document.getElementById('status-label');
-    
     if (isAttending) {
         label.innerText = "状態：参加";
-        Object.keys(PRICES).forEach(key => {
-            document.getElementById(`card-${key}`).classList.remove('disabled-card');
-        });
+        Object.keys(PRICES).forEach(key => document.getElementById(`card-${key}`).classList.remove('disabled-card'));
     } else {
         label.innerText = "状態：不参加（干した・諦めた）";
         Object.keys(PRICES).forEach(key => {
@@ -233,9 +233,7 @@ function changeCount(key, delta) {
 
 function calc() {
     let total = parseInt(document.getElementById('ticket_fee').value) || 0;
-    Object.keys(PRICES).forEach(key => {
-        total += counts[key] * PRICES[key].price;
-    });
+    Object.keys(PRICES).forEach(key => { total += counts[key] * PRICES[key].price; });
     document.getElementById('display-total').innerText = `¥${total.toLocaleString()}`;
 }
 
@@ -247,6 +245,8 @@ async function sendData() {
     btn.innerText = '送信中...';
 
     const payload = {
+        action: isEditMode ? "update_history" : "insert_history", // 💡 アクションを分岐
+        row_index: editRowIndex, // 修正対象の行
         date: document.getElementById('date').value,
         event_name: document.getElementById('event_name').value,
         location: document.getElementById('location').value,
@@ -262,12 +262,12 @@ async function sendData() {
             headers: { 'Content-Type': 'text/plain' },
             body: JSON.stringify(payload)
         });
-        alert('保存完了しました！');
-        window.location.href = 'calendar.html';
+        alert(isEditMode ? '修正が完了しました！' : '保存完了しました！');
+        window.location.href = 'dashboard.html';
     } catch(e) {
         alert('エラーが発生しました');
         btn.disabled = false;
-        btn.innerText = 'LOG EVENT TO SHEET';
+        btn.innerText = isEditMode ? "UPDATE FIELD ENTRY (修正を保存)" : "LOG EVENT TO SHEET";
     }
 }
 </script>
