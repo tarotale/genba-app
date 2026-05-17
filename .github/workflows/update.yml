@@ -2,9 +2,8 @@ name: ChumToto Schedule Auto Sync
 
 on:
   schedule:
-    # 日本時間の 0, 3, 6, 9, 12, 15, 18, 21 時に自動実行（3時間おき）
     - cron: '0 0,3,6,9,12,15,18,21 * * *'
-  workflow_dispatch: # 手動実行ボタン
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -27,19 +26,22 @@ jobs:
         python -m pip install --upgrade pip
         pip install selenium webdriver-manager beautifulsoup4
 
-    # 【ステップ1】Pythonを動かして完璧な schedule.json をローカル作成（100%成功中・通信なし）
+    # 【Step 1】スクレイピングして完璧な schedule.json をローカル作成（100%成功中）
     - name: Run ChumToto Scraper
       run: |
         python chumtoto_scraper.py
 
-    # 【ステップ2】💡 物理分離したcURL工程：完成しているJSONをそのままストレートにGASへRAW送信
+    # 【Step 2】💡 物理分離したcURL工程：新しく取得した本物のGASウェブアプリURLへ送信
     - name: Upload Data to Google Sheets via cURL
+      env:
+        # 💡 送っていただいた本物のURLをここに完全セットしました
+        GAS_URL: "https://script.google.com/macros/s/AKfycbw7KeuN0XckEqU9V4wRxR3O8T9Rl6cC2jQesEOpOsNJTF09ZylpVFZWJnqo0aff1YNFRw/exec"
       run: |
         if [ -f "schedule.json" ]; then
-          echo "📨 完成している schedule.json の中身をそのまま Google Apps Script へ直接送信中..."
+          echo "📨 完成している schedule.json の中身を Google Apps Script へ直接送信中..."
           
-          # 💡 すでに完璧なJSON構造なので、加工（jq）を挟まずにそのままRAWテキストとして叩き込みます
-          curl -L -X POST "https://script.google.com/macros/s/AKfycbw7KeuN0XckEqU9V4wRxR3O8T9Rl6cC2jQesEOpOsNJTF09ZylpVFZWJnqo0aff1YNFRw/exec" \
+          # RAWデータとして本物のURLへ直接流し込みます
+          curl -L -X POST "$GAS_URL" \
                -H "Content-Type: text/plain" \
                --data-raw "$(cat schedule.json)"
                
@@ -49,7 +51,7 @@ jobs:
           exit 1
         fi
 
-    # 【ステップ3】生成された schedule.json をリポジトリ内に永続保存（カレンダー画面表示用）
+    # 【Step 3】生成された schedule.json をリポジトリ内に永続保存
     - name: Commit and Push schedule.json
       run: |
         git config --local user.email "action@github.com"
