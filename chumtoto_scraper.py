@@ -10,7 +10,6 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
 
 def setup_driver():
@@ -18,11 +17,13 @@ def setup_driver():
     options.add_argument('--headless=new')
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
-    # 💡 GitHub Actions上のLinux環境でSeleniumを100%安定させるための必須オプションを追加
     options.add_argument('--disable-gpu')
     options.add_argument('--window-size=1920,1080')
-    options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
-    return webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+    options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
+    
+    # 💡 Actions側で用意した正確なパスの ChromeDriver を直接指定して起動（干渉を回避）
+    service = Service('/usr/local/bin/chromedriver')
+    return webdriver.Chrome(service=service, options=options)
 
 def get_chumtoto_venue(driver, url):
     """詳細ページから会場と時間を取得"""
@@ -76,7 +77,7 @@ if __name__ == "__main__":
     print("🤖 ちゃむととのスケジュールを単独取得中...")
     try:
         driver.get(base_url)
-        # 画面サイズが確保されたので、これで要素を見つけられるようになります
+        # 環境が固定されたため、タイムアウトを回避して確実に取得が始まります
         wait = WebDriverWait(driver, 15)
         wait.until(EC.presence_of_element_located((By.CLASS_NAME, "full-calendar-day")))
         
