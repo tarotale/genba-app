@@ -2,9 +2,11 @@ name: ChumToto Schedule Auto Sync
 
 on:
   schedule:
-    # 日本時間の 0, 3, 6, 9, 12, 15, 18, 21 時に自動実行
     - cron: '0 0,3,6,9,12,15,18,21 * * *'
-  workflow_dispatch: # 手動実行ボタン
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -24,21 +26,33 @@ jobs:
         python -m pip install --upgrade pip
         pip install selenium webdriver-manager beautifulsoup4
 
-    # 【ステップ1】Pythonを動かして、スクレイピング結果をファイルに保存する（通信なし）
+    # 【Step 1】PythonでGAS完全対応の schedule.json を生成
     - name: Run ChumToto Scraper
       run: |
         python chumtoto_scraper.py
 
-    # 【ステップ2】💡 保存したファイルを cURL コマンドを使ってGASのURLへ直接POST送信する
+    # 【Step 2】💡 生成された json ファイルを cURL でスプレッドシート（GAS）へ流し込む
     - name: Upload Data to Google Sheets via cURL
       run: |
         if [ -f "schedule.json" ]; then
-          echo "🚀 schedule.json を Google Apps Script へ直接送信中..."
+          echo "🚀 GAS（スプレッドシート）の公式スケジュールへ直接同期中..."
           curl -L -X POST "https://script.google.com/macros/s/AKfycbxTpsaay81w4DDRfjfui7pfmnlc4aDaOPJx_fy4Shf275gpnyUZ9R-ObhAWQOMVOwyP/exec" \
                -H "Content-Type: text/plain" \
                -d @schedule.json
-          echo -e "\n🎉 スプレッドシートへの同期送信が完了しました！"
+          echo -e "\n🎉 スプレッドシートへの同期反映が正常に完了しました！"
         else
-          echo "⚠️ schedule.json が見つかりませんでした。スクレイピングが失敗した可能性があります。"
+          echo "⚠️ schedule.json が生成されませんでした。"
           exit 1
+        fi
+
+    # 【Step 3】生成された schedule.json をリポジトリ（genba-app）内に永続保存
+    - name: Commit and Push schedule.json
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        if [ -f "schedule.json" ]; then
+          git add schedule.json
+          git diff --cached --quiet || git commit -m "🤖 Auto Update ChumToto Schedule JSON (GAS Compatible)"
+          git push origin main
+          echo "📁 schedule.json をリポジトリに正常に保存しました！"
         fi
