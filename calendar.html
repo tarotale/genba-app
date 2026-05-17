@@ -119,7 +119,7 @@
 
     <div class="filter-group">
         <div class="brand-badge">CHUMTOTO</div>
-        <a href="index.html" class="manual-btn">＋手動入力</a>
+        <a href="entry.html" class="manual-btn">＋手動入力</a>
     </div>
 </header>
 
@@ -129,7 +129,7 @@
 <div class="bottom-nav">
     <a href="calendar.html" class="active"><span>📅</span>CALENDAR</a>
     <a href="dashboard.html"><span>📊</span>STATS</a>
-    <a href="index.html"><span>✍️</span>ENTRY</a>
+    <a href="entry.html"><span>✍️</span>ENTRY</a>
 </div>
 
 <script>
@@ -301,8 +301,9 @@
         `;
     }
 
+    // 💡 ③ タップして遷移するときのジャンプ先 URL を entry.html に修正
     function moveToEntry(date, title, venue) {
-        const targetUrl = `index.html?date=${date}&event=${title}&location=${venue}`;
+        const targetUrl = `entry.html?date=${date}&event=${title}&location=${venue}`;
         if (confirm(`選択した現場を記録しますか？\n\n現場：${decodeURIComponent(title)}`)) {
             window.location.href = targetUrl;
         }
