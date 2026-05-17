@@ -159,7 +159,7 @@
 <div class="bottom-nav">
     <a href="calendar.html"><span>📅</span>CALENDAR</a>
     <a href="dashboard.html"><span>📊</span>STATS</a>
-    <a href="index.html" class="active"><span>✍️</span>ENTRY</a>
+    <a href="entry.html" class="active"><span>✍️</span>ENTRY</a>
 </div>
 
 <script>
@@ -172,7 +172,6 @@ let editRowIndex = null;
 window.onload = function() {
     const params = new URLSearchParams(window.location.search);
     
-    // 💡 修正モード（edit）だった場合のデータの自動復元
     if (params.get('mode') === 'edit') {
         isEditMode = true;
         editRowIndex = params.get('row_index');
@@ -182,7 +181,6 @@ window.onload = function() {
         submitBtn.innerText = "UPDATE FIELD ENTRY (修正を保存)";
         submitBtn.classList.add('edit-mode');
         
-        // 既存の数値を入力欄にセット
         document.getElementById('date').value = params.get('date');
         document.getElementById('event_name').value = decodeURIComponent(params.get('event'));
         document.getElementById('location').value = decodeURIComponent(params.get('location'));
@@ -191,16 +189,14 @@ window.onload = function() {
         const isAttending = (decodeURIComponent(params.get('attendance')) === '参加');
         document.getElementById('attendance').checked = isAttending;
         
-        // チェキ枚数データの復元
         Object.keys(counts).forEach(key => {
             const countVal = parseInt(params.get(key)) || 0;
             counts[key] = countVal;
             document.getElementById(`val-${key}`).innerText = countVal;
         });
         
-        toggleAttendance(); // 暗転状態の見た目を連動
+        toggleAttendance();
     } else {
-        // 通常の新規登録モード
         if(params.get('date')) document.getElementById('date').value = params.get('date');
         if(params.get('event')) document.getElementById('event_name').value = decodeURIComponent(params.get('event'));
         if(params.get('location')) document.getElementById('location').value = decodeURIComponent(params.get('location'));
@@ -245,8 +241,8 @@ async function sendData() {
     btn.innerText = '送信中...';
 
     const payload = {
-        action: isEditMode ? "update_history" : "insert_history", // 💡 アクションを分岐
-        row_index: editRowIndex, // 修正対象の行
+        action: isEditMode ? "update_history" : "insert_history",
+        row_index: editRowIndex,
         date: document.getElementById('date').value,
         event_name: document.getElementById('event_name').value,
         location: document.getElementById('location').value,
@@ -263,7 +259,8 @@ async function sendData() {
             body: JSON.stringify(payload)
         });
         alert(isEditMode ? '修正が完了しました！' : '保存完了しました！');
-        window.location.href = 'dashboard.html';
+        // 💡 ② 保存・修正完了後の戻り先をポータル画面（index.html）に変更
+        window.location.href = 'index.html';
     } catch(e) {
         alert('エラーが発生しました');
         btn.disabled = false;
