@@ -1,0 +1,176 @@
+{
+  "action": "sync_schedule",
+  "events": [
+    {
+      "group": "ChumToto",
+      "date": "2026-04-28",
+      "start": "2026-04-28",
+      "title": "【イベント開催】江本夏渚イベント「秋うまれ夏渚そだち2026 ぜんぶ♡編」＠秋葉原ディアステージ",
+      "venue": "秋葉原ディアステージ (〒101-0021 東京都千代田区外神田3-10-9 DEMPAビル)",
+      "time": "OPEN 18:00 CLOSE 22:00",
+      "url": "https://chumtoto.jp/event/1653/"
+    },
+    {
+      "group": "ChumToto",
+      "date": "2026-04-29",
+      "start": "2026-04-29",
+      "title": "【ライブ出演】マンスリーナビゲーターGIRLS LIVE＠J-SQUARE SHINAGAWA",
+      "venue": "J-SQUARE SHINAGAWA",
+      "time": "開場13:00／開演13:30",
+      "url": "https://chumtoto.jp/event/1573/"
+    },
+    {
+      "group": "ChumToto",
+      "date": "2026-05-03",
+      "start": "2026-05-03",
+      "title": "【ライブ出演】sound stock Vol.11＠LIQUIDROOM",
+      "venue": "LIQUIDROOM",
+      "time": "開場16:30 / 開演17:00",
+      "url": "https://chumtoto.jp/event/1643/"
+    },
+    {
+      "group": "ChumToto",
+      "date": "2026-05-05",
+      "start": "2026-05-05",
+      "title": "【イベント出演】「歌舞伎町 UP GATE↑↑2026」＠新宿・歌舞伎町エリア",
+      "venue": "Zepp Shinjuku(TOKYO)／APEXIA／新宿 LOFT／SHINJUKU WALLY／新宿 MARZ／Zirco Tokyo／新宿 DHNoA／新宿 Biske／シアターマーキュリー新宿／新宿 motion／歌舞伎町タワーステージ",
+      "time": "開場 12:00/ 開演 13:00",
+      "url": "https://chumtoto.jp/event/1612/"
+    },
+    {
+      "group": "ChumToto",
+      "date": "2026-05-09",
+      "start": "2026-05-09",
+      "title": "【イベント出演】女性限定イベント「Dear Doll Tea Party the1st drop by #DSPMロリィタ部」＠MOSKA by Ginger Garden",
+      "venue": "MOSKA by Ginger Garden",
+      "time": "イベント時間：<1部>OPEN 16:30 / START 16:45 ＜2部＞OPEN 18:25 / START 18:40",
+      "url": "https://chumtoto.jp/event/1722/"
+    },
+    {
+      "group": "ChumToto",
+      "date": "2026-05-10",
+      "start": "2026-05-10",
+      "title": "【イベント開催】ChumToto イベント「まるっと、ちゃむタイム」＠秋葉原ディアステージ",
+      "venue": "秋葉原ディアステージ (〒101-0021 東京都千代田区外神田3-10-9 DEMPAビル)",
+      "time": "1部 OPEN 13:30 CLOSE 16:00 2部 OPEN 17:00 CLOSE 21:00",
+      "url": "https://chumtoto.jp/event/1658/"
+    },
+    {
+      "group": "ChumToto",
+      "date": "2026-05-11",
+      "start": "2026-05-11",
+      "title": "【ライブ出演】女性限定ライブ「Girls place to be. vol.2」＠シティホール&ギャラリー五反田",
+      "venue": "シティホール&ギャラリー五反田",
+      "time": "開場16:30 / 開演17:00",
+      "url": "https://chumtoto.jp/event/1666/"
+    },
+    {
+      "group": "ChumToto",
+      "date": "2026-05-16",
+      "start": "2026-05-16",
+      "title": "【ライブ出演】TIF ASIA TOUR 2026 in TOKYO＠白金高輪SELENE b2",
+      "venue": "白金高輪SELENE b2",
+      "time": "開場11:30 / 開演12:00",
+      "url": "https://chumtoto.jp/event/1688/"
+    },
+    {
+      "group": "ChumToto",
+      "date": "2026-05-21",
+      "start": "2026-05-21",
+      "title": "【ライブ出演】#DSPMLIVE NEXT＠高円寺HIGH",
+      "venue": "高円寺HIGH",
+      "time": "開場18:30 / 開演19:00",
+      "url": "https://chumtoto.jp/event/1717/"
+    },
+    {
+      "group": "ChumToto",
+      "date": "2026-05-23",
+      "start": "2026-05-23",
+      "title": "【イベント出演】「Shimokitazawa SOUND CRUISING 2026」＠下北沢エリア",
+      "venue": "シャングリラ / CLUB251 / 440 / BASEMENTBAR / THREE / SHELTER / LIVEHOLIC / DaisyBar / SPREAD / MOSAiC",
+      "time": "開場/開演 DAY 11:00/12:00　NIGHT 23:00/23:00",
+      "url": "https://chumtoto.jp/event/1767/"
+    },
+    {
+      "group": "ChumToto",
+      "date": "2026-05-26",
+      "start": "2026-05-26",
+      "title": "【イベント開催】宮原梓イベント「星の見えない街でただひとつの星〜になりたい〜」＠秋葉原ディアステージ",
+      "venue": "秋葉原ディアステージ (〒101-0021 東京都千代田区外神田3-10-9 DEMPAビル)",
+      "time": "OPEN 18:00 CLOSE 22:00",
+      "url": "https://chumtoto.jp/event/1802/"
+    },
+    {
+      "group": "ChumToto",
+      "date": "2026-05-30",
+      "start": "2026-05-30",
+      "title": "【ライブ出演】Hide and Seek＠新宿MARZ",
+      "venue": "新宿MARZ",
+      "time": "開場 17:00 / 開演17:30",
+      "url": "https://chumtoto.jp/event/1773/"
+    },
+    {
+      "group": "ChumToto",
+      "date": "2026-06-06",
+      "start": "2026-06-06",
+      "title": "【イベント開催】柏葉れん/詩之宮かこ イベント「茶む☆にゃんにゃん晩餐会」@静岡ディアステージ",
+      "venue": "静岡ディアステージ (〒420-0032 静岡県静岡市葵区両替町２丁目４−９ フィエスタ両替町 ３F)",
+      "time": "OPEN 19:00 CLOSE 20:15",
+      "url": "https://chumtoto.jp/event/1797/"
+    },
+    {
+      "group": "ChumToto",
+      "date": "2026-06-07",
+      "start": "2026-06-07",
+      "title": "【ツアー開催】「☆ちゃむわーるど拡張ツアー2026☆– だってキミの最強パートナーだから –＜静岡公演＞」＠ARTIE/LIVLIV",
+      "venue": "ARTIE/LIVLIV",
+      "time": "開場16:00 / 開演16:30（17:45頃終演・18:00以降特典会実施予定）",
+      "url": "https://chumtoto.jp/event/1730/"
+    },
+    {
+      "group": "ChumToto",
+      "date": "2026-06-13",
+      "start": "2026-06-13",
+      "title": "【ライブ出演】「あいらんど HARAJUKU」＠ラフォーレミュージアム原宿",
+      "venue": "ラフォーレミュージアム原宿",
+      "time": "開場 11:10/ 開演 11:30",
+      "url": "https://chumtoto.jp/event/1809/"
+    },
+    {
+      "group": "ChumToto",
+      "date": "2026-06-20",
+      "start": "2026-06-20",
+      "title": "【ツアー開催】「☆ちゃむわーるど拡張ツアー2026☆– だってキミの最強パートナーだから –＜大阪公演＞」＠梅田BANGBOO",
+      "venue": "梅田BANGBOO",
+      "time": "開場11:30 / 開演12:00（13:15頃終演・13:30以降特典会実施予定）",
+      "url": "https://chumtoto.jp/event/1732/"
+    },
+    {
+      "group": "ChumToto",
+      "date": "2026-06-28",
+      "start": "2026-06-28",
+      "title": "【ライブ出演】「#DSPM UNIT LIVE EXTRA」＠SHIBUYA DIVE",
+      "venue": "SHIBUYA DIVE",
+      "time": "OPEN/ START　12:30/13:00",
+      "url": "https://chumtoto.jp/event/1813/"
+    },
+    {
+      "group": "ChumToto",
+      "date": "2026-07-12",
+      "start": "2026-07-12",
+      "title": "【ツアー開催】「☆ちゃむわーるど拡張ツアー2026☆– だってキミの最強パートナーだから –＜東京公演＞」＠WOMB",
+      "venue": "WOMB",
+      "time": "開場16:00 / 開演16:45（18:00頃終演・18:15以降特典会実施予定）",
+      "url": "https://chumtoto.jp/event/1735/"
+    },
+    {
+      "group": "ChumToto",
+      "date": "2026-07-26",
+      "start": "2026-07-26",
+      "title": "【ライブ出演】「10年目記念で有明に引っ越しだよ！六本木アイドルフェスティバル2026」＠東京ドリームパーク",
+      "venue": "東京ドリームパーク（SGCホール有明、ドリームテラス）、TFTホール",
+      "time": "開場10:00 / 開演11:00",
+      "url": "https://chumtoto.jp/event/1817/"
+    }
+  ]
+}
