@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHUMTOTO PORTAL - COMMAND CENTER</title>
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0d080a 0%, #1a1014 50%, #0d080a 100%);
+            --header-gradient: linear-gradient(180deg, #24141a 0%, rgba(36, 20, 26, 0.95) 100%);
+            --color-chumtoto: #FF6B9D;
+            --color-warn: #FF3B30;
+            --color-success: #4CD964;
+            --text-main: #f5f0f2;
+            --text-muted: #9e8891;
+            --card-bg: rgba(255, 107, 157, 0.04);
+            --card-border: rgba(255, 107, 157, 0.15);
+            --input-bg: rgba(0, 0, 0, 0.4);
+        }
+
+        body { margin: 0; font-family: 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif; background: var(--bg-gradient); color: var(--text-main); min-height: 100vh; padding-bottom: 40px; }
+        header { background: var(--header-gradient); border-bottom: 1px solid rgba(255, 107, 157, 0.15); padding: 20px; text-align: center; backdrop-filter: blur(12px); }
+        header h1 { margin: 0; font-size: 20px; font-weight: 800; letter-spacing: 4px; color: #fff; text-shadow: 0 0 12px rgba(255, 107, 157, 0.5); }
+        .container { max-width: 500px; margin: 0 auto; padding: 20px 16px; box-sizing: border-box; }
+        
+        .portal-stats { background: linear-gradient(135deg, rgba(255,107,157,0.15) 0%, rgba(0,0,0,0.4) 100%); border: 1px solid rgba(255, 107, 157, 0.4); border-radius: 16px; padding: 24px 20px; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.5), inset 0 0 20px rgba(255,107,157,0.1); margin-bottom: 20px; }
+        .stat-block { margin-bottom: 20px; }
+        .stat-block:last-child { margin-bottom: 0; }
+        .stat-label { font-size: 11px; color: var(--text-muted); font-weight: bold; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
+        .stat-value-money { font-size: 38px; font-weight: 900; color: #fff; text-shadow: 0 0 15px rgba(255,255,255,0.2); }
+        .stat-value-cheki { font-size: 34px; font-weight: 900; color: var(--color-chumtoto); text-shadow: 0 0 12px rgba(255,107,157,0.4); }
+        .stat-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+        .alert-container { background: rgba(255, 59, 48, 0.05); border: 1px solid rgba(255, 59, 48, 0.3); border-radius: 12px; padding: 16px; margin-bottom: 24px; box-shadow: 0 4px 20px rgba(255,59,48,0.1); display: none; }
+        .alert-title { font-size: 13px; font-weight: bold; color: #ff453a; display: flex; align-items: center; gap: 6px; margin-bottom: 12px; letter-spacing: 1px; text-shadow: 0 0 8px rgba(255,59,48,0.4); }
+        .alert-list { display: flex; flex-direction: column; gap: 8px; }
+        .alert-item { background: rgba(0,0,0,0.4); border: 1px solid rgba(255, 59, 48, 0.2); padding: 10px 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .alert-info { flex: 1; padding-right: 10px; }
+        .alert-date { font-size: 11px; color: var(--text-muted); font-weight: bold; }
+        .alert-name { font-size: 13px; font-weight: bold; color: #fff; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 260px; }
+        .alert-btn { background: var(--color-chumtoto); border: none; color: #fff; padding: 6px 12px; font-size: 11px; font-weight: bold; border-radius: 6px; cursor: pointer; text-decoration: none; transition: 0.2s; }
+        .alert-btn:hover { opacity: 0.9; box-shadow: 0 0 8px var(--color-chumtoto); }
+
+        .clear-container { background: rgba(76, 217, 100, 0.03); border: 1px solid rgba(76, 217, 100, 0.2); border-radius: 12px; padding: 14px; text-align: center; font-size: 12px; color: var(--color-success); font-weight: bold; letter-spacing: 1px; margin-bottom: 24px; display: none; }
+
+        .menu-title { font-size: 12px; color: var(--text-muted); font-weight: bold; letter-spacing: 2px; margin-left: 6px; margin-bottom: 10px; text-transform: uppercase; }
+        .launcher-grid { display: flex; flex-direction: column; gap: 10px; }
+        
+        .launch-btn { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 18px 20px; display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: #fff; font-weight: bold; font-size: 15px; letter-spacing: 1px; transition: all 0.25s; }
+        .launch-btn:hover { background: rgba(255, 107, 157, 0.12); border-color: var(--color-chumtoto); transform: translateY(-2px); box-shadow: 0 4px 15px rgba(255,107,157,0.15); }
+        .launch-btn span.icon { font-size: 20px; margin-right: 12px; }
+        .launch-btn span.arrow { color: var(--color-chumtoto); font-size: 14px; transition: transform 0.2s; }
+        .launch-btn:hover span.arrow { transform: translateX(4px); }
+
+        .loading-cover { text-align: center; color: var(--color-chumtoto); font-weight: bold; padding: 40px; letter-spacing: 2px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>CHUMTOTO SYSTEM</h1>
+</header>
+
+<div class="container">
+    
+    <div class="portal-stats" id="portalStats" style="display: none;">
+        <div class="stat-block">
+            <div class="stat-label">Total Investment (生涯累計投資)</div>
+            <div class="stat-value-money" id="total-money">¥0</div>
+        </div>
+        <div class="stat-block" style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 18px;">
+            <div class="stat-label">Total Cheki Taken (累計チェキ撮影枚数)</div>
+            <div class="stat-value-cheki" id="total-cheki">0 <span style="font-size:16px;">枚</span></div>
+            <div class="stat-sub" id="cheki-breakdown">サイン: 0枚 / 白: 0枚</div>
+        </div>
+    </div>
+
+    <div class="alert-container" id="alertBox">
+        <div class="alert-title">🚨 WARNING: 未入力の過去現場があります</div>
+        <div class="alert-list" id="alertList"></div>
+    </div>
+
+    <div class="clear-container" id="clearBox">
+        ✨ ALL CLEAR: すべての終了済み現場が正常に記録されています。
+    </div>
+
+    <div id="portal-loading" class="loading-cover">INITIALIZING SYSTEM...</div>
+
+    <div class="menu-title">System Launcher</div>
+    <div class="launcher-grid">
+        <a href="calendar.html" class="launch-btn">
+            <div style="display:flex; align-items:center;"><span class="icon">📅</span> 公式スケジュールカレンダー</div>
+            <span class="arrow">LAUNCH ▶</span>
+        </a>
+        <a href="dashboard.html" class="launch-btn">
+            <div style="display:flex; align-items:center;"><span class="icon">📊</span> 現場支出統計・参戦履歴</div>
+            <span class="arrow">LAUNCH ▶</span>
+        </a>
+        <a href="entry.html" class="launch-btn">
+            <div style="display:flex; align-items:center;"><span class="icon">✍️</span> 新規現場記録・手動入力</div>
+            <span class="arrow">LAUNCH ▶</span>
+        </a>
+    </div>
+
+</div>
+
+<script>
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbw7KeuN0XckEqU9V4wRxR3O8T9Rl6cC2jQesEOpOsNJTF09ZylpVFZWJnqo0aff1YNFRw/exec';
+    const PRICES = { sign_cheki: 3000, white_cheki: 2000, tiktok: 3500, kakomi: 4000, item_sign: 4500, omiyokuri: 1500 };
+
+    window.onload = async function() {
+        try {
+            const [reqSched, reqHist] = await Promise.all([
+                fetch(GAS_URL + "?action=read_schedule").then(r => r.json()),
+                fetch(GAS_URL + "?action=read_history").then(r => r.json())
+            ]);
+
+            if (reqSched.result === "success" && reqHist.result === "success") {
+                document.getElementById('portal-loading').style.display = 'none';
+                document.getElementById('portalStats').style.display = 'block';
+
+                calculatePortalStats(reqHist.data);
+                checkMissingEntries(reqSched.data, reqHist.data);
+            }
+        } catch(e) {
+            document.getElementById('portal-loading').innerText = "ERROR: CONNECTION FAILED";
+        }
+    }
+
+    function calculatePortalStats(historyData) {
+        let totalMoney = 0;
+        let totalSign = 0;
+        let totalWhite = 0;
+
+        historyData.forEach(row => {
+            let rowTotal = parseInt(row.ticket_fee) || 0;
+            Object.keys(PRICES).forEach(key => {
+                let count = parseInt(row[key]) || 0;
+                rowTotal += count * PRICES[key];
+            });
+            totalMoney += rowTotal;
+            totalSign += parseInt(row.sign_cheki) || 0;
+            totalWhite += parseInt(row.white_cheki) || 0;
+        });
+
+        document.getElementById('total-money').innerText = `¥${totalMoney.toLocaleString()}`;
+        document.getElementById('total-cheki').innerHTML = `${totalSign + totalWhite} <span style="font-size:16px;">枚</span>`;
+        document.getElementById('cheki-breakdown').innerText = `サイン: ${totalSign}枚 / 白: ${totalWhite}枚`;
+    }
+
+    function checkMissingEntries(scheduleData, historyData) {
+        const todayStr = new Date().toISOString().substring(0, 10);
+        const alertList = document.getElementById('alertList');
+        let missingCount = 0;
+
+        const historyKeys = historyData.map(h => `${h.date}_${h.event_name}`);
+
+        scheduleData.forEach(sched => {
+            if (!sched.date) return;
+            if (sched.date <= todayStr) {
+                const checkKey = `${sched.date}_${sched.title}`;
+                if (!historyKeys.includes(checkKey)) {
+                    missingCount++;
+                    const mDate = new Date(sched.date);
+                    const displayDate = `${mDate.getMonth() + 1}/${mDate.getDate()}`;
+                    
+                    // 💡 ボタンのジャンプ先を index.html から entry.html に変更
+                    const itemHtml = `
+                        <div class="alert-item">
+                            <div class="alert-info">
+                                <div class="alert-date">📅 ${displayDate} (${sched.venue || '会場未定'})</div>
+                                <div class="alert-name">${sched.title}</div>
+                            </div>
+                            <a href="entry.html?date=${sched.date}&event=${encodeURIComponent(sched.title)}&location=${encodeURIComponent(sched.venue || '')}" class="alert-btn">今すぐ記録！</a>
+                        </div>
+                    `;
+                    alertList.innerHTML += itemHtml;
+                }
+            }
+        });
+
+        if (missingCount > 0) {
+            document.getElementById('alertBox').style.display = 'block';
+        } else {
+            document.getElementById('clearBox').style.display = 'block';
+        }
+    }
+</script>
+</body>
+</html>
