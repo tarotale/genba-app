@@ -21,9 +21,13 @@ def setup_driver():
     options.add_argument('--window-size=1920,1080')
     options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
     
-    # 💡 Actions側で用意した正確なパスの ChromeDriver を直接指定して起動（干渉を回避）
-    service = Service('/usr/local/bin/chromedriver')
-    return webdriver.Chrome(service=service, options=options)
+    # 💡 Linux(GitHub Actions)環境に標準で入っているChromeのパスを明示的にセット
+    chrome_bin = "/usr/bin/google-chrome"
+    if os.path.exists(chrome_bin):
+        options.binary_location = chrome_bin
+        
+    # パス指定なしで標準のサービスとして起動（環境側の固定ドライバーを自動使用）
+    return webdriver.Chrome(options=options)
 
 def get_chumtoto_venue(driver, url):
     """詳細ページから会場と時間を取得"""
@@ -77,7 +81,6 @@ if __name__ == "__main__":
     print("🤖 ちゃむととのスケジュールを単独取得中...")
     try:
         driver.get(base_url)
-        # 環境が固定されたため、タイムアウトを回避して確実に取得が始まります
         wait = WebDriverWait(driver, 15)
         wait.until(EC.presence_of_element_located((By.CLASS_NAME, "full-calendar-day")))
         
@@ -107,7 +110,7 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"取得エラー: {e}")
 
-    print(f"➡ ChumTotoのイベントを {len(events)} 件回収しました。各会場を解析中...")
+    print(f"➡ ChumToto의 イベントを {len(events)} 件回収しました。各会場を解析中...")
 
     # 詳細ページの解析
     formatted_events = []
