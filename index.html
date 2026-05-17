@@ -28,7 +28,6 @@
         .stat-block:last-child { margin-bottom: 0; }
         .stat-label { font-size: 11px; color: var(--text-muted); font-weight: bold; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
         .stat-value-money { font-size: 38px; font-weight: 900; color: #fff; text-shadow: 0 0 15px rgba(255,255,255,0.2); }
-        /* 💡 参戦率用のスタイル定義 */
         .stat-value-rate { font-size: 34px; font-weight: 900; color: #5AC8FA; text-shadow: 0 0 12px rgba(90,200,250,0.4); }
         .stat-value-cheki { font-size: 34px; font-weight: 900; color: var(--color-chumtoto); text-shadow: 0 0 12px rgba(255,107,157,0.4); }
         .stat-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
@@ -128,7 +127,6 @@
                 document.getElementById('portal-loading').style.display = 'none';
                 document.getElementById('portalStats').style.display = 'block';
 
-                // 💡 計算処理を連動させるため、両方のデータを引数で渡すようにアップデート
                 calculatePortalStats(reqHist.data, reqSched.data);
                 checkMissingEntries(reqSched.data, reqHist.data);
             }
@@ -137,14 +135,13 @@
         }
     }
 
-    // 💡 参戦率の計算ロジックを追加した新・統計計算処理
     function calculatePortalStats(historyData, scheduleData) {
         let totalMoney = 0;
         let totalSign = 0;
         let totalWhite = 0;
         
-        let attendCount = 0; // 参加回数
-        let totalCount = historyData.length; // 記録のある総現場数
+        let attendCount = 0;
+        let totalCount = historyData.length;
 
         historyData.forEach(row => {
             let rowTotal = parseInt(row.ticket_fee) || 0;
@@ -156,16 +153,13 @@
             totalSign += parseInt(row.sign_cheki) || 0;
             totalWhite += parseInt(row.white_cheki) || 0;
 
-            // 💡 状態が「参加」のデータをカウント
             if (row.attendance === "参加") {
                 attendCount++;
             }
         });
 
-        // 💡 参戦率（パーセンテージ）の算出
         const ratePercent = totalCount > 0 ? Math.round((attendCount / totalCount) * 100) : 0;
 
-        // 画面表示へパッと反映
         document.getElementById('total-money').innerText = `¥${totalMoney.toLocaleString()}`;
         document.getElementById('attendance-rate').innerText = `${ratePercent}%`;
         document.getElementById('attendance-breakdown').innerText = `参戦: ${attendCount}回 / 総現場数: ${totalCount}回`;
