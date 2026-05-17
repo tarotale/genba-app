@@ -1,0 +1,29 @@
+name: ChumToto Schedule Auto Sync
+
+on:
+  schedule:
+    # 💡 日本時間の 0, 3, 6, 9, 12, 15, 18, 21 時にあたる UTC 時間を指定（3時間おき）
+    - cron: '0 0,3,6,9,12,15,18,21 * * *'
+  workflow_dispatch: # GitHubの画面からいつでも手動で実行できるボタン
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install selenium webdriver-manager beautifulsoup4 requests
+
+    - name: Run ChumToto Scraper
+      run: |
+        python chumtoto_scraper.py
