@@ -3,200 +3,361 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>現場記録</title>
+    <title>CHUMTOTO FIELD ENTRY</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f0f2f5; margin: 0; padding: 10px; padding-bottom: 100px; }
-        .container { max-width: 500px; margin: 0 auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        h2 { text-align: center; color: #1a73e8; margin-top: 0; }
-        .nav-links { text-align: center; margin-bottom: 15px; }
-        .nav-links a { color: #1a73e8; text-decoration: none; font-size: 0.9rem; font-weight: bold; }
-        .input-group { margin-bottom: 15px; }
-        label { display: block; font-size: 0.85rem; color: #666; margin-bottom: 5px; font-weight: bold; }
-        input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
-        
-        /* トグルのデザイン */
-        .switch-group { display: flex; align-items: center; justify-content: space-between; background: #e8f0fe; padding: 12px; border-radius: 8px; margin-bottom: 15px; }
-        .switch { position: relative; display: inline-block; width: 60px; height: 34px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: #34a853; }
-        input:checked + .slider:before { transform: translateX(26px); }
-        
-        .counter-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 20px; }
-        .counter-card { display: flex; align-items: center; justify-content: space-between; padding: 12px; border: 1px solid #eee; border-radius: 10px; background: #fafafa; transition: opacity 0.3s; }
-        .disabled-card { opacity: 0.4; pointer-events: none; }
-        .item-info { flex: 1; }
-        .item-name { font-weight: bold; font-size: 0.95rem; }
-        .item-price { font-size: 0.75rem; color: #888; }
-        .stepper { display: flex; align-items: center; gap: 15px; }
-        .btn-step { width: 36px; height: 36px; border-radius: 50%; border: none; background: #1a73e8; color: white; font-size: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .btn-step:active { transform: scale(0.9); background: #1557b0; }
-        .count-display { font-size: 1.2rem; font-weight: bold; width: 30px; text-align: center; }
-        .footer-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #333; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -2px 10px rgba(0,0,0,0.3); z-index: 100; }
-        .total-label { font-size: 0.8rem; opacity: 0.8; }
-        .total-amount { font-size: 1.5rem; font-weight: bold; }
-        .btn-submit { background: #34a853; color: white; border: none; padding: 12px 25px; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; }
-        .btn-submit:disabled { background: #999; }
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0d080a 0%, #1a1014 50%, #0d080a 100%);
+            --header-gradient: linear-gradient(180deg, #24141a 0%, rgba(36, 20, 26, 0.95) 100%);
+            --color-chumtoto: #FF6B9D;
+            --text-main: #f5f0f2;
+            --text-muted: #9e8891;
+            --card-bg: rgba(255, 107, 157, 0.05);
+            --card-border: rgba(255, 107, 157, 0.2);
+            --input-bg: rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding-bottom: 100px;
+        }
+
+        header {
+            background: var(--header-gradient);
+            border-bottom: 1px solid rgba(255, 107, 157, 0.15);
+            padding: 16px 20px 12px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+            text-align: center;
+        }
+
+        h2 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #fff;
+            text-shadow: 0 0 8px rgba(255, 107, 157, 0.4);
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 20px auto;
+            padding: 0 16px;
+            box-sizing: border-box;
+        }
+
+        .form-box {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .input-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        input[type="date"], input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            background: var(--input-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            box-sizing: border-box;
+            transition: all 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--color-chumtoto);
+            box-shadow: 0 0 8px rgba(255, 107, 157, 0.3);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--input-bg);
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--card-border);
+            cursor: pointer;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--color-chumtoto);
+            cursor: pointer;
+        }
+
+        .checkbox-label {
+            font-size: 14px;
+            color: #fff;
+            user-select: none;
+            cursor: pointer;
+        }
+
+        /* 特典カウンター */
+        .benefit-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.02);
+            padding: 10px 14px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+
+        .benefit-name {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .counter-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn-count {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 1px solid var(--card-border);
+            background: rgba(255, 107, 157, 0.15);
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+
+        .btn-count:hover {
+            background: var(--color-chumtoto);
+            box-shadow: 0 0 8px var(--color-chumtoto);
+        }
+
+        .count-value {
+            font-size: 16px;
+            font-weight: bold;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        /* 総計表示 */
+        .total-box {
+            margin-top: 24px;
+            background: linear-gradient(135deg, rgba(255,107,157,0.2) 0%, rgba(255,255,255,0.02) 100%);
+            border: 1px solid var(--color-chumtoto);
+            border-radius: 10px;
+            padding: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 0 10px rgba(255,107,157,0.1);
+        }
+
+        .total-label {
+            font-size: 12px;
+            font-weight: bold;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+        }
+
+        .total-price {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--color-chumtoto);
+            text-shadow: 0 0 8px rgba(255,107,157,0.4);
+        }
+
+        .submit-btn {
+            width: 100%;
+            margin-top: 20px;
+            padding: 14px;
+            background: var(--color-chumtoto);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 15px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 4px 12px rgba(255,107,157,0.3);
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            opacity: 0.9;
+            box-shadow: 0 4px 20px rgba(255,107,157,0.5);
+        }
+
+        .submit-btn:disabled {
+            background: #4a353c;
+            color: #8a7078;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        /* 下部ナビゲーション */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--header-gradient); border-top: 1px solid rgba(255, 107, 157, 0.15); display: flex; justify-content: space-around; padding: 10px 0; z-index: 100; backdrop-filter: blur(12px); }
+        .bottom-nav a { color: var(--text-muted); text-decoration: none; font-size: 10px; text-align: center; display: flex; flex-direction: column; gap: 4px; font-weight: bold; transition: color 0.2s; }
+        .bottom-nav a.active { color: var(--color-chumtoto); }
     </style>
 </head>
 <body>
 
+<header>
+    <h2>✍️ FIELD ENTRY</h2>
+</header>
+
 <div class="container">
-    <h2>現場記録入力</h2>
-    <div class="nav-links">
-        <a href="calendar.html">📅 カレンダー画面へ移動</a>
-    </div>
-    
-    <div class="input-group">
-        <label>日付</label>
-        <input type="date" id="date">
-    </div>
+    <div class="form-box">
+        <div class="input-group">
+            <label>DATE</label>
+            <input type="date" id="date">
+        </div>
 
-    <div class="switch-group">
-        <span id="status-label" style="font-weight: bold; color: #2b579a;">状態：参加</span>
-        <label class="switch">
-            <input type="checkbox" id="attendance" checked onchange="toggleAttendance()">
-            <span class="slider"></span>
-        </label>
-    </div>
+        <div class="input-group">
+            <label>EVENT NAME</label>
+            <input type="text" id="event_name" placeholder="イベント名を入力">
+        </div>
 
-    <div class="input-group">
-        <label>イベント名</label>
-        <input type="text" id="event_name" placeholder="例：まるっと、ちゃむタイム">
-    </div>
-    <div class="input-group">
-        <label>会場</label>
-        <select id="location">
-            <option value="秋葉原ディアステージ">秋葉原ディアステージ</option>
-            <option value="渋谷WOMB">渋谷WOMB</option>
-            <option value="SHIBUYA DIVE">SHIBUYA DIVE</option>
-            <option value="1000club">1000club</option>
-            <option value="横浜ブロンテ">横浜ブロンテ</option>
-            <option value="その他">その他</option>
-        </select>
-    </div>
-    <div class="input-group">
-        <label>チケット代 (¥)</label>
-        <input type="number" id="ticket_fee" value="0" step="100" oninput="calc()">
-    </div>
+        <div class="input-group">
+            <label>LOCATION</label>
+            <input type="text" id="location" placeholder="会場を入力">
+        </div>
 
-    <div class="counter-grid" id="counter-grid"></div>
+        <div class="input-group">
+            <label>TICKET FEE</label>
+            <input type="number" id="ticket_fee" placeholder="¥ 0" oninput="calc()">
+        </div>
+
+        <div class="input-group" style="margin-bottom: 24px;">
+            <label class="checkbox-group" for="attendance">
+                <input type="checkbox" id="attendance" checked>
+                <span class="checkbox-label">この現場に参加する</span>
+            </label>
+        </div>
+
+        <label style="margin-bottom: 10px;">BENEFIT BENEFITS (特典会)</label>
+        
+        <div class="benefit-row">
+            <span class="benefit-name">📸 サインチェキ (¥2,000)</span>
+            <div class="counter-controls">
+                <button class="btn-count" onclick="changeCount('sign_cheki', -1)">-</button>
+                <span class="count-value" id="val-sign_cheki">0</span>
+                <button class="btn-count" onclick="changeCount('sign_cheki', 1)">+</button>
+            </div>
+        </div>
+
+        <div class="benefit-row">
+            <span class="benefit-name">⚪ 白チェキ (¥1,000)</span>
+            <div class="counter-controls">
+                <button class="btn-count" onclick="changeCount('white_cheki', -1)">-</button>
+                <span class="count-value" id="val-white_cheki">0</span>
+                <button class="btn-count" onclick="changeCount('white_cheki', 1)">+</button>
+            </div>
+        </div>
+
+        <div class="benefit-row">
+            <span class="benefit-name">📱 TikTok撮影 (¥1,000)</span>
+            <div class="counter-controls">
+                <button class="btn-count" onclick="changeCount('tiktok', -1)">-</button>
+                <span class="count-value" id="val-tiktok">0</span>
+                <button class="btn-count" onclick="changeCount('tiktok', 1)">+</button>
+            </div>
+        </div>
+
+        <div class="benefit-row">
+            <span class="benefit-name">👥 囲み撮影 (¥3,000)</span>
+            <div class="counter-controls">
+                <button class="btn-count" onclick="changeCount('kakomi', -1)">-</button>
+                <span class="count-value" id="val-kakomi">0</span>
+                <button class="btn-count" onclick="changeCount('kakomi', 1)">+</button>
+            </div>
+        </div>
+
+        <div class="benefit-row">
+            <span class="benefit-name">🎒 私物サイン (¥2,000)</span>
+            <div class="counter-controls">
+                <button class="btn-count" onclick="changeCount('goods_sign', -1)">-</button>
+                <span class="count-value" id="val-goods_sign">0</span>
+                <button class="btn-count" onclick="changeCount('goods_sign', 1)">+</button>
+            </div>
+        </div>
+
+        <div class="benefit-row">
+            <span class="benefit-name">👋 お見送り (¥500)</span>
+            <div class="counter-controls">
+                <button class="btn-count" onclick="changeCount('omijouri', -1)">-</button>
+                <span class="count-value" id="val-omijouri">0</span>
+                <button class="btn-count" onclick="changeCount('omijouri', 1)">+</button>
+            </div>
+        </div>
+
+        <div class="total-box">
+            <span class="total-label">ESTIMATED TOTAL EXPENSE</span>
+            <span class="total-price" id="display-total">¥0</span>
+        </div>
+
+        <button class="submit-btn" id="submit-btn" onclick="sendData()">LOG EVENT TO SHEET</button>
+    </div>
 </div>
 
-<div class="footer-bar">
-    <div>
-        <div class="total-label">合計金額</div>
-        <div class="total-amount" id="display-total">¥0</div>
-    </div>
-    <button class="btn-submit" id="submit-btn" onclick="sendData()">保存</button>
+<div class="bottom-nav">
+    <a href="calendar.html"><span>📅</span>CALENDAR</a>
+    <a href="dashboard.html"><span>📊</span>STATS</a>
+    <a href="index.html" class="active"><span>✍️</span>ENTRY</a>
 </div>
 
 <script>
-// 単価設定
 const PRICES = {
-    sign_cheki: { name: 'サインチェキ', price: 3000 },
-    white_cheki: { name: '白チェキ', price: 2000 },
-    tiktok: { name: 'TikTok', price: 3500 },
-    kakomi: { name: '囲み', price: 4000 },
-    item_sign: { name: '私物サイン', price: 0 },
-    omiyokuri: { name: 'お見送り', price: 1500 }
+    sign_cheki: { price: 2000 },
+    white_cheki: { price: 1000 },
+    tiktok: { price: 1000 },
+    kakomi: { price: 3000 },
+    goods_sign: { price: 2000 },
+    omijouri: { price: 500 }
 };
 
-const counts = {};
-Object.keys(PRICES).forEach(key => counts[key] = 0);
+let counts = { sign_cheki: 0, white_cheki: 0, tiktok: 0, kakomi: 0, goods_sign: 0, omijouri: 0 };
 
-// 初期表示とパラメータ解析
-window.onload = () => {
-    // --- 【追加機能】URLパラメータ (?date=xxx&event=yyy...) を解析して自動入力 ---
-    const urlParams = new URLSearchParams(window.location.search);
-    const paramDate = urlParams.get('date');
-    const paramEvent = urlParams.get('event');
-    const paramLocation = urlParams.get('location');
-
-    // 日付のセット
-    if (paramDate) {
-        document.getElementById('date').value = paramDate;
-    } else {
-        document.getElementById('date').valueAsDate = new Date();
-    }
-
-    // イベント名のセット
-    if (paramEvent) {
-        document.getElementById('event_name').value = paramEvent;
-    }
-
-    // 会場（場所）セレクトボックスの自動セット
-    if (paramLocation) {
-        const locationSelect = document.getElementById('location');
-        let matchFound = false;
-        
-        // 既存のセレクトボックスの選択肢に一致するものがあるかチェック
-        for (let i = 0; i < locationSelect.options.length; i++) {
-            if (locationSelect.options[i].value === paramLocation) {
-                locationSelect.selectedIndex = i;
-                matchFound = true;
-                break;
-            }
-        }
-        
-        // 元のプルダウンにない会場名だった場合、臨時の選択肢を追加して選択状態にする
-        if (!matchFound) {
-            const newOpt = document.createElement('option');
-            newOpt.value = paramLocation;
-            newOpt.text = paramLocation;
-            newOpt.selected = true;
-            locationSelect.add(newOpt, locationSelect.options[0]); // 先頭に追加
-        }
-    }
-
-    // カウンターカードの生成
-    const grid = document.getElementById('counter-grid');
-    Object.keys(PRICES).forEach(key => {
-        const item = PRICES[key];
-        grid.innerHTML += `
-            <div class="counter-card" id="card-${key}">
-                <div class="item-info">
-                    <div class="item-name">${item.name}</div>
-                    <div class="item-price">¥${item.price.toLocaleString()}</div>
-                </div>
-                <div class="stepper">
-                    <button class="btn-step" onclick="updateCount('${key}', -1)">−</button>
-                    <div class="count-display" id="count-${key}">0</div>
-                    <button class="btn-step" onclick="updateCount('${key}', 1)">+</button>
-                </div>
-            </div>
-        `;
-    });
-    
-    calc(); // 初期合計金額の計算
-};
-
-function toggleAttendance() {
-    const isAttending = document.getElementById('attendance').checked;
-    const label = document.getElementById('status-label');
-    
-    if (isAttending) {
-        label.innerText = "状態：参加";
-        label.style.color = "#2b579a";
-        Object.keys(PRICES).forEach(key => {
-            document.getElementById(`card-${key}`).classList.remove('disabled-card');
-        });
-    } else {
-        label.innerText = "状態：不参加（干した・諦めた）";
-        label.style.color = "#d32f2f";
-        Object.keys(PRICES).forEach(key => {
-            counts[key] = 0;
-            document.getElementById(`count-${key}`).innerText = 0;
-            document.getElementById(`card-${key}`).classList.add('disabled-card');
-        });
-    }
+// URLパラメータの解析とセット
+window.onload = function() {
+    const params = new URLSearchParams(window.location.search);
+    if(params.get('date')) document.getElementById('date').value = params.get('date');
+    if(params.get('event')) document.getElementById('event_name').value = decodeURIComponent(params.get('event'));
+    if(params.get('location')) document.getElementById('location').value = decodeURIComponent(params.get('location'));
     calc();
 }
 
-function updateCount(key, delta) {
+function changeCount(key, delta) {
     counts[key] = Math.max(0, counts[key] + delta);
-    document.getElementById(`count-${key}`).innerText = counts[key];
+    document.getElementById(`val-${key}`).innerText = counts[key];
     calc();
 }
 
@@ -212,7 +373,7 @@ async function sendData() {
     const btn = document.getElementById('submit-btn');
     
     // ★重要：ご自身の新デプロイ版GASウェブアプリURLに書き換えてください
-    const GAS_URL = 'https://script.google.com/macros/s/AKfycbxTpsaay81w4DDRfjfui7pfmnlc4aDaOPJx_fy4Shf275gpnyUZ9R-ObhAWQOMVOwyP/exec';
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbw7KeuN0XckEqU9V4wRxR3O8T9Rl6cC2jQesEOpOsNJTF09ZylpVFZWJnqo0aff1YNFRw/exec';
 
     btn.disabled = true;
     btn.innerText = '送信中...';
@@ -233,13 +394,12 @@ async function sendData() {
             headers: { 'Content-Type': 'text/plain' },
             body: JSON.stringify(payload)
         });
-        alert('保存しました！');
-        // 保存後はパラメータを消すために通常のトップへ遷移リロード
-        window.location.href = window.location.pathname;
-    } catch (e) {
+        alert('保存完了しました！');
+        window.location.href = 'calendar.html';
+    } catch(e) {
         alert('エラーが発生しました');
         btn.disabled = false;
-        btn.innerText = '保存';
+        btn.innerText = 'LOG EVENT TO SHEET';
     }
 }
 </script>
