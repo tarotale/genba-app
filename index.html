@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>現場記録</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f0f2f5; margin: 0; padding: 10px; padding-bottom: 100px; }
+        .container { max-width: 500px; margin: 0 auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #1a73e8; margin-top: 0; }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; font-size: 0.85rem; color: #666; margin-bottom: 5px; font-weight: bold; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
+        .counter-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 20px; }
+        .counter-card { display: flex; align-items: center; justify-content: space-between; padding: 12px; border: 1px solid #eee; border-radius: 10px; background: #fafafa; }
+        .item-info { flex: 1; }
+        .item-name { font-weight: bold; font-size: 0.95rem; }
+        .item-price { font-size: 0.75rem; color: #888; }
+        .stepper { display: flex; align-items: center; gap: 15px; }
+        .btn-step { width: 36px; height: 36px; border-radius: 50%; border: none; background: #1a73e8; color: white; font-size: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .btn-step:active { transform: scale(0.9); background: #1557b0; }
+        .count-display { font-size: 1.2rem; font-weight: bold; width: 30px; text-align: center; }
+        .footer-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #333; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -2px 10px rgba(0,0,0,0.3); z-index: 100; }
+        .total-label { font-size: 0.8rem; opacity: 0.8; }
+        .total-amount { font-size: 1.5rem; font-weight: bold; }
+        .btn-submit { background: #34a853; color: white; border: none; padding: 12px 25px; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; }
+        .btn-submit:disabled { background: #999; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>現場記録入力</h2>
+    
+    <div class="input-group">
+        <label>日付</label>
+        <input type="date" id="date">
+    </div>
+    <div class="input-group">
+        <label>イベント名</label>
+        <input type="text" id="event_name" placeholder="例：まるっと、ちゃむタイム">
+    </div>
+    <div class="input-group">
+        <label>会場</label>
+        <select id="location">
+            <option value="秋葉原ディアステージ">秋葉原ディアステージ</option>
+            <option value="渋谷WOMB">渋谷WOMB</option>
+            <option value="SHIBUYA DIVE">SHIBUYA DIVE</option>
+            <option value="1000club">1000club</option>
+            <option value="横浜ブロンテ">横浜ブロンテ</option>
+            <option value="その他">その他（直接入力は後ほど）</option>
+        </select>
+    </div>
+    <div class="input-group">
+        <label>チケット代 (¥)</label>
+        <input type="number" id="ticket_fee" value="0" step="100" oninput="calc()">
+    </div>
+
+    <div class="counter-grid" id="counter-grid"></div>
+</div>
+
+<div class="footer-bar">
+    <div>
+        <div class="total-label">合計金額</div>
+        <div class="total-amount" id="display-total">¥0</div>
+    </div>
+    <button class="btn-submit" id="submit-btn" onclick="sendData()">保存</button>
+</div>
+
+<script>
+// 単価設定
+const PRICES = {
+    sign_cheki: { name: 'サインチェキ', price: 3000 },
+    white_cheki: { name: '白チェキ', price: 2000 },
+    tiktok: { name: 'TikTok', price: 3500 },
+    kakomi: { name: '囲み', price: 4000 },
+    item_sign: { name: '私物サイン', price: 0 },
+    omiyokuri: { name: 'お見送り', price: 1500 }
+};
+
+const counts = {};
+Object.keys(PRICES).forEach(key => counts[key] = 0);
+
+// 初期表示
+window.onload = () => {
+    document.getElementById('date').valueAsDate = new Date();
+    const grid = document.getElementById('counter-grid');
+    
+    Object.keys(PRICES).forEach(key => {
+        const item = PRICES[key];
+        grid.innerHTML += `
+            <div class="counter-card">
+                <div class="item-info">
+                    <div class="item-name">${item.name}</div>
+                    <div class="item-price">¥${item.price.toLocaleString()}</div>
+                </div>
+                <div class="stepper">
+                    <button class="btn-step" onclick="updateCount('${key}', -1)">−</button>
+                    <div class="count-display" id="count-${key}">0</div>
+                    <button class="btn-step" onclick="updateCount('${key}', 1)">+</button>
+                </div>
+            </div>
+        `;
+    });
+};
+
+function updateCount(key, delta) {
+    counts[key] = Math.max(0, counts[key] + delta);
+    document.getElementById(`count-${key}`).innerText = counts[key];
+    calc();
+}
+
+function calc() {
+    let total = parseInt(document.getElementById('ticket_fee').value) || 0;
+    Object.keys(PRICES).forEach(key => {
+        total += counts[key] * PRICES[key].price;
+    });
+    document.getElementById('display-total').innerText = `¥${total.toLocaleString()}`;
+}
+
+async function sendData() {
+    const btn = document.getElementById('submit-btn');
+    const GAS_URL = 'ここにコピーしたURLを貼り付け'; // ★要書き換え
+
+    if (GAS_URL.includes('ここに')) {
+        alert('GASのURLが設定されていません');
+        return;
+    }
+
+    btn.disabled = true;
+    btn.innerText = '送信中...';
+
+    const payload = {
+        date: document.getElementById('date').value,
+        event_name: document.getElementById('event_name').value,
+        location: document.getElementById('location').value,
+        ticket_fee: document.getElementById('ticket_fee').value,
+        ...counts
+    };
+
+    try {
+        // CORS回避のためtext/plainで送る手法
+        await fetch(GAS_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify(payload)
+        });
+        alert('保存しました！');
+        location.reload(); // 入力リセット
+    } catch (e) {
+        alert('エラーが発生しました');
+        btn.disabled = false;
+        btn.innerText = '保存';
+    }
+}
+</script>
+</body>
+</html>
