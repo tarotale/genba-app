@@ -2,7 +2,7 @@ name: ChumToto Schedule Auto Sync
 
 on:
   schedule:
-    # 日本時間の 0, 3, 6, 9, 12, 15, 18, 21 時にあたる UTC 時間を指定
+    # 日本時間の 0, 3, 6, 9, 12, 15, 18, 21 時に自動実行
     - cron: '0 0,3,6,9,12,15,18,21 * * *'
   workflow_dispatch: # 手動実行ボタン
 
@@ -22,9 +22,23 @@ jobs:
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
-        # 💡 ここに webdriver-manager をしっかり追加して、Pythonがエラーを起こさないようにします
-        pip install selenium webdriver-manager beautifulsoup4 requests
+        pip install selenium webdriver-manager beautifulsoup4
 
+    # 【ステップ1】Pythonを動かして、スクレイピング結果をファイルに保存する（通信なし）
     - name: Run ChumToto Scraper
       run: |
         python chumtoto_scraper.py
+
+    # 【ステップ2】💡 保存したファイルを cURL コマンドを使ってGASのURLへ直接POST送信する
+    - name: Upload Data to Google Sheets via cURL
+      run: |
+        if [ -f "schedule.json" ]; then
+          echo "🚀 schedule.json を Google Apps Script へ直接送信中..."
+          curl -L -X POST "https://script.google.com/macros/s/AKfycbxTpsaay81w4DDRfjfui7pfmnlc4aDaOPJx_fy4Shf275gpnyUZ9R-ObhAWQOMVOwyP/exec" \
+               -H "Content-Type: text/plain" \
+               -d @schedule.json
+          echo -e "\n🎉 スプレッドシートへの同期送信が完了しました！"
+        else
+          echo "⚠️ schedule.json が見つかりませんでした。スクレイピングが失敗した可能性があります。"
+          exit 1
+        fi
