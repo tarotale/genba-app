@@ -3,86 +3,326 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>公式スケジュールカレンダー</title>
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+    <title>CHUMTOTO SCHEDULE MANAGER</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f0f2f5; margin: 0; padding: 10px; }
-        .container { max-width: 700px; margin: 0 auto; background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .nav-links { text-align: center; margin-bottom: 15px; display: flex; justify-content: center; gap: 20px; }
-        .nav-links a { color: #1a73e8; text-decoration: none; font-size: 0.9rem; font-weight: bold; }
-        #calendar { margin-top: 10px; }
-        /* カレンダー内のイベントのデザイン微調整 */
-        .fc-event { cursor: pointer; padding: 2px 5px; font-size: 0.85rem; border-radius: 4px; background-color: #1a73e8 !important; border: none !important; }
-        .loading { text-align: center; color: #666; padding: 20px; font-weight: bold; }
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0d080a 0%, #1a1014 50%, #0d080a 100%);
+            --header-gradient: linear-gradient(180deg, #24141a 0%, rgba(36, 20, 26, 0.95) 100%);
+            --color-chumtoto: #FF6B9D;
+            --text-main: #f5f0f2;
+            --text-muted: #9e8891;
+            --card-bg: linear-gradient(135deg, rgba(255, 107, 157, 0.12) 0%, rgba(255, 255, 255, 0.02) 100%);
+            --card-border: rgba(255, 107, 157, 0.3);
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+        }
+
+        header {
+            background: var(--header-gradient);
+            border-bottom: 1px solid rgba(255, 107, 157, 0.15);
+            padding: 16px 20px 12px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+        }
+
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .today-display { font-size: 11px; letter-spacing: 2px; color: #fff; font-weight: 700; text-transform: uppercase; border-bottom: 1px solid var(--color-chumtoto); padding-bottom: 2px; }
+        
+        .nav-controls { display: flex; align-items: center; gap: 16px; margin-bottom: 8px; }
+        .current-month-title { font-size: 22px; font-weight: 700; letter-spacing: 1px; min-width: 140px; color: #fff; }
+        
+        .nav-btn {
+            background: rgba(255, 107, 157, 0.15); border: none; color: #fff;
+            width: 30px; height: 30px; border-radius: 50%; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; transition: 0.2s;
+        }
+        .nav-btn:hover { background: rgba(255, 107, 157, 0.3); }
+
+        .filter-group { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+        .brand-badge {
+            font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: var(--color-chumtoto);
+            background: rgba(255, 107, 157, 0.15); padding: 4px 12px; border-radius: 20px;
+            border: 1px solid rgba(255, 107, 157, 0.3);
+        }
+        .manual-btn {
+            padding: 4px 12px; border-radius: 20px; border: 1px solid var(--text-muted);
+            background: transparent; color: var(--text-muted); font-size: 11px; cursor: pointer;
+            text-decoration: none; font-weight: bold; transition: all 0.2s;
+        }
+        .manual-btn:hover { border-color: var(--color-chumtoto); color: var(--color-chumtoto); }
+        
+        .view-toggle { display: flex; gap: 4px; }
+        .toggle-btn {
+            padding: 4px 12px; border-radius: 6px; border: none; background: transparent;
+            color: var(--text-muted); font-size: 11px; cursor: pointer;
+        }
+        .toggle-btn.active { background: rgba(255, 107, 157, 0.2); color: #fff; font-weight: bold; }
+
+        .content { padding: 16px 16px 60px; max-width: 800px; margin: 0 auto; }
+
+        /* リスト・カレンダー共通 */
+        .date-section { margin-bottom: 24px; scroll-margin-top: 200px; }
+        .date-header { font-size: 13px; font-weight: 700; letter-spacing: 1px; color: var(--text-muted); border-left: 3px solid rgba(255, 107, 157, 0.3); padding-left: 10px; margin-bottom: 8px; }
+        .date-header.today { color: #fff; border-left-color: var(--color-chumtoto); text-shadow: 0 0 8px rgba(255,107,157,0.5); }
+        
+        .event-card { border-radius: 8px; padding: 14px; margin-bottom: 8px; text-decoration: none; display: block; transition: transform 0.2s; cursor: pointer; background: var(--card-bg); border: 1px solid var(--card-border); border-left: 4px solid var(--color-chumtoto); }
+        .event-card:hover { transform: translateX(4px); background: linear-gradient(135deg, rgba(255, 107, 157, 0.18) 0%, rgba(255, 255, 255, 0.04) 100%); }
+        
+        .event-title { font-size: 14px; font-weight: 600; line-height: 1.4; margin-bottom: 6px; color: #fff; }
+        .event-info { font-size: 11px; color: #ccc; margin-top: 3px; display: flex; align-items: center; gap: 4px; }
+
+        /* カレンダーグリッド */
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; margin-bottom: 20px; }
+        .calendar-weekday { text-align: center; font-size: 10px; color: var(--text-muted); padding: 6px 0; font-weight: 600; }
+        .calendar-day { min-height: 52px; border-radius: 6px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.02); padding: 4px; cursor: pointer; position: relative; }
+        .calendar-day.empty { background: transparent; cursor: default; border: none; }
+        .calendar-day.selected { background: rgba(255, 107, 157, 0.15); border-color: rgba(255, 107, 157, 0.4); }
+        .calendar-day.is-today { border: 1.5px solid var(--color-chumtoto); box-shadow: inset 0 0 6px rgba(255,107,157,0.2); }
+        .day-num { font-size: 11px; color: #ccc; text-align: center; margin-bottom: 4px; }
+        .dot-container { display: flex; flex-wrap: wrap; gap: 2px; justify-content: center; }
+        .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--color-chumtoto); box-shadow: 0 0 4px var(--color-chumtoto); }
+
+        #selected-day-events { margin-top: 20px; padding: 14px; background: rgba(255,107,157,0.03); border-radius: 12px; border: 1px solid rgba(255,107,157,0.1); }
+        
+        .loading { text-align: center; color: var(--color-chumtoto); padding: 40px; font-weight: bold; letter-spacing: 2px; text-shadow: 0 0 6px rgba(255,107,157,0.3); }
+        
+        /* 下部ナビゲーション */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--header-gradient); border-top: 1px solid rgba(255, 107, 157, 0.15); display: flex; justify-content: space-around; padding: 10px 0; z-index: 100; backdrop-filter: blur(12px); }
+        .bottom-nav a { color: var(--text-muted); text-decoration: none; font-size: 10px; text-align: center; display: flex; flex-direction: column; gap: 4px; font-weight: bold; transition: color 0.2s; }
+        .bottom-nav a.active { color: var(--color-chumtoto); }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2 style="text-align: center; color: #333; margin-top: 0; font-size: 1.3rem;">📅 スケジュールカレンダー</h2>
-    <div class="nav-links">
-        <a href="index.html">➕ 手動入力フォーム</a>
-        <a href="dashboard.html">📊 ダッシュボード</a>
+<header>
+    <div class="header-top">
+        <div class="today-display" id="todayLabel">--- --, ----</div>
+        <div class="view-toggle">
+            <button class="toggle-btn active" id="listToggle">リスト</button>
+            <button class="toggle-btn" id="calendarToggle">カレンダー</button>
+        </div>
+    </div>
+    
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="changeMonth(-1)">◀</button>
+        <div class="current-month-title" id="currentMonthTitle">----年 --月</div>
+        <button class="nav-btn" onclick="changeMonth(1)">▶</button>
     </div>
 
-    <div id="loading" class="loading">公式スケジュールを読み込み中...</div>
-    <div id="calendar"></div>
+    <div class="filter-group">
+        <div class="brand-badge">CHUMTOTO</div>
+        <a href="index.html" class="manual-btn">＋手動入力</a>
+    </div>
+</header>
+
+<div id="loading" class="loading">SYNCING CHUMTOTO SCHEDULE...</div>
+<div class="content" id="mainDisplay"></div>
+
+<div class="bottom-nav">
+    <a href="calendar.html" class="active"><span>📅</span>CALENDAR</a>
+    <a href="dashboard.html"><span>📊</span>STATS</a>
+    <a href="index.html"><span>✍️</span>ENTRY</a>
 </div>
 
 <script>
-// ★重要：GASのURLを貼り付けてください
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbw7KeuN0XckEqU9V4wRxR3O8T9Rl6cC2jQesEOpOsNJTF09ZylpVFZWJnqo0aff1YNFRw/exec';
+    // ★重要：GASのウェブアプリURL
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbw7KeuN0XckEqU9V4wRxR3O8T9Rl6cC2jQesEOpOsNJTF09ZylpVFZWJnqo0aff1YNFRw/exec';
 
-document.addEventListener('DOMContentLoaded', async function() {
-    const calendarEl = document.getElementById('calendar');
-    const loadingEl = document.getElementById('loading');
+    let allEvents = [];
+    let viewMode = "list";
+    let selectedDate = null;
+    const now = new Date();
+    let displayDate = new Date(now.getFullYear(), now.getMonth(), 1);
+    const dayNames = ["日", "月", "火", "水", "木", "金", "土"];
+    const monthNamesEn = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
 
-    try {
-        // GASから公式スケジュールデータを取得
-        const response = await fetch(GAS_URL + "?action=read_schedule");
-        const resData = await response.json();
-        
-        loadingEl.style.display = 'none';
+    const getTodayStr = () => {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    };
 
-        if (resData.result === "success") {
-            // FullCalendarが読み込める形式にイベントデータを変換
-            const events = resData.data.map(item => ({
-                title: `【${item.venue}】${item.title}`,
-                start: item.date,
-                // クリックしたときにデータを受け渡すためのカスタム属性
-                extendedProps: {
-                    rawTitle: item.title,
-                    venue: item.venue,
-                    date: item.date
-                }
-            }));
-
-            const calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                locale: 'ja',
-                headerToolbar: {
-                    left: 'prev',
-                    center: 'title',
-                    right: 'next'
-                },
-                events: events,
-                // イベントをクリックしたときの動き
-                eventClick: function(info) {
-                    const props = info.event.extendedProps;
-                    // URLパラメータを作成して、入力画面(index.html)にデータを引き継いでジャンプ
-                    const targetUrl = `index.html?date=${props.date}&event=${encodeURIComponent(props.rawTitle)}&location=${encodeURIComponent(props.venue)}`;
-                    
-                    if (confirm(`選択した現場を記録しますか？\n\n現場：${props.rawTitle}\n会場：${props.venue}`)) {
-                        window.location.href = targetUrl;
-                    }
-                }
-            });
-            calendar.render();
-        }
-    } catch (e) {
-        loadingEl.innerText = "スケジュールデータの取得に失敗しました。Pythonから同期を行ってください。";
+    function updateTodayLabel() {
+        const d = new Date();
+        document.getElementById('todayLabel').innerText = `${monthNamesEn[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
     }
-});
+
+    async function init() {
+        updateTodayLabel();
+        try {
+            const response = await fetch(GAS_URL + "?action=read_schedule");
+            const resData = await response.json();
+            
+            if (resData.result === "success") {
+                allEvents = resData.data;
+                document.getElementById('loading').style.display = 'none';
+                updateHeader();
+                render(true);
+            }
+        } catch (e) {
+            document.getElementById('loading').innerText = "ERROR: FAILED TO FETCH DATA";
+        }
+    }
+
+    function changeMonth(delta) {
+        displayDate.setMonth(displayDate.getMonth() + delta);
+        selectedDate = null;
+        updateHeader();
+        render(false);
+    }
+
+    function updateHeader() {
+        const y = displayDate.getFullYear();
+        const m = displayDate.getMonth();
+        document.getElementById('currentMonthTitle').innerText = `${y}年 ${m + 1}月`;
+    }
+
+    function render(shouldScroll = false) {
+        const display = document.getElementById('mainDisplay');
+        display.innerHTML = "";
+        const y = displayDate.getFullYear();
+        const m = displayDate.getMonth();
+        
+        const filtered = allEvents.filter(ev => {
+            const evDate = new Date(ev.date);
+            return evDate.getFullYear() === y && evDate.getMonth() === m;
+        });
+
+        if (viewMode === "list") {
+            renderList(filtered, display, shouldScroll);
+        } else {
+            renderCalendar(filtered, display);
+        }
+    }
+
+    function renderList(events, container, shouldScroll) {
+        const grouped = {};
+        events.sort((a,b) => a.date.localeCompare(b.date)).forEach(ev => {
+            if(!grouped[ev.date]) grouped[ev.date] = [];
+            grouped[ev.date].push(ev);
+        });
+
+        const todayStr = getTodayStr();
+        let closestDate = null;
+
+        if (Object.keys(grouped).length === 0) {
+            container.innerHTML = '<div style="text-align:center; color:var(--text-muted); margin-top:60px; font-size:12px; letter-spacing:1px;">NO SCHEDULE THIS MONTH</div>';
+            return;
+        }
+
+        for (const date in grouped) {
+            const d = new Date(date);
+            const isToday = (date === todayStr);
+            if (!closestDate && date >= todayStr) closestDate = date;
+
+            container.innerHTML += `
+                <div class="date-section" id="date-${date}">
+                    <div class="date-header ${isToday ? 'today' : ''}">${d.getMonth()+1}/${d.getDate()}（${dayNames[d.getDay()]}）${isToday ? ' [TODAY]' : ''}</div>
+                    ${grouped[date].map(ev => createEventCard(ev)).join('')}
+                </div>
+            `;
+        }
+
+        if (shouldScroll && closestDate) {
+            setTimeout(() => {
+                const target = document.getElementById(`date-${closestDate}`);
+                if (target) {
+                    const headerHeight = document.querySelector('header').offsetHeight;
+                    window.scrollTo({ top: target.offsetTop - headerHeight - 20, behavior: 'smooth' });
+                }
+            }, 100);
+        }
+    }
+
+    function renderCalendar(events, container) {
+        const y = displayDate.getFullYear();
+        const m = displayDate.getMonth();
+        const firstDay = new Date(y, m, 1).getDay();
+        const daysInMonth = new Date(y, m + 1, 0).getDate();
+        const todayStr = getTodayStr();
+        
+        let html = '<div class="calendar-grid">';
+        dayNames.forEach((d, i) => html += `<div class="calendar-weekday" style="color:${i==0?'#ff6b9d':i==6?'#6ba3ff':''}">${d}</div>`);
+        for(let i=0; i<firstDay; i++) html += '<div class="calendar-day empty"></div>';
+        
+        for(let d=1; d<=daysInMonth; d++) {
+            const dateKey = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+            const dayEvents = events.filter(e => e.date === dateKey);
+            const isToday = (dateKey === todayStr);
+            
+            html += `
+                <div class="calendar-day ${selectedDate === dateKey?'selected':''} ${isToday?'is-today':''}" onclick="selectDate('${dateKey}')">
+                    <div class="day-num">${d}</div>
+                    <div class="dot-container">
+                        ${dayEvents.length > 0 ? '<div class="dot"></div>' : ''}
+                    </div>
+                </div>
+            `;
+        }
+        html += '</div><div id="selected-day-events"></div>';
+        container.innerHTML = html;
+        if(selectedDate) renderSelectedDay(events);
+    }
+
+    function selectDate(date) {
+        selectedDate = (selectedDate === date) ? null : date;
+        render(false);
+    }
+
+    function renderSelectedDay(events) {
+        const dayEvents = events.filter(e => e.date === selectedDate);
+        const container = document.getElementById('selected-day-events');
+        if(!dayEvents.length) { container.innerHTML = ""; return; }
+        const d = new Date(selectedDate);
+        container.innerHTML = `
+            <div class="date-header" style="margin-bottom:12px">${d.getMonth()+1}/${d.getDate()}（${dayNames[d.getDay()]}）</div>
+            ${dayEvents.map(ev => createEventCard(ev)).join('')}
+        `;
+    }
+
+    function createEventCard(ev) {
+        const timeInfo = ev.time ? `<div class="event-info">⏰ ${ev.time}</div>` : '';
+        const venueInfo = `<div class="event-info">📍 ${ev.venue || '詳細確認'}</div>`;
+        const clickAction = `onclick="moveToEntry('${ev.date}', '${encodeURIComponent(ev.title)}', '${encodeURIComponent(ev.venue)}')"`
+
+        return `
+            <div class="event-card" ${clickAction}>
+                <div class="event-title">${ev.title}</div>
+                ${timeInfo}
+                ${venueInfo}
+            </div>
+        `;
+    }
+
+    function moveToEntry(date, title, venue) {
+        const targetUrl = `index.html?date=${date}&event=${title}&location=${venue}`;
+        if (confirm(`選択した現場を記録しますか？\n\n現場：${decodeURIComponent(title)}`)) {
+            window.location.href = targetUrl;
+        }
+    }
+
+    document.getElementById('listToggle').addEventListener('click', () => {
+        viewMode = "list";
+        document.getElementById('listToggle').classList.add('active');
+        document.getElementById('calendarToggle').classList.remove('active');
+        render(true);
+    });
+
+    document.getElementById('calendarToggle').addEventListener('click', () => {
+        viewMode = "calendar";
+        document.getElementById('calendarToggle').classList.add('active');
+        document.getElementById('listToggle').classList.remove('active');
+        render(false);
+    });
+
+    init();
 </script>
 </body>
 </html>
