@@ -18,255 +18,278 @@
         }
 
         body { margin: 0; font-family: 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif; background: var(--bg-gradient); color: var(--text-main); min-height: 100vh; padding-bottom: 100px; }
-        header { background: var(--header-gradient); border-bottom: 1px solid rgba(255, 107, 157, 0.15); padding: 16px 20px 12px; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(12px); text-align: center; }
-        h2 { margin: 0; font-size: 18px; font-weight: 700; letter-spacing: 2px; color: #fff; text-shadow: 0 0 8px rgba(255, 107, 157, 0.4); }
-        .container { max-width: 500px; margin: 20px auto; padding: 0 16px; box-sizing: border-box; }
-        .form-box { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
-        .input-group { margin-bottom: 18px; }
-        label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 6px; font-weight: bold; letter-spacing: 1px; }
-
-        input[type="date"], input[type="text"], input[type="number"] { width: 100%; padding: 12px; background: var(--input-bg); border: 1px solid var(--card-border); border-radius: 8px; color: #fff; font-size: 14px; box-sizing: border-box; transition: all 0.2s; }
-        input:focus { outline: none; border-color: var(--color-chumtoto); box-shadow: 0 0 8px rgba(255, 107, 157, 0.3); }
-
-        .checkbox-group { display: flex; align-items: center; gap: 10px; background: var(--input-bg); padding: 12px; border-radius: 8px; border: 1px solid var(--card-border); cursor: pointer; }
-        .checkbox-group input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--color-chumtoto); cursor: pointer; }
-        .checkbox-label { font-size: 14px; color: #fff; user-select: none; cursor: pointer; }
-
-        .benefit-row { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02); padding: 10px 14px; border-radius: 8px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.04); transition: opacity 0.3s; }
-        .disabled-card { opacity: 0.3; pointer-events: none; }
-        .benefit-name { font-size: 13px; font-weight: 600; }
-        .counter-controls { display: flex; align-items: center; gap: 15px; }
         
-        .btn-count { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--card-border); background: rgba(255, 107, 157, 0.15); color: #fff; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-        .btn-count:hover { background: var(--color-chumtoto); box-shadow: 0 0 8px var(--color-chumtoto); }
-        .count-value { font-size: 16px; font-weight: bold; min-width: 20px; text-align: center; }
+        header {
+            background: var(--header-gradient);
+            border-bottom: 1px solid rgba(255, 107, 157, 0.15);
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            height: 34px;
+        }
 
-        .total-box { margin-top: 24px; background: linear-gradient(135deg, rgba(255,107,157,0.2) 0%, rgba(255,255,255,0.02) 100%); border: 1px solid var(--color-chumtoto); border-radius: 10px; padding: 14px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 0 10px rgba(255,107,157,0.1); }
-        .total-label { font-size: 12px; font-weight: bold; color: var(--text-muted); letter-spacing: 1px; }
-        .total-price { font-size: 24px; font-weight: 800; color: var(--color-chumtoto); text-shadow: 0 0 8px rgba(255,107,157,0.4); }
+        .back-portal-btn {
+            color: var(--color-chumtoto);
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: bold;
+            border: 1px solid rgba(255, 107, 157, 0.3);
+            padding: 6px 10px;
+            border-radius: 6px;
+            background: rgba(255, 107, 157, 0.05);
+            transition: 0.2s;
+            position: absolute;
+            left: 20px;
+            z-index: 10;
+        }
+        .back-portal-btn:hover {
+            background: rgba(255, 107, 157, 0.15);
+        }
 
-        .submit-btn { width: 100%; margin-top: 20px; padding: 14px; background: var(--color-chumtoto); border: none; border-radius: 8px; color: #fff; font-size: 15px; font-weight: bold; letter-spacing: 2px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 12px rgba(255,107,157,0.3); }
-        .submit-btn:hover:not(:disabled) { opacity: 0.9; box-shadow: 0 4px 20px rgba(255,107,157,0.5); }
-        .submit-btn.edit-mode { background: var(--color-update); box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3); }
-        .submit-btn.edit-mode:hover:not(:disabled) { box-shadow: 0 4px 20px rgba(33, 150, 243, 0.5); }
-        .submit-btn:disabled { background: #4a353c; color: #8a7078; box-shadow: none; cursor: not-allowed; }
+        header h1 {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: 3px;
+            color: #fff;
+            text-shadow: 0 0 8px rgba(255, 107, 157, 0.4);
+            width: 100%;
+            text-align: center;
+        }
 
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--header-gradient); border-top: 1px solid rgba(255, 107, 157, 0.15); display: flex; justify-content: space-around; padding: 10px 0; z-index: 100; backdrop-filter: blur(12px); }
-        .bottom-nav a { color: var(--text-muted); text-decoration: none; font-size: 10px; text-align: center; display: flex; flex-direction: column; gap: 4px; font-weight: bold; }
-        .bottom-nav a.active { color: var(--color-chumtoto); }
+        .container { max-width: 500px; margin: 0 auto; padding: 16px; box-sizing: border-box; }
+
+        .form-section { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px; margin-bottom: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+        .section-title { font-size: 12px; font-weight: bold; color: var(--color-chumtoto); letter-spacing: 1px; margin-bottom: 16px; border-left: 3px solid var(--color-chumtoto); padding-left: 8px; }
+        
+        .input-group { margin-bottom: 14px; }
+        .input-group label { display: block; font-size: 11px; font-weight: bold; color: var(--text-muted); margin-bottom: 6px; letter-spacing: 0.5px; }
+        .input-group input[type="text"], .input-group input[type="date"], .input-group input[type="number"] { width: 100%; background: var(--input-bg); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; color: #fff; font-size: 14px; font-weight: 500; outline: none; box-sizing: border-box; transition: 0.2s; }
+        .input-group input:focus { border-color: var(--color-chumtoto); background: rgba(0,0,0,0.5); }
+
+        .switch-group { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 12px 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.02); }
+        .switch-label { font-size: 13px; font-weight: bold; }
+        .toggle-switch { position: relative; display: inline-block; width: 46px; height: 26px; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.1); transition: .3s; border-radius: 26px; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--color-chumtoto); }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        .counter-mesh { display: flex; flex-direction: column; gap: 10px; }
+        .counter-row { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.02); }
+        .counter-info { flex: 1; }
+        .counter-name { font-size: 13px; font-weight: bold; color: #fff; }
+        .counter-price { font-size: 10px; color: var(--text-muted); margin-top: 1px; }
+        .counter-actions { display: flex; align-items: center; gap: 14px; }
+        .cnt-btn { width: 32px; height: 32px; background: rgba(255,107,157,0.1); border: 1px solid rgba(255,107,157,0.2); color: var(--color-chumtoto); font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.15s; }
+        .cnt-btn:active { background: var(--color-chumtoto); color: #fff; }
+        .cnt-val { font-size: 16px; font-weight: 900; min-width: 20px; text-align: center; color: #fff; }
+
+        .sticky-calc-bar { position: fixed; bottom: 56px; left: 0; right: 0; background: linear-gradient(180deg, rgba(36,20,26,0.9) 0%, #24141a 100%); border-top: 1px solid rgba(255,107,157,0.2); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(15px); z-index: 90; }
+        .calc-lbl { font-size: 11px; color: var(--text-muted); font-weight: bold; letter-spacing: 1px; }
+        .calc-amt { font-size: 24px; font-weight: 900; color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.1); }
+        .submit-btn { background: var(--color-chumtoto); border: none; color: #fff; padding: 10px 20px; font-size: 13px; font-weight: bold; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 12px rgba(255,107,157,0.3); }
+        .submit-btn:disabled { background: #4a343c; color: var(--text-muted); box-shadow: none; cursor: not-allowed; }
+
+        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(19, 11, 14, 0.92); border-top: 1px solid rgba(255,107,157,0.1); display: flex; padding: 6px 0; backdrop-filter: blur(10px); z-index: 100; }
+        .nav-item { flex: 1; text-align: center; text-decoration: none; color: var(--text-muted); font-size: 10px; font-weight: bold; display: flex; flex-direction: column; gap: 2px; }
+        .nav-item.active { color: var(--color-chumtoto); }
+        .nav-icon { font-size: 18px; }
     </style>
 </head>
 <body>
 
 <header>
-    <h2 id="form-title">✍️ FIELD ENTRY</h2>
+    <a href="index.html" class="back-portal-btn">◀ PORTAL</a>
+    <h1 id="form-title">FIELD ENTRY</h1>
 </header>
 
 <div class="container">
-    <div class="form-box">
+    <div class="form-section">
+        <div class="section-title">基本現場情報</div>
+        
         <div class="input-group">
-            <label>DATE</label>
-            <input type="date" id="date" onclick="this.showPicker()">
+            <label>DATE (開催日)</label>
+            <input type="date" id="date">
+        </div>
+        <div class="input-group">
+            <label>EVENT NAME (現場・イベント名)</label>
+            <input type="text" id="event_name" placeholder="対バン名、単独公演名など">
+        </div>
+        <div class="input-group">
+            <label>LOCATION (会場・配信プラットフォーム)</label>
+            <input type="text" id="location" placeholder="秋葉原ディアステージ、ZEPPなど">
+        </div>
+        <div class="input-group" style="margin-bottom:18px;">
+            <label>TICKET FEE (チケット代・発券手数料込)</label>
+            <input type="number" id="ticket_fee" value="0" oninput="calc()">
         </div>
 
-        <div class="input-group">
-            <label>EVENT NAME</label>
-            <input type="text" id="event_name" placeholder="イベント名を入力">
-        </div>
-
-        <div class="input-group">
-            <label>LOCATION</label>
-            <input type="text" id="location" placeholder="会場を入力">
-        </div>
-
-        <div class="input-group">
-            <label>TICKET FEE</label>
-            <input type="number" id="ticket_fee" placeholder="¥ 0" oninput="calc()">
-        </div>
-
-        <div class="input-group" style="margin-bottom: 24px;">
-            <label class="checkbox-group" for="attendance">
-                <input type="checkbox" id="attendance" checked onchange="toggleAttendance()">
-                <span class="checkbox-label" id="status-label">状態：参加</span>
+        <div class="switch-group">
+            <span class="switch-label">現場に「参加」しましたか？</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="attendance" checked>
+                <span class="slider"></span>
             </label>
         </div>
+    </div>
 
-        <label style="margin-bottom: 10px;">BENEFIT BENEFITS (特典会)</label>
-        
-        <div class="benefit-row" id="card-sign_cheki">
-            <span class="benefit-name">📸 サインチェキ (¥3,000)</span>
-            <div class="counter-controls">
-                <button class="btn-count" onclick="changeCount('sign_cheki', -1)">-</button>
-                <span class="count-value" id="val-sign_cheki">0</span>
-                <button class="btn-count" onclick="changeCount('sign_cheki', 1)">+</button>
+    <div class="form-section" style="margin-bottom: 80px;">
+        <div class="section-title">特典会・物販インベントリ</div>
+        <div class="counter-mesh">
+            <div class="counter-row">
+                <div class="counter-info"><div class="counter-name">サイン対象チェキ</div><div class="counter-price">¥3,000 / 枚</div></div>
+                <div class="counter-actions"><button class="cnt-btn" onclick="step('sign_cheki',-1)">-</button><span class="cnt-val" id="val-sign_cheki">0</span><button class="cnt-btn" onclick="step('sign_cheki',1)">+</button></div>
+            </div>
+            <div class="counter-row">
+                <div class="counter-info"><div class="counter-name">サインなし白チェキ</div><div class="counter-price">¥2,000 / 枚</div></div>
+                <div class="counter-actions"><button class="cnt-btn" onclick="step('white_cheki',-1)">-</button><span class="cnt-val" id="val-white_cheki">0</span><button class="cnt-btn" onclick="step('white_cheki',1)">+</button></div>
+            </div>
+            <div class="counter-row">
+                <div class="counter-info"><div class="counter-name">15秒動画 (TikTok)</div><div class="counter-price">¥3,500 / 本</div></div>
+                <div class="counter-actions"><button class="cnt-btn" onclick="step('tiktok',-1)">-</button><span class="cnt-val" id="val-tiktok">0</span><button class="cnt-btn" onclick="step('tiktok',1)">+</button></div>
+            </div>
+            <div class="counter-row">
+                <div class="counter-info"><div class="counter-name">囲み・ペアチェキ</div><div class="counter-price">¥4,000 / 枚</div></div>
+                <div class="counter-actions"><button class="cnt-btn" onclick="step('kakomi',-1)">-</button><span class="cnt-val" id="val-kakomi">0</span><button class="cnt-btn" onclick="step('kakomi',1)">+</button></div>
+            </div>
+            <div class="counter-row">
+                <div class="counter-info"><div class="counter-name">私物サイン券</div><div class="counter-price">¥4,500 / 枚</div></div>
+                <div class="counter-actions"><button class="cnt-btn" onclick="step('item_sign',-1)">-</button><span class="cnt-val" id="val-item_sign">0</span><button class="cnt-btn" onclick="step('item_sign',1)">+</button></div>
+            </div>
+            <div class="counter-row">
+                <div class="counter-info"><div class="counter-name">お見送り会参加券</div><div class="counter-price">¥1,500 / 枚</div></div>
+                <div class="counter-actions"><button class="cnt-btn" onclick="step('omiyokuri',-1)">-</button><span class="cnt-val" id="val-omiyokuri">0</span><button class="cnt-btn" onclick="step('omiyokuri',1)">+</button></div>
             </div>
         </div>
-
-        <div class="benefit-row" id="card-white_cheki">
-            <span class="benefit-name">⚪ 白チェキ (¥2,000)</span>
-            <div class="counter-controls">
-                <button class="btn-count" onclick="changeCount('white_cheki', -1)">-</button>
-                <span class="count-value" id="val-white_cheki">0</span>
-                <button class="btn-count" onclick="changeCount('white_cheki', 1)">+</button>
-            </div>
-        </div>
-
-        <div class="benefit-row" id="card-tiktok">
-            <span class="benefit-name">📱 TikTok撮影 (¥3,500)</span>
-            <div class="counter-controls">
-                <button class="btn-count" onclick="changeCount('tiktok', -1)">-</button>
-                <span class="count-value" id="val-tiktok">0</span>
-                <button class="btn-count" onclick="changeCount('tiktok', 1)">+</button>
-            </div>
-        </div>
-
-        <div class="benefit-row" id="card-kakomi">
-            <span class="benefit-name">👥 囲み撮影 (¥4,000)</span>
-            <div class="counter-controls">
-                <button class="btn-count" onclick="changeCount('kakomi', -1)">-</button>
-                <span class="count-value" id="val-kakomi">0</span>
-                <button class="btn-count" onclick="changeCount('kakomi', 1)">+</button>
-            </div>
-        </div>
-
-        <div class="benefit-row" id="card-item_sign">
-            <span class="benefit-name">🎒 私物サイン (¥4,500)</span>
-            <div class="counter-controls">
-                <button class="btn-count" onclick="changeCount('item_sign', -1)">-</button>
-                <span class="count-value" id="val-item_sign">0</span>
-                <button class="btn-count" onclick="changeCount('item_sign', 1)">+</button>
-            </div>
-        </div>
-
-        <div class="benefit-row" id="card-omiyokuri">
-            <span class="benefit-name">👋 お見送り (¥1,500)</span>
-            <div class="counter-controls">
-                <button class="btn-count" onclick="changeCount('omiyokuri', -1)">-</button>
-                <span class="count-value" id="val-omiyokuri">0</span>
-                <button class="btn-count" onclick="changeCount('omiyokuri', 1)">+</button>
-            </div>
-        </div>
-
-        <div class="total-box">
-            <span class="total-label">ESTIMATED TOTAL EXPENSE</span>
-            <span class="total-price" id="display-total">¥0</span>
-        </div>
-
-        <button class="submit-btn" id="submit-btn" onclick="sendData()">LOG EVENT TO SHEET</button>
     </div>
 </div>
 
-<div class="bottom-nav">
-    <a href="calendar.html"><span>📅</span>CALENDAR</a>
-    <a href="dashboard.html"><span>📊</span>STATS</a>
-    <a href="entry.html" class="active"><span>✍️</span>ENTRY</a>
+<div class="sticky-calc-bar">
+    <div><div class="calc-lbl">CURRENT TOTAL</div><div class="calc-amt" id="display-total">¥0</div></div>
+    <button class="submit-btn" id="submit-btn" onclick="sendData()">データ保存</button>
 </div>
 
+<nav class="nav-bar">
+    <a href="calendar.html" class="nav-item"><span class="nav-icon">📅</span>SCHEDULE</a>
+    <a href="dashboard.html" class="nav-item"><span class="nav-icon">📊</span>STATS</a>
+    <a href="entry.html" class="nav-item active"><span class="nav-icon">✍️</span>ENTRY</a>
+</nav>
+
 <script>
-const PRICES = { sign_cheki: { price: 3000 }, white_cheki: { price: 2000 }, tiktok: { price: 3500 }, kakomi: { price: 4000 }, item_sign: { price: 4500 }, omiyokuri: { price: 1500 } };
-let counts = { sign_cheki: 0, white_cheki: 0, tiktok: 0, kakomi: 0, item_sign: 0, omiyokuri: 0 };
-
-let isEditMode = false;
-let editRowIndex = null;
-
-window.onload = function() {
-    const params = new URLSearchParams(window.location.search);
-    
-    if (params.get('mode') === 'edit') {
-        isEditMode = true;
-        editRowIndex = params.get('row_index');
-        
-        document.getElementById('form-title').innerText = "✏️ EDIT FIELD ENTRY";
-        const submitBtn = document.getElementById('submit-btn');
-        submitBtn.innerText = "UPDATE FIELD ENTRY (修正を保存)";
-        submitBtn.classList.add('edit-mode');
-        
-        document.getElementById('date').value = params.get('date');
-        document.getElementById('event_name').value = decodeURIComponent(params.get('event'));
-        document.getElementById('location').value = decodeURIComponent(params.get('location'));
-        document.getElementById('ticket_fee').value = params.get('ticket_fee');
-        
-        const isAttending = (decodeURIComponent(params.get('attendance')) === '参加');
-        document.getElementById('attendance').checked = isAttending;
-        
-        Object.keys(counts).forEach(key => {
-            const countVal = parseInt(params.get(key)) || 0;
-            counts[key] = countVal;
-            document.getElementById(`val-${key}`).innerText = countVal;
-        });
-        
-        toggleAttendance();
-    } else {
-        if(params.get('date')) document.getElementById('date').value = params.get('date');
-        if(params.get('event')) document.getElementById('event_name').value = decodeURIComponent(params.get('event'));
-        if(params.get('location')) document.getElementById('location').value = decodeURIComponent(params.get('location'));
-    }
-    calc();
-}
-
-function toggleAttendance() {
-    const isAttending = document.getElementById('attendance').checked;
-    const label = document.getElementById('status-label');
-    if (isAttending) {
-        label.innerText = "状態：参加";
-        Object.keys(PRICES).forEach(key => document.getElementById(`card-${key}`).classList.remove('disabled-card'));
-    } else {
-        label.innerText = "状態：不参加（干した・諦めた）";
-        Object.keys(PRICES).forEach(key => {
-            counts[key] = 0;
-            document.getElementById(`val-${key}`).innerText = 0;
-            document.getElementById(`card-${key}`).classList.add('disabled-card');
-        });
-    }
-    calc();
-}
-
-function changeCount(key, delta) {
-    counts[key] = Math.max(0, counts[key] + delta);
-    document.getElementById(`val-${key}`).innerText = counts[key];
-    calc();
-}
-
-function calc() {
-    let total = parseInt(document.getElementById('ticket_fee').value) || 0;
-    Object.keys(PRICES).forEach(key => { total += counts[key] * PRICES[key].price; });
-    document.getElementById('display-total').innerText = `¥${total.toLocaleString()}`;
-}
-
-async function sendData() {
-    const btn = document.getElementById('submit-btn');
-    const GAS_URL = 'https://script.google.com/macros/s/AKfycbw7KeuN0XckEqU9V4wRxR3O8T9Rl6cC2jQesEOpOsNJTF09ZylpVFZWJnqo0aff1YNFRw/exec';
-
-    btn.disabled = true;
-    btn.innerText = '送信中...';
-
-    const payload = {
-        action: isEditMode ? "update_history" : "insert_history",
-        row_index: editRowIndex,
-        date: document.getElementById('date').value,
-        event_name: document.getElementById('event_name').value,
-        location: document.getElementById('location').value,
-        ticket_fee: document.getElementById('ticket_fee').value,
-        attendance: document.getElementById('attendance').checked ? "参加" : "不参加",
-        ...counts
+    const PRICES = {
+        sign_cheki: { label: "サインチェキ", price: 3000 },
+        white_cheki: { label: "白チェキ", price: 2000 },
+        tiktok: { label: "15秒動画", price: 3500 },
+        kakomi: { label: "囲みチェキ", price: 4000 },
+        item_sign: { label: "私物サイン", price: 4500 },
+        omiyokuri: { label: "お見送り", price: 1500 }
     };
 
-    try {
-        await fetch(GAS_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'text/plain' },
-            body: JSON.stringify(payload)
-        });
-        alert(isEditMode ? '修正が完了しました！' : '保存完了しました！');
-        // 💡 ② 保存・修正完了後の戻り先をポータル画面（index.html）に変更
-        window.location.href = 'index.html';
-    } catch(e) {
-        alert('エラーが発生しました');
-        btn.disabled = false;
-        btn.innerText = isEditMode ? "UPDATE FIELD ENTRY (修正を保存)" : "LOG EVENT TO SHEET";
+    let counts = { sign_cheki: 0, white_cheki: 0, tiktok: 0, kakomi: 0, item_sign: 0, omiyokuri: 0 };
+    let isEditMode = false;
+    let editRowIndex = null;
+
+    window.onload = function() {
+        const params = new URLSearchParams(window.location.search);
+        
+        const editRow = params.get('edit_row');
+        if (editRow) {
+            isEditMode = true;
+            editRowIndex = editRow;
+            document.getElementById('form-title').innerText = "EDIT FIELD RECORD";
+            document.getElementById('submit-btn').innerText = "修正内容を保存";
+            document.getElementById('submit-btn').style.backgroundColor = "var(--color-update)";
+            fetchRowData(editRow);
+            return;
+        }
+
+        const pDate = params.get('date');
+        const pEvent = params.get('event');
+        const pLoc = params.get('location');
+
+        if (pDate) document.getElementById('date').value = pDate;
+        if (pEvent) document.getElementById('event_name').value = decodeURIComponent(pEvent);
+        if (pLoc) document.getElementById('location').value = decodeURIComponent(pLoc);
+        calc();
     }
-}
+
+    async function fetchRowData(rowIndex) {
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbw7KeuN0XckEqU9V4wRxR3O8T9Rl6cC2jQesEOpOsNJTF09ZylpVFZWJnqo0aff1YNFRw/exec';
+        try {
+            const r = await fetch(`${GAS_URL}?action=read_history`);
+            const res = await r.json();
+            if (res.result === "success") {
+                const targetRow = res.data.find(row => String(row.row_index) === String(rowIndex));
+                if (targetRow) {
+                    document.getElementById('date').value = targetRow.date || "";
+                    document.getElementById('event_name').value = targetRow.event_name || "";
+                    document.getElementById('location').value = targetRow.location || "";
+                    document.getElementById('ticket_fee').value = targetRow.ticket_fee || 0;
+                    document.getElementById('attendance').checked = (targetRow.attendance === "参加");
+                    
+                    Object.keys(counts).forEach(key => {
+                        counts[key] = parseInt(targetRow[key]) || 0;
+                        document.getElementById(`val-${key}`).innerText = counts[key];
+                    });
+                    calc();
+                }
+            }
+        } catch(e) {
+            alert("修正対象データの読み込みに失敗しました。");
+        }
+    }
+
+    function step(key, val) {
+        counts[key] = Math.max(0, counts[key] + val);
+        document.getElementById(`val-${key}`).innerText = counts[key];
+        calc();
+    }
+
+    function calc() {
+        let total = parseInt(document.getElementById('ticket_fee').value) || 0;
+        Object.keys(PRICES).forEach(key => { total += counts[key] * PRICES[key].price; });
+        document.getElementById('display-total').innerText = `¥${total.toLocaleString()}`;
+    }
+
+    async function sendData() {
+        const btn = document.getElementById('submit-btn');
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbw7KeuN0XckEqU9V4wRxR3O8T9Rl6cC2jQesEOpOsNJTF09ZylpVFZWJnqo0aff1YNFRw/exec';
+
+        btn.disabled = true;
+        btn.innerText = '送信中...';
+
+        const payload = {
+            action: isEditMode ? "update_history" : "insert_history",
+            row_index: editRowIndex,
+            date: document.getElementById('date').value,
+            event_name: document.getElementById('event_name').value,
+            location: document.getElementById('location').value,
+            ticket_fee: document.getElementById('ticket_fee').value,
+            attendance: document.getElementById('attendance').checked ? "参加" : "不参加",
+            ...counts
+        };
+
+        try {
+            await fetch(GAS_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain' },
+                body: JSON.stringify(payload)
+            });
+            alert(isEditMode ? '修正が完了しました！' : '保存完了しました！');
+            window.location.href = 'index.html'; 
+        } catch (e) {
+            alert('通信エラーが発生しました。');
+            btn.disabled = false;
+            btn.innerText = isEditMode ? '修正内容を保存' : 'データ保存';
+        }
+    }
 </script>
 </body>
 </html>
