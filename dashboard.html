@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>現場集計ダッシュボード</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f0f2f5; margin: 0; padding: 15px; }
+        .container { max-width: 600px; margin: 0 auto; }
+        h2 { text-align: center; color: #1a73e8; margin-top: 0; }
+        .nav-links { text-align: center; margin-bottom: 20px; }
+        .nav-links a { color: #1a73e8; text-decoration: none; font-size: 0.9rem; font-weight: bold; }
+        
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .stats-card { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); text-align: center; }
+        .stats-card.full { grid-column: span 2; background: #e8f0fe; }
+        .stats-label { font-size: 0.8rem; color: #666; margin-bottom: 5px; }
+        .stats-value { font-size: 1.4rem; font-weight: bold; color: #333; }
+        
+        .chart-container { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .loading { text-align: center; color: #666; padding: 40px 0; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>現場集計ダッシュボード</h2>
+    <div class="nav-links">
+        <a href="index.html">➕ 現場記録を入力する画面に戻る</a>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stats-card full">
+            <div class="stats-label">遠征・オタ活 総支出</div>
+            <div class="stats-value" id="total-all">¥0</div>
+        </div>
+        <div class="stats-card">
+            <div class="stats-label">今月の支出</div>
+            <div class="stats-value" id="total-month">¥0</div>
+        </div>
+        <div class="stats-card">
+            <div class="stats-label">現場参加率</div>
+            <div class="stats-value" id="attendance-rate">0%</div>
+        </div>
+    </div>
+
+    <div class="chart-container">
+        <h3 style="font-size: 1rem; color: #444; margin-top: 0;">月別支出推移 (¥)</h3>
+        <div id="loading-text" class="loading">スプレッドシートからデータを計算中...</div>
+        <canvas id="expenseChart" style="display: none;"></canvas>
+    </div>
+</div>
+
+<script>
+// 単価テーブル（集計計算用）
+const PRICES = { sign_cheki: 3000, white_cheki: 2000, tiktok: 3500, kakomi: 4000, item_sign: 0, omiyokuri: 1500 };
+
+// ★重要：データを読み込むためのGASのURL（index.htmlと同じものを貼り付けてください）
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxTpsaay81w4DDRfjfui7pfmnlc4aDaOPJx_fy4Shf275gpnyUZ9R-ObhAWQOMVOwyP/exec';
+
+window.onload = async () => {
+    try {
+        // GASから全データをGETで取得（※現状のGASはPOSTしかないので、簡易的に全読み込みするための仕組みを後ほど補足します）
+        // 一旦、GAS側を「データ取得」にも対応させる必要があります。
+        
+        // ※解説：現在のGASコードは書き込み(doPost)専用なので、ダッシュボードでデータを読むために
+        // GAS側に「データを全件返す機能(doGet)」を追加する必要があります。
+        
+        // テスト表示用ロジック（GASのアップデート後に完全連動します）
+        fetchDataAndRender();
+    } catch (e) {
+        document.getElementById('loading-text').innerText = "データの読み込みに失敗しました。";
+    }
+};
+
+async function fetchDataAndRender() {
+    // データ取得用にGASのURLを叩く（GETリクエスト）
+    const response = await fetch(GAS_URL + "?action=read");
+    const resData = await response.json();
+    
+    if(resData.result === "success") {
+        const rows = resData.data; // スプシから届いた全行データ
+        
+        let totalAll = 0;
+        let totalMonth = 0;
+        let attendCount = 0;
+        let totalCount = 0;
+        
+        const currentMonth = new Date().toISOString().substring(0, 7); // "2026-05"
+        const monthlyData = {}; // 月ごとの集計用オブジェクト
+
+        rows.forEach(row => {
+            if (!row.date) return;
+            totalCount++;
+            if (row.attendance === "参加") attendCount++;
+            
+            // 1行の合計金額を計算
+            let rowTotal = Number(row.ticket_fee) || 0;
+            rowTotal += (Number(row.sign_cheki) || 0) * PRICES.sign_cheki;
+            rowTotal += (Number(row.white_cheki) || 0) * PRICES.white_cheki;
+            rowTotal += (Number(row.tiktok) || 0) * PRICES.tiktok;
+            rowTotal += (Number(row.kakomi) || 0) * PRICES.kakomi;
+            rowTotal += (Number(row.item_sign) || 0) * PRICES.item_sign;
+            rowTotal += (Number(row.omiyokuri) || 0) * PRICES.omiyokuri;
+            
+            totalAll += rowTotal;
+            
+            // 今月の支出
+            if (row.date.substring(0, 7) === currentMonth) {
+                totalMonth += rowTotal;
+            }
+            
+            // 月別の集計
+            const monthKey = row.date.substring(0, 7); // "2026-01" など
+            monthlyData[monthKey] = (monthlyData[monthKey] || 0) + rowTotal;
+        });
+
+        // 画面の数字を更新
+        document.getElementById('total-all').innerText = `¥${totalAll.toLocaleString()}`;
+        document.getElementById('total-month').innerText = `¥${totalMonth.toLocaleString()}`;
+        document.getElementById('attendance-rate').innerText = totalCount > 0 ? `${Math.round((attendCount / totalCount) * 100)}%` : "0%";
+
+        // グラフ用データの整理
+        const labels = Object.keys(monthlyData).sort();
+        const chartValues = labels.map(key => monthlyData[key]);
+
+        document.getElementById('loading-text').style.display = 'none';
+        const ctx = document.getElementById('expenseChart');
+        ctx.style.display = 'block';
+
+        // Chart.jsで棒グラフを作成
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: '支出合計',
+                    data: chartValues,
+                    backgroundColor: '#1a73e8',
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+    }
+}
+</script>
+</body>
+</html>
