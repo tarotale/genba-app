@@ -19,19 +19,11 @@ jobs:
       with:
         python-version: '3.10'
 
-    # 💡 Linux環境のブラウザとドライバーの互換性問題を完全に解決するセットアップ
-    - name: Setup Chrome and ChromeDriver
+    # 💡 公式の安全なChrome/ChromeDriverセットアップだけに絞ります
+    - name: Setup Chrome
       uses: browser-actions/setup-chrome@v1
       with:
         chrome-version: stable
-    - name: Install ChromeDriver
-      run: |
-        CHROME_VERSION=$(google-chrome --version | cut -d ' ' -f 3 | cut -d '.' -f 1)
-        CHROMEDRIVER_VERSION=$(curl -s "https://googlechromelabs.github.io/chrome-for-testing/LATEST_RELEASE_${CHROME_VERSION}")
-        curl -sS -o /tmp/chromedriver.zip "https://googlechromelabs.github.io/chrome-for-testing/${CHROMEDRIVER_VERSION}/linux64/chromedriver-linux64.zip"
-        unzip -q /tmp/chromedriver.zip -d /tmp
-        sudo mv /tmp/chromedriver-linux64/chromedriver /usr/local/bin/chromedriver
-        sudo chmod +x /usr/local/bin/chromedriver
 
     - name: Install Dependencies
       run: |
