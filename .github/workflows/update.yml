@@ -2,8 +2,9 @@ name: ChumToto Schedule Auto Sync
 
 on:
   schedule:
+    # 日本時間の 0, 3, 6, 9, 12, 15, 18, 21 時に自動実行
     - cron: '0 0,3,6,9,12,15,18,21 * * *'
-  workflow_dispatch:
+  workflow_dispatch: # 手動実行ボタン
 
 permissions:
   contents: write
@@ -26,33 +27,39 @@ jobs:
         python -m pip install --upgrade pip
         pip install selenium webdriver-manager beautifulsoup4
 
-    # 【Step 1】PythonでGAS完全対応の schedule.json を生成
+    # 【ステップ1】Pythonを動かして、ChumTotoのイベントをただスクレイピングして schedule.json を作成
     - name: Run ChumToto Scraper
       run: |
         python chumtoto_scraper.py
 
-    # 【Step 2】💡 生成された json ファイルを cURL でスプレッドシート（GAS）へ流し込む
+    # 【ステップ2】💡 生成された schedule.json を cURL コマンドでGAS（スプシ）へ物理分離してPOST送信
     - name: Upload Data to Google Sheets via cURL
       run: |
         if [ -f "schedule.json" ]; then
-          echo "🚀 GAS（スプレッドシート）の公式スケジュールへ直接同期中..."
+          echo "🚀 schedule.json を元に、GAS専用のペイロードを組み立て中..."
+          
+          # Linuxの標準機能(jq)を使い、GASが『公式スケジュール』シートを認識できる {"action": "sync_schedule", "events": [...]} の形にラップします
+          jq '{action: "sync_schedule", events: .}' schedule.json > gas_payload.json
+          
+          echo "📨 Google Apps Script へデータを直接送信中..."
           curl -L -X POST "https://script.google.com/macros/s/AKfycbxTpsaay81w4DDRfjfui7pfmnlc4aDaOPJx_fy4Shf275gpnyUZ9R-ObhAWQOMVOwyP/exec" \
                -H "Content-Type: text/plain" \
-               -d @schedule.json
-          echo -e "\n🎉 スプレッドシートへの同期反映が正常に完了しました！"
+               -d @gas_payload.json
+               
+          echo -e "\n🎉 スプレッドシート（公式スケジュール）への同期送信が完了しました！"
         else
-          echo "⚠️ schedule.json が生成されませんでした。"
+          echo "⚠️ schedule.json が見つかりませんでした。"
           exit 1
         fi
 
-    # 【Step 3】生成された schedule.json をリポジトリ（genba-app）内に永続保存
+    # 【ステップ3】生成された schedule.json をリポジトリ内に永続保存（カレンダー表示用）
     - name: Commit and Push schedule.json
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         if [ -f "schedule.json" ]; then
           git add schedule.json
-          git diff --cached --quiet || git commit -m "🤖 Auto Update ChumToto Schedule JSON (GAS Compatible)"
+          git diff --cached --quiet || git commit -m "🤖 Auto Update ChumToto Schedule JSON"
           git push origin main
-          echo "📁 schedule.json をリポジトリに正常に保存しました！"
+          echo "📁 schedule.json をリポジトリに保存しました！"
         fi
