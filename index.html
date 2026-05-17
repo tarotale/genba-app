@@ -8,11 +8,24 @@
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f0f2f5; margin: 0; padding: 10px; padding-bottom: 100px; }
         .container { max-width: 500px; margin: 0 auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         h2 { text-align: center; color: #1a73e8; margin-top: 0; }
+        .nav-links { text-align: center; margin-bottom: 15px; }
+        .nav-links a { color: #1a73e8; text-decoration: none; font-size: 0.9rem; font-weight: bold; }
         .input-group { margin-bottom: 15px; }
         label { display: block; font-size: 0.85rem; color: #666; margin-bottom: 5px; font-weight: bold; }
         input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
+        
+        /* トグルのデザイン */
+        .switch-group { display: flex; align-items: center; justify-content: space-between; background: #e8f0fe; padding: 12px; border-radius: 8px; margin-bottom: 15px; }
+        .switch { position: relative; display: inline-block; width: 60px; height: 34px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #34a853; }
+        input:checked + .slider:before { transform: translateX(26px); }
+        
         .counter-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 20px; }
-        .counter-card { display: flex; align-items: center; justify-content: space-between; padding: 12px; border: 1px solid #eee; border-radius: 10px; background: #fafafa; }
+        .counter-card { display: flex; align-items: center; justify-content: space-between; padding: 12px; border: 1px solid #eee; border-radius: 10px; background: #fafafa; transition: opacity 0.3s; }
+        .disabled-card { opacity: 0.4; pointer-events: none; }
         .item-info { flex: 1; }
         .item-name { font-weight: bold; font-size: 0.95rem; }
         .item-price { font-size: 0.75rem; color: #888; }
@@ -31,11 +44,23 @@
 
 <div class="container">
     <h2>現場記録入力</h2>
+    <div class="nav-links">
+        <a href="dashboard.html">📊 ダッシュボード（集計画面）を見る</a>
+    </div>
     
     <div class="input-group">
         <label>日付</label>
         <input type="date" id="date">
     </div>
+
+    <div class="switch-group">
+        <span id="status-label" style="font-weight: bold; color: #2b579a;">状態：参加</span>
+        <label class="switch">
+            <input type="checkbox" id="attendance" checked onchange="toggleAttendance()">
+            <span class="slider"></span>
+        </label>
+    </div>
+
     <div class="input-group">
         <label>イベント名</label>
         <input type="text" id="event_name" placeholder="例：まるっと、ちゃむタイム">
@@ -48,7 +73,7 @@
             <option value="SHIBUYA DIVE">SHIBUYA DIVE</option>
             <option value="1000club">1000club</option>
             <option value="横浜ブロンテ">横浜ブロンテ</option>
-            <option value="その他">その他（直接入力は後ほど）</option>
+            <option value="その他">その他</option>
         </select>
     </div>
     <div class="input-group">
@@ -68,7 +93,6 @@
 </div>
 
 <script>
-// 単価設定
 const PRICES = {
     sign_cheki: { name: 'サインチェキ', price: 3000 },
     white_cheki: { name: '白チェキ', price: 2000 },
@@ -81,7 +105,6 @@ const PRICES = {
 const counts = {};
 Object.keys(PRICES).forEach(key => counts[key] = 0);
 
-// 初期表示
 window.onload = () => {
     document.getElementById('date').valueAsDate = new Date();
     const grid = document.getElementById('counter-grid');
@@ -89,7 +112,7 @@ window.onload = () => {
     Object.keys(PRICES).forEach(key => {
         const item = PRICES[key];
         grid.innerHTML += `
-            <div class="counter-card">
+            <div class="counter-card" id="card-${key}">
                 <div class="item-info">
                     <div class="item-name">${item.name}</div>
                     <div class="item-price">¥${item.price.toLocaleString()}</div>
@@ -103,6 +126,29 @@ window.onload = () => {
         `;
     });
 };
+
+function toggleAttendance() {
+    const isAttending = document.getElementById('attendance').checked;
+    const label = document.getElementById('status-label');
+    
+    if (isAttending) {
+        label.innerText = "状態：参加";
+        label.style.color = "#2b579a";
+        Object.keys(PRICES).forEach(key => {
+            document.getElementById(`card-${key}`).classList.remove('disabled-card');
+        });
+    } else {
+        label.innerText = "状態：不参加（干した・諦めた）";
+        label.style.color = "#d32f2f";
+        // 不参加ならカウンターを全部0にして操作不能にする
+        Object.keys(PRICES).forEach(key => {
+            counts[key] = 0;
+            document.getElementById(`count-${key}`).innerText = 0;
+            document.getElementById(`card-${key}`).classList.add('disabled-card');
+        });
+    }
+    calc();
+}
 
 function updateCount(key, delta) {
     counts[key] = Math.max(0, counts[key] + delta);
@@ -120,12 +166,7 @@ function calc() {
 
 async function sendData() {
     const btn = document.getElementById('submit-btn');
-    const GAS_URL = 'https://script.google.com/macros/s/AKfycbxTpsaay81w4DDRfjfui7pfmnlc4aDaOPJx_fy4Shf275gpnyUZ9R-ObhAWQOMVOwyP/exec'; // ★要書き換え
-
-    if (GAS_URL.includes('ここに')) {
-        alert('GASのURLが設定されていません');
-        return;
-    }
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbxTpsaay81w4DDRfjfui7pfmnlc4aDaOPJx_fy4Shf275gpnyUZ9R-ObhAWQOMVOwyP/exec'; // ★要確認
 
     btn.disabled = true;
     btn.innerText = '送信中...';
@@ -135,11 +176,11 @@ async function sendData() {
         event_name: document.getElementById('event_name').value,
         location: document.getElementById('location').value,
         ticket_fee: document.getElementById('ticket_fee').value,
+        attendance: document.getElementById('attendance').checked ? "参加" : "不参加",
         ...counts
     };
 
     try {
-        // CORS回避のためtext/plainで送る手法
         await fetch(GAS_URL, {
             method: 'POST',
             mode: 'no-cors',
@@ -147,7 +188,7 @@ async function sendData() {
             body: JSON.stringify(payload)
         });
         alert('保存しました！');
-        location.reload(); // 入力リセット
+        location.reload();
     } catch (e) {
         alert('エラーが発生しました');
         btn.disabled = false;
