@@ -3,14 +3,12 @@ import json
 import time
 import re
 from datetime import datetime
-import requests
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-# 💡 成功実績のある DriverManager を復活させて環境のズレを自動吸収します
 from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
 
@@ -22,8 +20,6 @@ def setup_driver():
     options.add_argument('--disable-gpu')
     options.add_argument('--window-size=1920,1080')
     options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
-    
-    # 💡 成功している本番環境と全く同じ自動生成ロジックにします
     return webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
 def get_chumtoto_venue(driver, url):
@@ -75,7 +71,7 @@ if __name__ == "__main__":
     events = []
     base_url = "https://chumtoto.jp/schedule/"
     
-    print("🤖 ちゃむととのスケジュールを単独取得中...")
+    print("🤖 【Step 1】ちゃむととのスケジュールを単独取得中...")
     try:
         driver.get(base_url)
         wait = WebDriverWait(driver, 15)
@@ -117,7 +113,7 @@ if __name__ == "__main__":
         
         formatted_events.append({
             "date": ev['start'],
-            "title": ev['title'],
+            "title": ev['title'].replace('【ちゃむ】', ''),  # ここで綺麗に成形
             "venue": venue,
             "time": time_info,
             "url": ev['url']
@@ -126,20 +122,14 @@ if __name__ == "__main__":
     driver.quit()
 
     # ==========================================
-    # Googleスプレッドシート（GAS）への一発同期
+    # 💡 通信せず、データをGAS用の形式のJSONファイルに書き出すだけ
     # ==========================================
-    GAS_URL = "https://script.google.com/macros/s/AKfycbxTpsaay81w4DDRfjfui7pfmnlc4aDaOPJx_fy4Shf275gpnyUZ9R-ObhAWQOMVOwyP/exec"
-
     payload = {
         "action": "sync_schedule",
         "events": formatted_events
     }
 
-    print("🚀 Googleスプレッドシートの『公式スケジュール』へ同期を送信中...")
-    try:
-        response = requests.post(GAS_URL, json=payload, headers={'Content-Type': 'text/plain'})
-        print("同期結果:", response.text)
-    except Exception as e:
-        print(f"送信エラー: {e}")
-
-    print("🎉 すべての単独同期工程が正常に終了しました！")
+    with open('schedule.json', 'w', encoding='utf-8') as f:
+        json.dump(payload, f, ensure_ascii=False, indent=4)
+        
+    print("📁 中間ファイル schedule.json の作成が完了しました。")
