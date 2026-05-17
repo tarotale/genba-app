@@ -21,287 +21,278 @@
             background: var(--bg-gradient);
             color: var(--text-main);
             min-height: 100vh;
+            padding-bottom: 100px;
         }
 
         header {
             background: var(--header-gradient);
             border-bottom: 1px solid rgba(255, 107, 157, 0.15);
-            padding: 16px 20px 12px;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            backdrop-filter: blur(12px);
             position: sticky;
             top: 0;
             z-index: 100;
-            backdrop-filter: blur(12px);
+            height: 34px;
         }
 
-        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .today-display { font-size: 11px; letter-spacing: 2px; color: #fff; font-weight: 700; text-transform: uppercase; border-bottom: 1px solid var(--color-chumtoto); padding-bottom: 2px; }
-        
-        .nav-controls { display: flex; align-items: center; gap: 16px; margin-bottom: 8px; }
-        .current-month-title { font-size: 22px; font-weight: 700; letter-spacing: 1px; min-width: 140px; color: #fff; }
-        
-        .nav-btn {
-            background: rgba(255, 107, 157, 0.15); border: none; color: #fff;
-            width: 30px; height: 30px; border-radius: 50%; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; transition: 0.2s;
-        }
-        .nav-btn:hover { background: rgba(255, 107, 157, 0.3); }
-
-        .filter-group { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-        .brand-badge {
-            font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: var(--color-chumtoto);
-            background: rgba(255, 107, 157, 0.15); padding: 4px 12px; border-radius: 20px;
+        .back-portal-btn {
+            color: var(--color-chumtoto);
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: bold;
             border: 1px solid rgba(255, 107, 157, 0.3);
+            padding: 6px 10px;
+            border-radius: 6px;
+            background: rgba(255, 107, 157, 0.05);
+            transition: 0.2s;
+            position: relative;
+            z-index: 10;
         }
+        .back-portal-btn:hover {
+            background: rgba(255, 107, 157, 0.15);
+            box-shadow: 0 0 8px rgba(255, 107, 157, 0.3);
+        }
+
+        header h1 {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            margin: 0;
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: 3px;
+            color: #fff;
+            text-shadow: 0 0 8px rgba(255, 107, 157, 0.4);
+            pointer-events: none;
+        }
+
         .manual-btn {
-            padding: 4px 12px; border-radius: 20px; border: 1px solid var(--text-muted);
-            background: transparent; color: var(--text-muted); font-size: 11px; cursor: pointer;
-            text-decoration: none; font-weight: bold; transition: all 0.2s;
+            background: transparent;
+            border: 1px solid var(--color-chumtoto);
+            color: var(--color-chumtoto);
+            padding: 6px 12px;
+            font-size: 11px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+            position: relative;
+            z-index: 10;
         }
-        .manual-btn:hover { border-color: var(--color-chumtoto); color: var(--color-chumtoto); }
-        
-        .view-toggle { display: flex; gap: 4px; }
-        .toggle-btn {
-            padding: 4px 12px; border-radius: 6px; border: none; background: transparent;
-            color: var(--text-muted); font-size: 11px; cursor: pointer;
+        .manual-btn:hover {
+            background: var(--color-chumtoto);
+            color: #fff;
+            box-shadow: 0 0 10px rgba(255, 107, 157, 0.4);
         }
-        .toggle-btn.active { background: rgba(255, 107, 157, 0.2); color: #fff; font-weight: bold; }
 
-        .content { padding: 16px 16px 60px; max-width: 800px; margin: 0 auto; }
+        .container { max-width: 500px; margin: 0 auto; padding: 16px; box-sizing: border-box; }
+        
+        .view-switcher { display: flex; background: rgba(0,0,0,0.4); padding: 4px; border-radius: 8px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.05); }
+        .view-switcher button { flex: 1; background: transparent; border: none; color: var(--text-muted); padding: 8px; font-size: 12px; font-weight: bold; border-radius: 6px; cursor: pointer; transition: 0.2s; }
+        .view-switcher button.active { background: var(--color-chumtoto); color: #fff; box-shadow: 0 2px 8px rgba(255, 107, 157, 0.3); }
 
-        /* リスト・カレンダー共通 */
-        .date-section { margin-bottom: 24px; scroll-margin-top: 200px; }
-        .date-header { font-size: 13px; font-weight: 700; letter-spacing: 1px; color: var(--text-muted); border-left: 3px solid rgba(255, 107, 157, 0.3); padding-left: 10px; margin-bottom: 8px; }
-        .date-header.today { color: #fff; border-left-color: var(--color-chumtoto); text-shadow: 0 0 8px rgba(255,107,157,0.5); }
-        
-        .event-card { border-radius: 8px; padding: 14px; margin-bottom: 8px; text-decoration: none; display: block; transition: transform 0.2s; cursor: pointer; background: var(--card-bg); border: 1px solid var(--card-border); border-left: 4px solid var(--color-chumtoto); }
-        .event-card:hover { transform: translateX(4px); background: linear-gradient(135deg, rgba(255, 107, 157, 0.18) 0%, rgba(255, 255, 255, 0.04) 100%); }
-        
-        .event-title { font-size: 14px; font-weight: 600; line-height: 1.4; margin-bottom: 6px; color: #fff; }
-        .event-info { font-size: 11px; color: #ccc; margin-top: 3px; display: flex; align-items: center; gap: 4px; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.03); }
+        .weekday { text-align: center; font-size: 10px; font-weight: bold; color: var(--text-muted); padding: 4px 0; }
+        .day { background: rgba(255,255,255,0.02); border-radius: 6px; min-height: 55px; padding: 4px; font-size: 11px; font-weight: bold; border: 1px solid transparent; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; }
+        .day.today { border-color: var(--color-chumtoto); background: rgba(255,107,157,0.03); }
+        .day.other-month { opacity: 0.2; pointer-events: none; }
+        .day .day-num { color: var(--text-muted); }
+        .day.today .day-num { color: var(--color-chumtoto); }
+        .day .has-event-dot { width: 5px; height: 5px; background: var(--color-chumtoto); border-radius: 50%; margin: 0 auto 2px auto; box-shadow: 0 0 6px var(--color-chumtoto); }
 
-        /* カレンダーグリッド */
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; margin-bottom: 20px; }
-        .calendar-weekday { text-align: center; font-size: 10px; color: var(--text-muted); padding: 6px 0; font-weight: 600; }
-        .calendar-day { min-height: 52px; border-radius: 6px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.02); padding: 4px; cursor: pointer; position: relative; }
-        .calendar-day.empty { background: transparent; cursor: default; border: none; }
-        .calendar-day.selected { background: rgba(255, 107, 157, 0.15); border-color: rgba(255, 107, 157, 0.4); }
-        .calendar-day.is-today { border: 1.5px solid var(--color-chumtoto); box-shadow: inset 0 0 6px rgba(255,107,157,0.2); }
-        .day-num { font-size: 11px; color: #ccc; text-align: center; margin-bottom: 4px; }
-        .dot-container { display: flex; flex-wrap: wrap; gap: 2px; justify-content: center; }
-        .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--color-chumtoto); box-shadow: 0 0 4px var(--color-chumtoto); }
+        .list-view { display: flex; flex-direction: column; gap: 10px; }
+        .event-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 14px 16px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        .event-card:hover { border-color: var(--color-chumtoto); background: rgba(255,107,157,0.08); transform: translateY(-1px); }
+        .event-title { font-size: 14px; font-weight: bold; color: #fff; margin-bottom: 6px; line-height: 1.4; }
+        .event-info { font-size: 11px; color: var(--text-muted); font-weight: 500; margin-top: 2px; }
 
-        #selected-day-events { margin-top: 20px; padding: 14px; background: rgba(255,107,157,0.03); border-radius: 12px; border: 1px solid rgba(255,107,157,0.1); }
-        
-        .loading { text-align: center; color: var(--color-chumtoto); padding: 40px; font-weight: bold; letter-spacing: 2px; text-shadow: 0 0 6px rgba(255,107,157,0.3); }
-        
-        /* 下部ナビゲーション */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--header-gradient); border-top: 1px solid rgba(255, 107, 157, 0.15); display: flex; justify-content: space-around; padding: 10px 0; z-index: 100; backdrop-filter: blur(12px); }
-        .bottom-nav a { color: var(--text-muted); text-decoration: none; font-size: 10px; text-align: center; display: flex; flex-direction: column; gap: 4px; font-weight: bold; transition: color 0.2s; }
-        .bottom-nav a.active { color: var(--color-chumtoto); }
+        .selected-day-panel { margin-top: 16px; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 14px; border: 1px solid rgba(255,255,255,0.05); }
+        .panel-date { font-size: 12px; font-weight: bold; color: var(--color-chumtoto); margin-bottom: 10px; }
+
+        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(19, 11, 14, 0.92); border-top: 1px solid rgba(255,107,157,0.1); display: flex; padding: 6px 0; backdrop-filter: blur(10px); z-index: 100; }
+        .nav-item { flex: 1; text-align: center; text-decoration: none; color: var(--text-muted); font-size: 10px; font-weight: bold; display: flex; flex-direction: column; gap: 2px; }
+        .nav-item.active { color: var(--color-chumtoto); }
+        .nav-icon { font-size: 18px; }
+
+        .loading-cover { text-align: center; color: var(--color-chumtoto); font-weight: bold; padding: 40px; letter-spacing: 2px; }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="header-top">
-        <div class="today-display" id="todayLabel">--- --, ----</div>
-        <div class="view-toggle">
-            <button class="toggle-btn active" id="listToggle">リスト</button>
-            <button class="toggle-btn" id="calendarToggle">カレンダー</button>
-        </div>
-    </div>
-    
-    <div class="nav-controls">
-        <button class="nav-btn" onclick="changeMonth(-1)">◀</button>
-        <div class="current-month-title" id="currentMonthTitle">----年 --月</div>
-        <button class="nav-btn" onclick="changeMonth(1)">▶</button>
-    </div>
-
-    <div class="filter-group">
-        <div class="brand-badge">CHUMTOTO</div>
-        <a href="entry.html" class="manual-btn">＋手動入力</a>
-    </div>
+    <a href="index.html" class="back-portal-btn">◀ PORTAL</a>
+    <h1>SCHEDULE</h1>
+    <button class="manual-btn" onclick="location.href='entry.html'">＋手動入力</button>
 </header>
 
-<div id="loading" class="loading">SYNCING CHUMTOTO SCHEDULE...</div>
-<div class="content" id="mainDisplay"></div>
+<div class="container">
+    <div class="view-switcher">
+        <button id="calendarToggle" class="active">CALENDAR VIEW</button>
+        <button id="listToggle">LIST VIEW</button>
+    </div>
 
-<div class="bottom-nav">
-    <a href="calendar.html" class="active"><span>📅</span>CALENDAR</a>
-    <a href="dashboard.html"><span>📊</span>STATS</a>
-    <a href="entry.html"><span>✍️</span>ENTRY</a>
+    <div id="loading-msg" class="loading-cover">FETCHING SCHEDULE...</div>
+
+    <div id="calendarContainer" style="display: none;">
+        <div class="calendar-grid" id="calendarGrid">
+            <div class="weekday">SUN</div><div class="weekday">MON</div><div class="weekday">TUE</div>
+            <div class="weekday">WED</div><div class="weekday">THU</div><div class="weekday">FRI</div>
+            <div class="weekday">SAT</div>
+        </div>
+        <div class="selected-day-panel" id="selectedDayPanel">
+            <div class="panel-date" id="panelDateStr">日付を選択してください</div>
+            <div id="panelEventsList" class="list-view"></div>
+        </div>
+    </div>
+
+    <div id="listContainer" class="list-view" style="display: none;"></div>
 </div>
 
+<nav class="nav-bar">
+    <a href="calendar.html" class="nav-item active"><span class="nav-icon">📅</span>SCHEDULE</a>
+    <a href="dashboard.html" class="nav-item"><span class="nav-icon">📊</span>STATS</a>
+    <a href="entry.html" class="nav-item"><span class="nav-icon">✍️</span>ENTRY</a>
+</nav>
+
 <script>
-    // ★重要：GASのウェブアプリURL
     const GAS_URL = 'https://script.google.com/macros/s/AKfycbw7KeuN0XckEqU9V4wRxR3O8T9Rl6cC2jQesEOpOsNJTF09ZylpVFZWJnqo0aff1YNFRw/exec';
+    let scheduleData = [];
+    let viewMode = "calendar"; 
+    let currentFocusDateStr = "";
 
-    let allEvents = [];
-    let viewMode = "list";
-    let selectedDate = null;
-    const now = new Date();
-    let displayDate = new Date(now.getFullYear(), now.getMonth(), 1);
-    const dayNames = ["日", "月", "火", "水", "木", "金", "土"];
-    const monthNamesEn = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
-
-    const getTodayStr = () => {
-        const d = new Date();
-        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-    };
-
-    function updateTodayLabel() {
-        const d = new Date();
-        document.getElementById('todayLabel').innerText = `${monthNamesEn[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
-    }
-
-    async function init() {
-        updateTodayLabel();
+    window.onload = async function() {
         try {
             const response = await fetch(GAS_URL + "?action=read_schedule");
-            const resData = await response.json();
-            
-            if (resData.result === "success") {
-                allEvents = resData.data;
-                document.getElementById('loading').style.display = 'none';
-                updateHeader();
-                render(true);
+            const res = await response.json();
+            if (res.result === "success") {
+                scheduleData = res.data;
+                document.getElementById('loading-msg').style.display = 'none';
+                document.getElementById('calendarContainer').style.display = 'block';
+                
+                const today = new Date();
+                currentFocusDateStr = today.toISOString().substring(0, 10);
+                
+                render(false); 
             }
         } catch (e) {
-            document.getElementById('loading').innerText = "ERROR: FAILED TO FETCH DATA";
+            document.getElementById('loading-msg').innerText = "FAILED TO RECOVERY DATA";
         }
     }
 
-    function changeMonth(delta) {
-        displayDate.setMonth(displayDate.getMonth() + delta);
-        selectedDate = null;
-        updateHeader();
-        render(false);
-    }
-
-    function updateHeader() {
-        const y = displayDate.getFullYear();
-        const m = displayDate.getMonth();
-        document.getElementById('currentMonthTitle').innerText = `${y}年 ${m + 1}月`;
-    }
-
-    function render(shouldScroll = false) {
-        const display = document.getElementById('mainDisplay');
-        display.innerHTML = "";
-        const y = displayDate.getFullYear();
-        const m = displayDate.getMonth();
-        
-        const filtered = allEvents.filter(ev => {
-            const evDate = new Date(ev.date);
-            return evDate.getFullYear() === y && evDate.getMonth() === m;
-        });
-
-        if (viewMode === "list") {
-            renderList(filtered, display, shouldScroll);
+    function render(isListOnly) {
+        if (isListOnly || viewMode === "list") {
+            document.getElementById('calendarContainer').style.display = 'none';
+            document.getElementById('listContainer').style.display = 'flex';
+            renderListView();
         } else {
-            renderCalendar(filtered, display);
+            document.getElementById('calendarContainer').style.display = 'block';
+            document.getElementById('listContainer').style.display = 'none';
+            renderCalendarView();
+            renderSelectedDayPanel(currentFocusDateStr);
         }
     }
 
-    function renderList(events, container, shouldScroll) {
-        const grouped = {};
-        events.sort((a,b) => a.date.localeCompare(b.date)).forEach(ev => {
-            if(!grouped[ev.date]) grouped[ev.date] = [];
-            grouped[ev.date].push(ev);
-        });
+    function renderCalendarView() {
+        const grid = document.getElementById('calendarGrid');
+        const elements = grid.querySelectorAll('.day');
+        elements.forEach(el => el.remove());
 
-        const todayStr = getTodayStr();
-        let closestDate = null;
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = now.getMonth();
 
-        if (Object.keys(grouped).length === 0) {
-            container.innerHTML = '<div style="text-align:center; color:var(--text-muted); margin-top:60px; font-size:12px; letter-spacing:1px;">NO SCHEDULE THIS MONTH</div>';
+        const firstDay = new Date(year, month, 1).getDay();
+        const numDays = new Date(year, month + 1, 0).getDate();
+
+        for (let i = 0; i < firstDay; i++) {
+            const cell = document.createElement('div');
+            cell.className = 'day other-month';
+            grid.appendChild(cell);
+        }
+
+        const todayStr = now.toISOString().substring(0, 10);
+
+        for (let d = 1; d <= numDays; d++) {
+            const cell = document.createElement('div');
+            cell.className = 'day';
+            
+            const dateObj = new Date(year, month, d);
+            dateObj.setHours(dateObj.getHours() + 9); 
+            const dateStr = dateObj.toISOString().substring(0, 10);
+
+            if (dateStr === todayStr) cell.classList.add('today');
+
+            cell.innerHTML = `<span class="day-num">${d}</span>`;
+
+            const hasEvent = scheduleData.some(ev => ev.date === dateStr);
+            if (hasEvent) {
+                const dot = document.createElement('div');
+                dot.className = 'has-event-dot';
+                cell.appendChild(dot);
+            }
+
+            cell.onclick = () => {
+                currentFocusDateStr = dateStr;
+                renderSelectedDayPanel(dateStr);
+            };
+
+            grid.appendChild(cell);
+        }
+    }
+
+    function renderSelectedDayPanel(dateStr) {
+        const sDate = new Date(dateStr);
+        document.getElementById('panelDateStr').innerText = `📅 ${sDate.getMonth() + 1}月${sDate.getDate()}日の公式スケジュール`;
+        
+        const listContainer = document.getElementById('panelEventsList');
+        listContainer.innerHTML = "";
+
+        const dayEvents = scheduleData.filter(ev => ev.date === dateStr);
+        if (dayEvents.length === 0) {
+            listContainer.innerHTML = '<div style="font-size:11px; color:var(--text-muted); text-align:center; padding:10px;">公式予定はありません</div>';
             return;
         }
 
-        for (const date in grouped) {
-            const d = new Date(date);
-            const isToday = (date === todayStr);
-            if (!closestDate && date >= todayStr) closestDate = date;
-
-            container.innerHTML += `
-                <div class="date-section" id="date-${date}">
-                    <div class="date-header ${isToday ? 'today' : ''}">${d.getMonth()+1}/${d.getDate()}（${dayNames[d.getDay()]}）${isToday ? ' [TODAY]' : ''}</div>
-                    ${grouped[date].map(ev => createEventCard(ev)).join('')}
-                </div>
-            `;
-        }
-
-        if (shouldScroll && closestDate) {
-            setTimeout(() => {
-                const target = document.getElementById(`date-${closestDate}`);
-                if (target) {
-                    const headerHeight = document.querySelector('header').offsetHeight;
-                    window.scrollTo({ top: target.offsetTop - headerHeight - 20, behavior: 'smooth' });
-                }
-            }, 100);
-        }
+        dayEvents.forEach(ev => {
+            listContainer.innerHTML += createEventCard(ev);
+        });
     }
 
-    function renderCalendar(events, container) {
-        const y = displayDate.getFullYear();
-        const m = displayDate.getMonth();
-        const firstDay = new Date(y, m, 1).getDay();
-        const daysInMonth = new Date(y, m + 1, 0).getDate();
-        const todayStr = getTodayStr();
-        
-        let html = '<div class="calendar-grid">';
-        dayNames.forEach((d, i) => html += `<div class="calendar-weekday" style="color:${i==0?'#ff6b9d':i==6?'#6ba3ff':''}">${d}</div>`);
-        for(let i=0; i<firstDay; i++) html += '<div class="calendar-day empty"></div>';
-        
-        for(let d=1; d<=daysInMonth; d++) {
-            const dateKey = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-            const dayEvents = events.filter(e => e.date === dateKey);
-            const isToday = (dateKey === todayStr);
-            
-            html += `
-                <div class="calendar-day ${selectedDate === dateKey?'selected':''} ${isToday?'is-today':''}" onclick="selectDate('${dateKey}')">
-                    <div class="day-num">${d}</div>
-                    <div class="dot-container">
-                        ${dayEvents.length > 0 ? '<div class="dot"></div>' : ''}
-                    </div>
-                </div>
-            `;
+    function renderListView() {
+        const container = document.getElementById('listContainer');
+        container.innerHTML = "";
+
+        const todayStr = new Date().toISOString().substring(0, 10);
+        const upcomingEvents = scheduleData.filter(ev => ev.date >= todayStr).sort((a,b) => a.date.localeCompare(b.date));
+
+        if (upcomingEvents.length === 0) {
+            container.innerHTML = '<div style="color:var(--text-muted); text-align:center; padding:40px; font-size:12px;">今後の予定はありません</div>';
+            return;
         }
-        html += '</div><div id="selected-day-events"></div>';
-        container.innerHTML = html;
-        if(selectedDate) renderSelectedDay(events);
-    }
 
-    function selectDate(date) {
-        selectedDate = (selectedDate === date) ? null : date;
-        render(false);
-    }
-
-    function renderSelectedDay(events) {
-        const dayEvents = events.filter(e => e.date === selectedDate);
-        const container = document.getElementById('selected-day-events');
-        if(!dayEvents.length) { container.innerHTML = ""; return; }
-        const d = new Date(selectedDate);
-        container.innerHTML = `
-            <div class="date-header" style="margin-bottom:12px">${d.getMonth()+1}/${d.getDate()}（${dayNames[d.getDay()]}）</div>
-            ${dayEvents.map(ev => createEventCard(ev)).join('')}
-        `;
+        upcomingEvents.forEach(ev => {
+            const mDate = new Date(ev.date);
+            const dateLabel = `<div class="panel-date" style="margin-bottom:6px;">✨ ${mDate.getMonth()+1}/${mDate.getDate()}</div>`;
+            container.innerHTML += `<div>${dateLabel}${createEventCard(ev)}</div>`;
+        });
     }
 
     function createEventCard(ev) {
         const timeInfo = ev.time ? `<div class="event-info">⏰ ${ev.time}</div>` : '';
         const venueInfo = `<div class="event-info">📍 ${ev.venue || '詳細確認'}</div>`;
-        const clickAction = `onclick="moveToEntry('${ev.date}', '${encodeURIComponent(ev.title)}', '${encodeURIComponent(ev.venue)}')"`
+        const clickAction = `onclick=\"moveToEntry('${ev.date}', '${encodeURIComponent(ev.title)}', '${encodeURIComponent(ev.venue)}')\"`
 
         return `
-            <div class="event-card" ${clickAction}>
-                <div class="event-title">${ev.title}</div>
+            <div class="event-card" ${clickAction}>\n                <div class="event-title">${ev.title}</div>
                 ${timeInfo}
                 ${venueInfo}
             </div>
         `;
     }
 
-    // 💡 ③ タップして遷移するときのジャンプ先 URL を entry.html に修正
     function moveToEntry(date, title, venue) {
         const targetUrl = `entry.html?date=${date}&event=${title}&location=${venue}`;
         if (confirm(`選択した現場を記録しますか？\n\n現場：${decodeURIComponent(title)}`)) {
@@ -322,8 +313,6 @@
         document.getElementById('listToggle').classList.remove('active');
         render(false);
     });
-
-    init();
 </script>
 </body>
 </html>
