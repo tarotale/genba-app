@@ -10,6 +10,8 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+# 💡 成功実績のある DriverManager を復活させて環境のズレを自動吸収します
+from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
 
 def setup_driver():
@@ -19,15 +21,10 @@ def setup_driver():
     options.add_argument('--disable-dev-shm-usage')
     options.add_argument('--disable-gpu')
     options.add_argument('--window-size=1920,1080')
-    options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
+    options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
     
-    # 💡 Linux(GitHub Actions)環境に標準で入っているChromeのパスを明示的にセット
-    chrome_bin = "/usr/bin/google-chrome"
-    if os.path.exists(chrome_bin):
-        options.binary_location = chrome_bin
-        
-    # パス指定なしで標準のサービスとして起動（環境側の固定ドライバーを自動使用）
-    return webdriver.Chrome(options=options)
+    # 💡 成功している本番環境と全く同じ自動生成ロジックにします
+    return webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
 def get_chumtoto_venue(driver, url):
     """詳細ページから会場と時間を取得"""
@@ -110,7 +107,7 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"取得エラー: {e}")
 
-    print(f"➡ ChumToto의 イベントを {len(events)} 件回収しました。各会場を解析中...")
+    print(f"➡ ChumTotoのイベントを {len(events)} 件回収しました。各会場を解析中...")
 
     # 詳細ページの解析
     formatted_events = []
