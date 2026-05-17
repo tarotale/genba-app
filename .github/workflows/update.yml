@@ -19,16 +19,11 @@ jobs:
       with:
         python-version: '3.10'
 
-    # 💡 公式の安全なChrome/ChromeDriverセットアップだけに絞ります
-    - name: Setup Chrome
-      uses: browser-actions/setup-chrome@v1
-      with:
-        chrome-version: stable
-
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install selenium beautifulsoup4 requests
+        # 💡 ここに webdriver-manager をしっかり追加して、Pythonがエラーを起こさないようにします
+        pip install selenium webdriver-manager beautifulsoup4 requests
 
     - name: Run ChumToto Scraper
       run: |
