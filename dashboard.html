@@ -66,13 +66,21 @@
         .filter-section { display: flex; gap: 8px; margin-bottom: 16px; }
         .filter-section select { flex: 1; background: var(--input-bg); border: 1px solid var(--card-border); color: #fff; padding: 10px; border-radius: 8px; font-weight: bold; font-size: 12px; outline: none; }
 
-        .summary-cards { display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 20px; }
-        .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-        .card-title { font-size: 11px; color: var(--text-muted); font-weight: bold; letter-spacing: 1px; margin-bottom: 4px; }
-        .card-value { font-size: 28px; font-weight: 900; color: #fff; }
-
-        .cheki-sub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px; }
-        .sub-value { font-size: 16px; font-weight: bold; color: var(--color-chumtoto); }
+        /* スタッツのグリッドレイアウト（2列均等並び） */
+        .summary-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-align: center; }
+        .card.full { grid-column: span 2; text-align: left; }
+        .card-title { font-size: 11px; color: var(--text-muted); font-weight: bold; letter-spacing: 1px; margin-bottom: 4px; text-transform: uppercase; }
+        .card-value { font-size: 24px; font-weight: 900; color: #fff; }
+        .card.full .card-value { font-size: 32px; color: #fff; }
+        
+        .rate-value { color: #5AC8FA !important; text-shadow: 0 0 10px rgba(90,200,250,0.3); }
+        .cheki-total-value { color: var(--color-chumtoto) !important; text-shadow: 0 0 10px rgba(255,107,157,0.3); }
+        
+        .card-sub-lbl { font-size: 10px; color: var(--text-muted); margin-top: 4px; font-weight: bold; }
+        .cheki-sub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px; text-align: center; }
+        .cheki-sub-grid .card-title { font-size: 9px; }
+        .cheki-sub-grid .sub-value { font-size: 15px; font-weight: bold; color: #fff; }
 
         .chart-box { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.03); border-radius: 16px; padding: 16px; margin-bottom: 20px; }
 
@@ -82,7 +90,7 @@
         .item-title { font-size: 13px; font-weight: bold; color: #fff; margin-bottom: 6px; line-height: 1.4; }
         .item-details { font-size: 11px; color: var(--text-muted); }
         .badge { position: absolute; top: 12px; right: 12px; font-size: 10px; padding: 3px 8px; border-radius: 4px; font-weight: bold; }
-        .badge.attend { background: rgba(7CD, 217, 100, 0.15); color: #4CD964; border: 1px solid rgba(7CD, 217, 100, 0.3); }
+        .badge.attend { background: rgba(76, 217, 100, 0.15); color: #4CD964; border: 1px solid rgba(76, 217, 100, 0.3); }
         .badge.absent { background: rgba(255, 59, 48, 0.15); color: #FF3B30; border: 1px solid rgba(255, 59, 48, 0.3); }
 
         .edit-indicator { font-size: 10px; color: var(--color-chumtoto); text-decoration: underline; margin-top: 8px; display: inline-block; cursor: pointer; }
@@ -112,13 +120,24 @@
 
     <div id="dashboard-content" style="display: none;">
         <div class="summary-cards">
-            <div class="card">
+            <div class="card full">
                 <div class="card-title" id="main-expense-label">総投資額</div>
                 <div class="card-value" id="total-main">¥0</div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Total Chekis</div>
+                <div class="card-value cheki-total-value" id="total-cheki-count">0 <span style="font-size:12px;">枚</span></div>
                 <div class="cheki-sub-grid">
-                    <div><div class="card-title">サインチェキ</div><div class="sub-value" id="total-sign-cheki">0枚</div></div>
-                    <div><div class="card-title">通常チェキ</div><div class="sub-value" id="total-white_cheki">0枚</div></div>
+                    <div><div class="card-title">サイン</div><div class="sub-value" id="total-sign-cheki">0</div></div>
+                    <div><div class="card-title">白チェ</div><div class="sub-value" id="total-white_cheki">0</div></div>
                 </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Attendance Rate</div>
+                <div class="card-value rate-value" id="total-attendance-rate">0%</div>
+                <div class="card-sub-lbl" id="attendance-count-str">0回 / 0現場</div>
             </div>
         </div>
 
@@ -209,7 +228,7 @@
                     <div class="item-details">
                         💰 決済額: ¥${itemTotal.toLocaleString()} (チケ代: ¥${(parseInt(row.ticket_fee)||0).toLocaleString()}) / 📸 サイン: ${row.sign_cheki||0}枚 白: ${row.white_cheki||0}枚
                     </div>
-                    <div class="edit-indicator" onclick="location.href='entry.html?edit_row=${row.row_index}'">⚡ データを修正する</div>
+                    <div class="edit-indicator" onclick="location.href='entry.html?edit_row=${row.row_index}'">✏️ データを修正する</div>
                 </div>
             `;
         }).join('');
@@ -219,16 +238,34 @@
         let totalExpense = 0;
         let signCount = 0;
         let whiteCount = 0;
+        
+        let attendCount = 0;
+        let totalRecords = data.length;
+
         data.forEach(row => {
             let rowTotal = (parseInt(row.ticket_fee) || 0) + Object.keys(PRICES).reduce((sum, key) => sum + (parseInt(row[key]) || 0) * PRICES[key], 0);
             totalExpense += rowTotal;
             signCount += parseInt(row.sign_cheki) || 0;
             whiteCount += parseInt(row.white_cheki) || 0;
+
+            if (row.attendance === "参加") {
+                attendCount++;
+            }
         });
+
+        const ratePercent = totalRecords > 0 ? Math.round((attendCount / totalRecords) * 100) : 0;
+
+        // ドキュメント要素の書き換え
         document.getElementById('main-expense-label').innerText = label;
         document.getElementById('total-main').innerText = `¥${totalExpense.toLocaleString()}`;
-        document.getElementById('total-sign-cheki').innerText = `${signCount}枚`;
-        document.getElementById('total-white_cheki').innerText = `${whiteCount}枚`;
+        document.getElementById('total-sign-cheki').innerText = signCount;
+        document.getElementById('total-white_cheki').innerText = whiteCount;
+        
+        // 💡 新設した「チェキ合計欄」に合算値をセット
+        document.getElementById('total-cheki-count').innerHTML = `${signCount + whiteCount} <span style="font-size:11px;">枚</span>`;
+        
+        document.getElementById('total-attendance-rate').innerText = `${ratePercent}%`;
+        document.getElementById('attendance-count-str').innerText = `${attendCount}回 / ${totalRecords}現場`;
     }
 
     function buildFilterOptions() {
