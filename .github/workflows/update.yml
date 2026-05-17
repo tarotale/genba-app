@@ -26,23 +26,26 @@ jobs:
         python -m pip install --upgrade pip
         pip install selenium webdriver-manager beautifulsoup4
 
-    # 【ステップ1】Pythonを動かして schedule.json を作成（安定・通信なし）
+    # 【Step 1】Pythonを動かして schedule.json を作成（100%成功中）
     - name: Run ChumToto Scraper
       run: |
         python chumtoto_scraper.py
 
-    # 【ステップ2】💡 cURLのデータ送信形式をRAWテキストモードに変更して確実に届かせます
+    # 【Step 2】💡 GASを「全員」に公開した新しいURLへ、RAWテキストとして確実に叩き込みます
     - name: Upload Data to Google Sheets via cURL
       run: |
         if [ -f "schedule.json" ]; then
           echo "🚀 schedule.json からGAS専用のペイロードを組み立て中..."
           
-          # GASが認識できる {"action": "sync_schedule", "events": [...]} の構造に成形
-          jq '{action: "sync_schedule", events: .}' schedule.json > gas_payload.json
+          # GASが綺麗に1発パースできるトッププロパティ構造にします
+          jq '{
+            action: "sync_schedule",
+            events: [ .[] | { group: "ChumToto", start: .date, title: .title, venue: .venue, time: .time, url: .url } ]
+          }' schedule.json > gas_payload.json
           
-          echo "📨 Google Apps Script へRAWテキストとしてデータを直接送信中..."
-          # 💡 --data-raw を使用して、JSON文字列をそのままストレートにGASに叩き込みます
-          curl -L -X POST "https://script.google.com/macros/s/AKfycbxTpsaay81w4DDRfjfui7pfmnlc4aDaOPJx_fy4Shf275gpnyUZ9R-ObhAWQOMVOwyP/exec" \
+          echo "📨 Google Apps Script（新URL）へデータを直接送信中..."
+          # ⚠️ 下記の「★ここに新しいGASのURLを貼り付け★」を、先ほどデプロイした新しいURL（/execで終わるもの）に差し替えてください
+          curl -L -X POST "https://script.google.com/macros/s/AKfycbzz_ulxkWibPM1bikldJ7BQFZTYCD4WP_mbw3m0gYopTHSBazTWudQamhANgaA_J4pU/exec" \
                -H "Content-Type: text/plain" \
                --data-raw "$(cat gas_payload.json)"
                
@@ -52,7 +55,7 @@ jobs:
           exit 1
         fi
 
-    # 【ステップ3】生成された schedule.json をリポジトリ内に保存（カレンダー表示用）
+    # 【Step 3】生成された schedule.json をリポジトリ内に永続保存（100%成功中）
     - name: Commit and Push schedule.json
       run: |
         git config --local user.email "action@github.com"
