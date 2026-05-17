@@ -2,7 +2,7 @@ import os
 import json
 import time
 import re
-from datetime import datetime, timedelta
+from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
@@ -12,7 +12,6 @@ from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
 
-# --- 共通セットアップ ---
 def setup_driver():
     options = Options()
     options.add_argument('--headless=new')
@@ -43,14 +42,12 @@ def get_detail_info(driver, url):
         content = soup.select_one('.common__article, .article__content, .body, .c-clubWysiwyg, .tribe-events-single-event-description, .p-clubScheduleArticle__description')
         
         if content:
-            # パターンA: 見出し(h4, strong)と内容が分かれている
+            # パターンA: 見出しと内容が分かれている場合
             for tag in content.find_all(['h4', 'strong']):
                 label = tag.get_text(strip=True)
-                
                 data = ""
                 if tag.next_sibling and isinstance(tag.next_sibling, str):
                     data = tag.next_sibling.strip()
-                
                 if not data or data in ["：", ":"]:
                     next_el = tag.find_next(['p', 'span'])
                     if next_el: data = next_el.get_text(strip=True)
@@ -62,8 +59,8 @@ def get_detail_info(driver, url):
                 elif "場所" in label or "会場" in label:
                     venue = data.replace("：", "").replace(":", "").strip()
 
-            # パターンB: 1つのタグ内に改行区切りで書かれている（ChumToto用）
-            if venue == "詳細を確認" or not time_info or time_info == "":
+            # パターンB: 改行区切りのテキスト解析（ChumToto用フォールバック）
+            if venue == "詳細を確認" or not time_info:
                 lines = [line.strip() for line in content.get_text("\n").split("\n") if line.strip()]
                 for line in lines:
                     if any(k in line for k in ["■場所", "■会場", "会場：", "会場:", "場所：", "場所:"]):
@@ -112,10 +109,15 @@ def scrape_chumtoto_only(driver, url):
             for item in links_to_crawl:
                 v, tm = get_detail_info(driver, item['url'])
                 
-                # 新カレンダー用に「[ChumToto]」や「【ちゃむ】」を外したピュアなタイトル、GAS用のキー名(date, venue, time)に成形
+                # 💡 GAS側（スプシ自動書き込み）とフロント側の両方が100%認識できる統合データ構造
+                # タイトルから余計な文言を除去して綺麗にします
+                clean_title = item['title'].replace('【ちゃむ】', '').replace('[ChumToto]', '').strip()
+                
                 events.append({
-                    "date": item['date'],
-                    "title": item['title'],
+                    "group": "ChumToto",            # GASが「公式スケジュール」タブに振り分けるためのトリガーキー
+                    "date": item['date'],           # フロント用キー
+                    "start": item['date'],          # GAS同期用キー
+                    "title": clean_title,
                     "venue": v,
                     "time": tm,
                     "url": item['url']
@@ -131,17 +133,14 @@ def scrape_chumtoto_only(driver, url):
 
 def main():
     driver = setup_driver()
-    
-    # ChumTotoのスケジュールだけをピンポイント取得
     chumtoto_events = scrape_chumtoto_only(driver, "https://chumtoto.jp/schedule/")
-    
     driver.quit()
 
     # 重複排除
-    unique_events = list({(ev['title'], ev['date']): ev for ev in chumtoto_events}.values())
+    unique_events = list({(ev['title'], ev['start']): ev for ev in chumtoto_events}.values())
 
     # ==========================================
-    # 💡 外部通信は一切せず、GAS要求フォーマットでJSON保存のみ行う
+    # 💡 フロント(JSON保管)とGAS(スプシ同期)の統合ペイロード作成
     # ==========================================
     payload = {
         "action": "sync_schedule",
@@ -151,7 +150,7 @@ def main():
     with open('schedule.json', 'w', encoding='utf-8') as f:
         json.dump(payload, f, ensure_ascii=False, indent=2)
 
-    print(f"📁 中間ファイルの作成が完了。合計 {len(unique_events)} 件のChumTotoスケジュールを記録しました。")
+    print(f"📁 中間ファイルの作成が完了。合計 {len(unique_events)} 件のChumTotoスケジュールをGAS互換形式で記録しました。")
 
 if __name__ == "__main__":
     main()
