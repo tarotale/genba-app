@@ -72,12 +72,16 @@
         .filter-select:disabled { opacity: 0.2; cursor: not-allowed; }
         .filter-select:focus { border-color: var(--color-chumtoto); }
 
+        /* スタッツグリッド（2列表示） */
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
         .stats-card { background: var(--card-bg); border: 1px solid var(--card-border); padding: 16px; border-radius: 12px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         .stats-card.full { grid-column: span 2; background: linear-gradient(135deg, rgba(255,107,157,0.12) 0%, rgba(255,255,255,0.01) 100%); border-color: rgba(255, 107, 157, 0.4); }
         .stats-label { font-size: 11px; color: var(--text-muted); font-weight: bold; letter-spacing: 1px; margin-bottom: 6px; text-transform: uppercase; }
         .stats-value { font-size: 22px; font-weight: 800; color: #fff; }
         .stats-card.full .stats-value { font-size: 32px; color: var(--color-chumtoto); text-shadow: 0 0 10px rgba(255,107,157,0.4); }
+        
+        /* 💡 チェキ枚数専用のハイライト数値デザイン */
+        .cheki-count { color: var(--color-chumtoto) !important; text-shadow: 0 0 6px rgba(255,107,157,0.3); }
 
         .chart-box { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         .loading { text-align: center; color: var(--color-chumtoto); padding: 40px; font-weight: bold; letter-spacing: 2px; text-shadow: 0 0 6px rgba(255,107,157,0.3); }
@@ -125,6 +129,15 @@
             <div class="stats-label">Attendance Rate (参戦率)</div>
             <div class="stats-value" id="attendance-rate">0%</div>
         </div>
+        
+        <div class="stats-card">
+            <div class="stats-label">Sign Cheki (サインチェキ数)</div>
+            <div class="stats-value cheki-count" id="total-sign-cheki">0枚</div>
+        </div>
+        <div class="stats-card">
+            <div class="stats-label">White Cheki (白チェキ数)</div>
+            <div class="stats-value cheki-count" id="total-white_cheki">0枚</div>
+        </div>
     </div>
 
     <div class="chart-box">
@@ -141,14 +154,13 @@
 </div>
 
 <script>
-// ★重要：ご自身のデプロイ版GASウェブアプリURL
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbw7KeuN0XckEqU9V4wRxR3O8T9Rl6cC2jQesEOpOsNJTF09ZylpVFZWJnqo0aff1YNFRw/exec';
 
 const PRICES = { sign_cheki: 3000, white_cheki: 2000, tiktok: 3500, kakomi: 4000, item_sign: 4500, omiyokuri: 1500 };
 
-let rawData = [];      // GASから取得した生の全履歴データ
-let currentChart = null; // Chart.jsインスタンス
-let currentMode = 'all'; // 'all', 'year', 'month'
+let rawData = [];
+let currentChart = null;
+let currentMode = 'all';
 
 window.onload = async function() {
     try {
@@ -159,15 +171,14 @@ window.onload = async function() {
             document.getElementById('loading-text').style.display = 'none';
             document.getElementById('expenseChart').style.display = 'block';
             
-            buildFilterOptions(); // データから年・月のドロップダウンを動的生成
-            renderDashboard();   // 初期表示
+            buildFilterOptions();
+            renderDashboard();
         }
     } catch (e) {
         document.getElementById('loading-text').innerText = "ERROR: FAILED TO LOAD DATA";
     }
 }
 
-// スプシのデータから自動的に年・月の選択肢を作る
 function buildFilterOptions() {
     const years = new Set();
     const months = new Set();
@@ -175,12 +186,11 @@ function buildFilterOptions() {
     rawData.forEach(row => {
         if (!row.date) return;
         const y = row.date.substring(0, 4);
-        const m = row.date.substring(0, 7); // "2026-05"
+        const m = row.date.substring(0, 7);
         years.add(y);
         months.add(m);
     });
 
-    // 年セレクトボックス生成
     const yearSelect = document.getElementById('year-select');
     Array.from(years).sort().reverse().forEach(y => {
         const opt = document.createElement('option');
@@ -189,27 +199,21 @@ function buildFilterOptions() {
         yearSelect.appendChild(opt);
     });
 
-    // 月セレクトボックス生成
     const monthSelect = document.getElementById('month-select');
     Array.from(months).sort().reverse().forEach(m => {
         const opt = document.createElement('option');
         opt.value = m;
-        // 表示用に "2026年05月" に整形
         const [yStr, mStr] = m.split('-');
         opt.innerText = `${yStr}年${mStr}月`;
         monthSelect.appendChild(opt);
     });
 }
 
-// タブを切り替えたとき
 function setMode(mode) {
     currentMode = mode;
-    
-    // アクティブなタブデザインの切り替え
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
     document.getElementById(`tab-${mode}`).classList.add('active');
 
-    // モードに応じてドロップダウンの有効・無効をコントロール
     const yearSelect = document.getElementById('year-select');
     const monthSelect = document.getElementById('month-select');
 
@@ -219,23 +223,16 @@ function setMode(mode) {
     } else if (mode === 'year') {
         yearSelect.disabled = false;
         monthSelect.disabled = true;
-        // 未選択なら一番新しい年を自動選択
-        if (!yearSelect.value && yearSelect.options.length > 1) {
-            yearSelect.selectedIndex = 1;
-        }
+        if (!yearSelect.value && yearSelect.options.length > 1) yearSelect.selectedIndex = 1;
     } else if (mode === 'month') {
         yearSelect.disabled = true;
         monthSelect.disabled = false;
-        // 未選択なら一番新しい月を自動選択
-        if (!monthSelect.value && monthSelect.options.length > 1) {
-            monthSelect.selectedIndex = 1;
-        }
+        if (!monthSelect.value && monthSelect.options.length > 1) monthSelect.selectedIndex = 1;
     }
 
     renderDashboard();
 }
 
-// ドロップダウンを変更したとき
 function onChangeFilter() {
     renderDashboard();
 }
@@ -244,7 +241,6 @@ function renderDashboard() {
     const yearSelect = document.getElementById('year-select');
     const monthSelect = document.getElementById('month-select');
 
-    // 1. データのフィルタリング
     const filteredData = rawData.filter(row => {
         if (!row.date) return false;
         if (currentMode === 'year') {
@@ -252,14 +248,18 @@ function renderDashboard() {
         } else if (currentMode === 'month') {
             return monthSelect.value ? row.date.substring(0, 7) === monthSelect.value : true;
         }
-        return true; // 'all'
+        return true;
     });
 
-    // 2. 集計処理
     let totalExpense = 0;
     let totalTicket = 0;
     let attendCount = 0;
     let totalCount = filteredData.length;
+    
+    // 💡 チェキ枚数カウント用変数の初期化
+    let signChekiCount = 0;
+    let whiteChekiCount = 0;
+    
     const monthlyData = {};
 
     filteredData.forEach(row => {
@@ -276,11 +276,14 @@ function renderDashboard() {
 
         totalExpense += rowTotal;
 
+        // 💡 スプシから取得したデータからそれぞれの枚数を加算
+        signChekiCount += parseInt(row.sign_cheki) || 0;
+        whiteChekiCount += parseInt(row.white_cheki) || 0;
+
         const monthKey = row.date.substring(0, 7);
         monthlyData[monthKey] = (monthlyData[monthKey] || 0) + rowTotal;
     });
 
-    // 3. 上部のカード情報を更新
     if (currentMode === 'all') {
         document.getElementById('main-expense-label').innerText = 'Total Investment (累計支出)';
     } else if (currentMode === 'year') {
@@ -294,8 +297,11 @@ function renderDashboard() {
     document.getElementById('total-main').innerText = `¥${totalExpense.toLocaleString()}`;
     document.getElementById('total-ticket').innerText = `¥${totalTicket.toLocaleString()}`;
     document.getElementById('attendance-rate').innerText = totalCount > 0 ? `${Math.round((attendCount / totalCount) * 100)}%` : "0%";
+    
+    // 💡 画面上のチェキカウント数値を更新
+    document.getElementById('total-sign-cheki').innerText = `${signChekiCount}枚`;
+    document.getElementById('total-white_cheki').innerText = `${whiteChekiCount}枚`;
 
-    // 4. グラフの分岐描画
     if (currentMode === 'month') {
         document.getElementById('chart-title').innerText = "選択月の支出内訳 (¥)";
         renderBreakdownChart(filteredData);
@@ -307,7 +313,6 @@ function renderDashboard() {
     }
 }
 
-// 【グラフA】棒グラフ（全期間・年別）
 function renderTrendChart(labels, values) {
     if (currentChart) currentChart.destroy();
 
@@ -337,7 +342,6 @@ function renderTrendChart(labels, values) {
     });
 }
 
-// 【グラフB】ドーナツグラフ（月別選択時専用）
 function renderBreakdownChart(monthData) {
     if (currentChart) currentChart.destroy();
 
