@@ -2,8 +2,9 @@ name: ChumToto Schedule Auto Sync
 
 on:
   schedule:
+    # 日本時間の 0, 3, 6, 9, 12, 15, 18, 21 時に自動実行（3時間おき）
     - cron: '0 0,3,6,9,12,15,18,21 * * *'
-  workflow_dispatch:
+  workflow_dispatch: # 手動実行ボタン
 
 permissions:
   contents: write
@@ -26,28 +27,21 @@ jobs:
         python -m pip install --upgrade pip
         pip install selenium webdriver-manager beautifulsoup4
 
-    # 【Step 1】Pythonを動かして schedule.json を作成（100%成功中）
+    # 【ステップ1】Pythonを動かして完璧な schedule.json をローカル作成（100%成功中・通信なし）
     - name: Run ChumToto Scraper
       run: |
         python chumtoto_scraper.py
 
-    # 【Step 2】💡 GASを「全員」に公開した新しいURLへ、RAWテキストとして確実に叩き込みます
+    # 【ステップ2】💡 物理分離したcURL工程：完成しているJSONをそのままストレートにGASへRAW送信
     - name: Upload Data to Google Sheets via cURL
       run: |
         if [ -f "schedule.json" ]; then
-          echo "🚀 schedule.json からGAS専用のペイロードを組み立て中..."
+          echo "📨 完成している schedule.json の中身をそのまま Google Apps Script へ直接送信中..."
           
-          # GASが綺麗に1発パースできるトッププロパティ構造にします
-          jq '{
-            action: "sync_schedule",
-            events: [ .[] | { group: "ChumToto", start: .date, title: .title, venue: .venue, time: .time, url: .url } ]
-          }' schedule.json > gas_payload.json
-          
-          echo "📨 Google Apps Script（新URL）へデータを直接送信中..."
-          # ⚠️ 下記の「★ここに新しいGASのURLを貼り付け★」を、先ほどデプロイした新しいURL（/execで終わるもの）に差し替えてください
-          curl -L -X POST "https://script.google.com/macros/s/AKfycbzz_ulxkWibPM1bikldJ7BQFZTYCD4WP_mbw3m0gYopTHSBazTWudQamhANgaA_J4pU/exec" \
+          # 💡 すでに完璧なJSON構造なので、加工（jq）を挟まずにそのままRAWテキストとして叩き込みます
+          curl -L -X POST "https://script.google.com/macros/s/AKfycbxTpsaay81w4DDRfjfui7pfmnlc4aDaOPJx_fy4Shf275gpnyUZ9R-ObhAWQOMVOwyP/exec" \
                -H "Content-Type: text/plain" \
-               --data-raw "$(cat gas_payload.json)"
+               --data-raw "$(cat schedule.json)"
                
           echo -e "\n🎉 スプレッドシート（公式スケジュール）への同期送信工程が完了しました！"
         else
@@ -55,7 +49,7 @@ jobs:
           exit 1
         fi
 
-    # 【Step 3】生成された schedule.json をリポジトリ内に永続保存（100%成功中）
+    # 【ステップ3】生成された schedule.json をリポジトリ内に永続保存（カレンダー画面表示用）
     - name: Commit and Push schedule.json
       run: |
         git config --local user.email "action@github.com"
