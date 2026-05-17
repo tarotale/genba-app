@@ -36,81 +36,18 @@
             text-align: center;
         }
 
-        h2 {
-            margin: 0;
-            font-size: 18px;
-            font-weight: 700;
-            letter-spacing: 2px;
-            color: #fff;
-            text-shadow: 0 0 8px rgba(255, 107, 157, 0.4);
-        }
+        h2 { margin: 0; font-size: 18px; font-weight: 700; letter-spacing: 2px; color: #fff; text-shadow: 0 0 8px rgba(255, 107, 157, 0.4); }
+        .container { max-width: 600px; margin: 0 auto; padding: 16px; box-sizing: border-box; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+        
+        .stats-card { background: var(--card-bg); border: 1px solid var(--card-border); padding: 16px; border-radius: 12px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .stats-card.full { grid-column: span 2; background: linear-gradient(135deg, rgba(255,107,157,0.12) 0%, rgba(255,255,255,0.01) 100%); border-color: rgba(255, 107, 157, 0.4); }
+        .stats-label { font-size: 11px; color: var(--text-muted); font-weight: bold; letter-spacing: 1px; margin-bottom: 6px; text-transform: uppercase; }
+        .stats-value { font-size: 22px; font-weight: 800; color: #fff; }
+        .stats-card.full .stats-value { font-size: 32px; color: var(--color-chumtoto); text-shadow: 0 0 10px rgba(255,107,157,0.4); }
 
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 16px;
-            box-sizing: border-box;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .stats-card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            padding: 16px;
-            border-radius: 12px;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-
-        .stats-card.full {
-            grid-column: span 2;
-            background: linear-gradient(135deg, rgba(255,107,157,0.12) 0%, rgba(255,255,255,0.01) 100%);
-            border-color: rgba(255, 107, 157, 0.4);
-        }
-
-        .stats-label {
-            font-size: 11px;
-            color: var(--text-muted);
-            font-weight: bold;
-            letter-spacing: 1px;
-            margin-bottom: 6px;
-            text-transform: uppercase;
-        }
-
-        .stats-value {
-            font-size: 22px;
-            font-weight: 800;
-            color: #fff;
-        }
-
-        .stats-card.full .stats-value {
-            font-size: 32px;
-            color: var(--color-chumtoto);
-            text-shadow: 0 0 10px rgba(255,107,157,0.4);
-        }
-
-        .chart-box {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 12px;
-            padding: 16px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-
-        .loading {
-            text-align: center;
-            color: var(--color-chumtoto);
-            padding: 40px;
-            font-weight: bold;
-            letter-spacing: 2px;
-            text-shadow: 0 0 6px rgba(255,107,157,0.3);
-        }
+        .chart-box { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .loading { text-align: center; color: var(--color-chumtoto); padding: 40px; font-weight: bold; letter-spacing: 2px; text-shadow: 0 0 6px rgba(255,107,157,0.3); }
 
         /* 下部ナビゲーション */
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--header-gradient); border-top: 1px solid rgba(255, 107, 157, 0.15); display: flex; justify-content: space-around; padding: 10px 0; z-index: 100; backdrop-filter: blur(12px); }
@@ -141,6 +78,7 @@
     </div>
 
     <div class="chart-box">
+        <h3 style="font-size: 12px; color: var(--text-main); margin-top: 0; margin-bottom: 15px; letter-spacing: 1px;">月別支出推移 (¥)</h3>
         <div id="loading-text" class="loading">ANALYZING FINANCIAL DATA...</div>
         <canvas id="expenseChart" style="display: none;"></canvas>
     </div>
@@ -153,17 +91,9 @@
 </div>
 
 <script>
-// ★重要：ご自身の新デプロイ版GASウェブアプリURLに書き換えてください
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbw7KeuN0XckEqU9V4wRxR3O8T9Rl6cC2jQesEOpOsNJTF09ZylpVFZWJnqo0aff1YNFRw/exec';
 
-const PRICES = {
-    sign_cheki: 2000,
-    white_cheki: 1000,
-    tiktok: 1000,
-    kakomi: 3000,
-    goods_sign: 2000,
-    omijouri: 500
-};
+const PRICES = { sign_cheki: 3000, white_cheki: 2000, tiktok: 3500, kakomi: 4000, item_sign: 4500, omiyokuri: 1500 };
 
 window.onload = async function() {
     try {
@@ -184,7 +114,7 @@ function createDashboard(data) {
     let totalCount = data.length;
     
     const now = new Date();
-    const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`; // \"2026-05\"
+    const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 
     const monthlyData = {};
 
@@ -193,7 +123,6 @@ function createDashboard(data) {
         
         if (row.attendance === "参加") attendCount++;
 
-        // 1行の合計計算
         let rowTotal = parseInt(row.ticket_fee) || 0;
         Object.keys(PRICES).forEach(key => {
             let count = parseInt(row[key]) || 0;
@@ -202,12 +131,10 @@ function createDashboard(data) {
 
         totalAll += rowTotal;
 
-        // 今月の支出
         if (row.date.substring(0, 7) === currentMonth) {
             totalMonth += rowTotal;
         }
         
-        // 月別の集計
         const monthKey = row.date.substring(0, 7);
         monthlyData[monthKey] = (monthlyData[monthKey] || 0) + rowTotal;
     });
@@ -223,7 +150,6 @@ function createDashboard(data) {
     const ctx = document.getElementById('expenseChart');
     ctx.style.display = 'block';
 
-    // ダークモード仕様のChart.js設定
     new Chart(ctx, {
         type: 'bar',
         data: {
@@ -239,20 +165,11 @@ function createDashboard(data) {
         options: {
             responsive: true,
             plugins: {
-                legend: {
-                    labels: { color: '#f5f0f2', font: { family: 'sans-serif', weight: 'bold' } }
-                }
+                legend: { labels: { color: '#f5f0f2', font: { weight: 'bold' } } }
             },
             scales: {
-                x: {
-                    grid: { color: 'rgba(255, 107, 157, 0.05)' },
-                    ticks: { color: '#9e8891' }
-                },
-                y: {
-                    beginAtZero: true,
-                    grid: { color: 'rgba(255, 107, 157, 0.1)' },
-                    ticks: { color: '#9e8891' }
-                }
+                x: { grid: { color: 'rgba(255, 107, 157, 0.05)' }, ticks: { color: '#9e8891' } },
+                y: { beginAtZero: true, grid: { color: 'rgba(255, 107, 157, 0.1)' }, ticks: { color: '#9e8891' } }
             }
         }
     });
