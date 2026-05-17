@@ -148,23 +148,30 @@
         document.getElementById('cheki-breakdown').innerText = `サイン: ${totalSign}枚 / 白: ${totalWhite}枚`;
     }
 
+    // 💡 日付の一致を保証した上で、部分一致で未入力をインテリジェントに検知する修正ロジック
     function checkMissingEntries(scheduleData, historyData) {
         const todayStr = new Date().toISOString().substring(0, 10);
         const alertList = document.getElementById('alertList');
+        alertList.innerHTML = ""; // 念のため初期化
         let missingCount = 0;
-
-        const historyKeys = historyData.map(h => `${h.date}_${h.event_name}`);
 
         scheduleData.forEach(sched => {
             if (!sched.date) return;
+            
+            // 今日、または過去のイベントが対象
             if (sched.date <= todayStr) {
-                const checkKey = `${sched.date}_${sched.title}`;
-                if (!historyKeys.includes(checkKey)) {
+                
+                // 💡 日付が「完全一致」かつ、自分の入力したイベント名の中に「公式のタイトル」が「含まれている」か判定
+                const isInputted = historyData.some(h => 
+                    h.date === sched.date && h.event_name.includes(sched.title)
+                );
+                
+                // 履歴に存在しない（＝未入力である）場合のみ、アラートを生成
+                if (!isInputted) {
                     missingCount++;
                     const mDate = new Date(sched.date);
                     const displayDate = `${mDate.getMonth() + 1}/${mDate.getDate()}`;
                     
-                    // 💡 ボタンのジャンプ先を index.html から entry.html に変更
                     const itemHtml = `
                         <div class="alert-item">
                             <div class="alert-info">
@@ -179,10 +186,13 @@
             }
         });
 
+        // 警告数に応じて表示/非表示をピシッとスイッチ
         if (missingCount > 0) {
             document.getElementById('alertBox').style.display = 'block';
+            document.getElementById('clearBox').style.display = 'none';
         } else {
             document.getElementById('clearBox').style.display = 'block';
+            document.getElementById('alertBox').style.display = 'none';
         }
     }
 </script>
