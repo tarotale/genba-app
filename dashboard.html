@@ -38,8 +38,13 @@
 
         h2 { margin: 0; font-size: 18px; font-weight: 700; letter-spacing: 2px; color: #fff; text-shadow: 0 0 8px rgba(255, 107, 157, 0.4); }
         .container { max-width: 600px; margin: 0 auto; padding: 16px; box-sizing: border-box; }
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
         
+        /* 期間切り替えタブ */
+        .filter-tabs { display: flex; background: rgba(0,0,0,0.3); border: 1px solid var(--card-border); padding: 4px; border-radius: 8px; margin-bottom: 16px; }
+        .tab-btn { flex: 1; padding: 8px 0; background: transparent; border: none; color: var(--text-muted); font-size: 12px; font-weight: bold; cursor: pointer; border-radius: 6px; transition: all 0.2s; }
+        .tab-btn.active { background: rgba(255, 107, 157, 0.2); color: #fff; text-shadow: 0 0 4px var(--color-chumtoto); }
+
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
         .stats-card { background: var(--card-bg); border: 1px solid var(--card-border); padding: 16px; border-radius: 12px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         .stats-card.full { grid-column: span 2; background: linear-gradient(135deg, rgba(255,107,157,0.12) 0%, rgba(255,255,255,0.01) 100%); border-color: rgba(255, 107, 157, 0.4); }
         .stats-label { font-size: 11px; color: var(--text-muted); font-weight: bold; letter-spacing: 1px; margin-bottom: 6px; text-transform: uppercase; }
@@ -62,14 +67,20 @@
 </header>
 
 <div class="container">
+    <div class="filter-tabs">
+        <button class="tab-btn active" onclick="switchPeriod('all')">全期間</button>
+        <button class="tab-btn" onclick="switchPeriod('year')">今年</button>
+        <button class="tab-btn" onclick="switchPeriod('month')">今月</button>
+    </div>
+
     <div class="stats-grid">
         <div class="stats-card full">
-            <div class="stats-label">Total Investment (累計支出)</div>
-            <div class="stats-value" id="total-all">¥0</div>
+            <div class="stats-label" id="main-expense-label">Total Investment (累計支出)</div>
+            <div class="stats-value" id="total-main">¥0</div>
         </div>
         <div class="stats-card">
-            <div class="stats-label">This Month (今月の支出)</div>
-            <div class="stats-value" id="total-month">¥0</div>
+            <div class="stats-label">Ticket Total (チケット代)</div>
+            <div class="stats-value" id="total-ticket">¥0</div>
         </div>
         <div class="stats-card">
             <div class="stats-label">Attendance Rate (参戦率)</div>
@@ -78,7 +89,7 @@
     </div>
 
     <div class="chart-box">
-        <h3 style="font-size: 12px; color: var(--text-main); margin-top: 0; margin-bottom: 15px; letter-spacing: 1px;">月別支出推移 (¥)</h3>
+        <h3 id="chart-title" style="font-size: 12px; color: var(--text-main); margin-top: 0; margin-bottom: 15px; letter-spacing: 1px;">月別支出推移 (¥)</h3>
         <div id="loading-text" class="loading">ANALYZING FINANCIAL DATA...</div>
         <canvas id="expenseChart" style="display: none;"></canvas>
     </div>
@@ -95,70 +106,139 @@ const GAS_URL = 'https://script.google.com/macros/s/AKfycbw7KeuN0XckEqU9V4wRxR3O
 
 const PRICES = { sign_cheki: 3000, white_cheki: 2000, tiktok: 3500, kakomi: 4000, item_sign: 4500, omiyokuri: 1500 };
 
+let rawData = []; // GASから取得した生の全履歴データ
+let currentChart = null; // Chart.jsのインスタンス保持用
+
 window.onload = async function() {
     try {
         const response = await fetch(GAS_URL + "?action=read_history");
         const resData = await response.json();
         if (resData.result === "success") {
-            createDashboard(resData.data);
+            rawData = resData.data;
+            document.getElementById('loading-text').style.display = 'none';
+            document.getElementById('expenseChart').style.display = 'block';
+            renderDashboard('all'); // 初期表示は全期間
         }
     } catch (e) {
         document.getElementById('loading-text').innerText = "ERROR: FAILED TO LOAD DATA";
     }
 }
 
-function createDashboard(data) {
-    let totalAll = 0;
-    let totalMonth = 0;
-    let attendCount = 0;
-    let totalCount = data.length;
+function switchPeriod(period) {
+    // タブのactive状態の切り替え
+    const buttons = document.querySelectorAll('.tab-btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    event.currentTarget.classList.add('active');
     
-    const now = new Date();
-    const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    renderDashboard(period);
+}
 
+function renderDashboard(period) {
+    const now = new Date();
+    const currentYearStr = String(now.getFullYear()); // "2026"
+    const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`; // "2026-05"
+
+    // 1. 選択された期間でデータをフィルタリング
+    const filteredData = rawData.filter(row => {
+        if (!row.date) return false;
+        if (period === 'year') {
+            return row.date.substring(0, 4) === currentYearStr;
+        } else if (period === 'month') {
+            return row.date.substring(0, 7) === currentMonthStr;
+        }
+        return true; // 'all'
+    });
+
+    // 2. 集計ロジックの実行
+    let totalExpense = 0;
+    let totalTicket = 0;
+    let attendCount = 0;
+    let totalCount = filteredData.length;
     const monthlyData = {};
 
-    data.forEach(row => {
-        if (!row.date) return;
-        
+    filteredData.forEach(row => {
         if (row.attendance === "参加") attendCount++;
 
-        let rowTotal = parseInt(row.ticket_fee) || 0;
+        let ticketFee = parseInt(row.ticket_fee) || 0;
+        totalTicket += ticketFee;
+
+        let rowTotal = ticketFee;
         Object.keys(PRICES).forEach(key => {
             let count = parseInt(row[key]) || 0;
             rowTotal += count * PRICES[key];
         });
 
-        totalAll += rowTotal;
+        totalExpense += rowTotal;
 
-        if (row.date.substring(0, 7) === currentMonth) {
-            totalMonth += rowTotal;
-        }
-        
+        // 月別集計（グラフ用）
         const monthKey = row.date.substring(0, 7);
         monthlyData[monthKey] = (monthlyData[monthKey] || 0) + rowTotal;
     });
 
-    document.getElementById('total-all').innerText = `¥${totalAll.toLocaleString()}`;
-    document.getElementById('total-month').innerText = `¥${totalMonth.toLocaleString()}`;
+    // 3. UIのラベルと数値を更新
+    const labelMap = { 'all': 'Total Investment (累計支出)', 'year': 'This Year (今年の支出)', 'month': 'This Month (今月の支出)' };
+    document.getElementById('main-expense-label').innerText = labelMap[period];
+    document.getElementById('total-main').innerText = `¥${totalExpense.toLocaleString()}`;
+    document.getElementById('total-ticket').innerText = `¥${totalTicket.toLocaleString()}`;
     document.getElementById('attendance-rate').innerText = totalCount > 0 ? `${Math.round((attendCount / totalCount) * 100)}%` : "0%";
 
+    // 4. グラフの再描画
     const labels = Object.keys(monthlyData).sort();
     const chartValues = labels.map(key => monthlyData[key]);
 
-    document.getElementById('loading-text').style.display = 'none';
-    const ctx = document.getElementById('expenseChart');
-    ctx.style.display = 'block';
+    if (period === 'month') {
+        document.getElementById('chart-title').innerText = "今月の支出内訳 (¥)";
+        // 今月のみ、月別ではなく「チケット代」や「特典（チェキ等）」の項目別内訳に変えると見やすいため切り替えます
+        renderBreakdownChart(filteredData);
+    } else {
+        document.getElementById('chart-title').innerText = period === 'year' ? "今年の月別支出推移 (¥)" : "月別支出推移 (¥)";
+        renderTrendChart(labels, chartValues);
+    }
+}
 
-    new Chart(ctx, {
+// 【グラフパターンA】全期間・年別のときの「月別推移グラフ」
+function renderTrendChart(labels, values) {
+    if (currentChart) currentChart.destroy();
+
+    const ctx = document.getElementById('expenseChart').getContext('2d');
+    currentChart = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: labels,
             datasets: [{
                 label: '支出合計',
-                data: chartValues,
+                data: values,
                 backgroundColor: '#FF6B9D',
                 borderRadius: 6,
+                borderWidth: 0
+            }]
+        },
+        options: getChartOptions()
+    });
+}
+
+// 【グラフパターンB】今月を選んだとき専用の「アイテム別支出内訳グラフ」
+function renderBreakdownChart(monthData) {
+    if (currentChart) currentChart.destroy();
+
+    let ticketSum = 0;
+    let benefitSum = 0;
+
+    monthData.forEach(row => {
+        ticketSum += parseInt(row.ticket_fee) || 0;
+        Object.keys(PRICES).forEach(key => {
+            benefitSum += (parseInt(row[key]) || 0) * PRICES[key];
+        });
+    });
+
+    const ctx = document.getElementById('expenseChart').getContext('2d');
+    currentChart = new Chart(ctx, {
+        type: 'doughnut', // 内訳がパッと見で分かりやすいドーナツ型に変更
+        data: {
+            labels: ['チケット代', '特典会（チェキ等）'],
+            datasets: [{
+                data: [ticketSum, benefitSum],
+                backgroundColor: ['#6ba3ff', '#FF6B9D'],
                 borderWidth: 0
             }]
         },
@@ -166,13 +246,23 @@ function createDashboard(data) {
             responsive: true,
             plugins: {
                 legend: { labels: { color: '#f5f0f2', font: { weight: 'bold' } } }
-            },
-            scales: {
-                x: { grid: { color: 'rgba(255, 107, 157, 0.05)' }, ticks: { color: '#9e8891' } },
-                y: { beginAtZero: true, grid: { color: 'rgba(255, 107, 157, 0.1)' }, ticks: { color: '#9e8891' } }
             }
         }
     });
+}
+
+// グラフの共通ダークデザインオプション
+function getChartOptions() {
+    return {
+        responsive: true,
+        plugins: {
+            legend: { labels: { color: '#f5f0f2', font: { weight: 'bold' } } }
+        },
+        scales: {
+            x: { grid: { color: 'rgba(255, 107, 157, 0.05)' }, ticks: { color: '#9e8891' } },
+            y: { beginAtZero: true, grid: { color: 'rgba(255, 107, 157, 0.1)' }, ticks: { color: '#9e8891' } }
+        }
+    };
 }
 </script>
 </body>
