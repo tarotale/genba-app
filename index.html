@@ -45,7 +45,7 @@
 <div class="container">
     <h2>現場記録入力</h2>
     <div class="nav-links">
-        <a href="dashboard.html">📊 ダッシュボード（集計画面）を見る</a>
+        <a href="calendar.html">📅 カレンダー画面へ移動</a>
     </div>
     
     <div class="input-group">
@@ -93,6 +93,7 @@
 </div>
 
 <script>
+// 単価設定
 const PRICES = {
     sign_cheki: { name: 'サインチェキ', price: 3000 },
     white_cheki: { name: '白チェキ', price: 2000 },
@@ -105,10 +106,52 @@ const PRICES = {
 const counts = {};
 Object.keys(PRICES).forEach(key => counts[key] = 0);
 
+// 初期表示とパラメータ解析
 window.onload = () => {
-    document.getElementById('date').valueAsDate = new Date();
+    // --- 【追加機能】URLパラメータ (?date=xxx&event=yyy...) を解析して自動入力 ---
+    const urlParams = new URLSearchParams(window.location.search);
+    const paramDate = urlParams.get('date');
+    const paramEvent = urlParams.get('event');
+    const paramLocation = urlParams.get('location');
+
+    // 日付のセット
+    if (paramDate) {
+        document.getElementById('date').value = paramDate;
+    } else {
+        document.getElementById('date').valueAsDate = new Date();
+    }
+
+    // イベント名のセット
+    if (paramEvent) {
+        document.getElementById('event_name').value = paramEvent;
+    }
+
+    // 会場（場所）セレクトボックスの自動セット
+    if (paramLocation) {
+        const locationSelect = document.getElementById('location');
+        let matchFound = false;
+        
+        // 既存のセレクトボックスの選択肢に一致するものがあるかチェック
+        for (let i = 0; i < locationSelect.options.length; i++) {
+            if (locationSelect.options[i].value === paramLocation) {
+                locationSelect.selectedIndex = i;
+                matchFound = true;
+                break;
+            }
+        }
+        
+        // 元のプルダウンにない会場名だった場合、臨時の選択肢を追加して選択状態にする
+        if (!matchFound) {
+            const newOpt = document.createElement('option');
+            newOpt.value = paramLocation;
+            newOpt.text = paramLocation;
+            newOpt.selected = true;
+            locationSelect.add(newOpt, locationSelect.options[0]); // 先頭に追加
+        }
+    }
+
+    // カウンターカードの生成
     const grid = document.getElementById('counter-grid');
-    
     Object.keys(PRICES).forEach(key => {
         const item = PRICES[key];
         grid.innerHTML += `
@@ -125,6 +168,8 @@ window.onload = () => {
             </div>
         `;
     });
+    
+    calc(); // 初期合計金額の計算
 };
 
 function toggleAttendance() {
@@ -140,7 +185,6 @@ function toggleAttendance() {
     } else {
         label.innerText = "状態：不参加（干した・諦めた）";
         label.style.color = "#d32f2f";
-        // 不参加ならカウンターを全部0にして操作不能にする
         Object.keys(PRICES).forEach(key => {
             counts[key] = 0;
             document.getElementById(`count-${key}`).innerText = 0;
@@ -166,7 +210,9 @@ function calc() {
 
 async function sendData() {
     const btn = document.getElementById('submit-btn');
-    const GAS_URL = 'https://script.google.com/macros/s/AKfycbzz_ulxkWibPM1bikldJ7BQFZTYCD4WP_mbw3m0gYopTHSBazTWudQamhANgaA_J4pU/exec'; // ★要確認
+    
+    // ★重要：ご自身の新デプロイ版GASウェブアプリURLに書き換えてください
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbxTpsaay81w4DDRfjfui7pfmnlc4aDaOPJx_fy4Shf275gpnyUZ9R-ObhAWQOMVOwyP/exec';
 
     btn.disabled = true;
     btn.innerText = '送信中...';
@@ -188,7 +234,8 @@ async function sendData() {
             body: JSON.stringify(payload)
         });
         alert('保存しました！');
-        location.reload();
+        // 保存後はパラメータを消すために通常のトップへ遷移リロード
+        window.location.href = window.location.pathname;
     } catch (e) {
         alert('エラーが発生しました');
         btn.disabled = false;
