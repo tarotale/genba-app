@@ -36,191 +36,41 @@
             text-align: center;
         }
 
-        h2 {
-            margin: 0;
-            font-size: 18px;
-            font-weight: 700;
-            letter-spacing: 2px;
-            color: #fff;
-            text-shadow: 0 0 8px rgba(255, 107, 157, 0.4);
-        }
-
-        .container {
-            max-width: 500px;
-            margin: 20px auto;
-            padding: 0 16px;
-            box-sizing: border-box;
-        }
-
-        .form-box {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-        }
-
-        .input-group {
-            margin-bottom: 18px;
-        }
-
-        label {
-            display: block;
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-            font-weight: bold;
-            letter-spacing: 1px;
-        }
+        h2 { margin: 0; font-size: 18px; font-weight: 700; letter-spacing: 2px; color: #fff; text-shadow: 0 0 8px rgba(255, 107, 157, 0.4); }
+        .container { max-width: 500px; margin: 20px auto; padding: 0 16px; box-sizing: border-box; }
+        .form-box { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+        .input-group { margin-bottom: 18px; }
+        label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 6px; font-weight: bold; letter-spacing: 1px; }
 
         input[type="date"], input[type="text"], input[type="number"] {
-            width: 100%;
-            padding: 12px;
-            background: var(--input-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 8px;
-            color: #fff;
-            font-size: 14px;
-            box-sizing: border-box;
-            transition: all 0.2s;
+            width: 100%; padding: 12px; background: var(--input-bg); border: 1px solid var(--card-border); border-radius: 8px; color: #fff; font-size: 14px; box-sizing: border-box; transition: all 0.2s;
         }
+        input:focus { outline: none; border-color: var(--color-chumtoto); box-shadow: 0 0 8px rgba(255, 107, 157, 0.3); }
 
-        input:focus {
-            outline: none;
-            border-color: var(--color-chumtoto);
-            box-shadow: 0 0 8px rgba(255, 107, 157, 0.3);
-        }
-
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: var(--input-bg);
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid var(--card-border);
-            cursor: pointer;
-        }
-
-        .checkbox-group input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            accent-color: var(--color-chumtoto);
-            cursor: pointer;
-        }
-
-        .checkbox-label {
-            font-size: 14px;
-            color: #fff;
-            user-select: none;
-            cursor: pointer;
-        }
+        .checkbox-group { display: flex; align-items: center; gap: 10px; background: var(--input-bg); padding: 12px; border-radius: 8px; border: 1px solid var(--card-border); cursor: pointer; }
+        .checkbox-group input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--color-chumtoto); cursor: pointer; }
+        .checkbox-label { font-size: 14px; color: #fff; user-select: none; cursor: pointer; }
 
         /* 特典カウンター */
-        .benefit-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(255,255,255,0.02);
-            padding: 10px 14px;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            border: 1px solid rgba(255,255,255,0.04);
-        }
-
-        .benefit-name {
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .counter-controls {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
+        .benefit-row { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02); padding: 10px 14px; border-radius: 8px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.04); transition: opacity 0.3s; }
+        .disabled-card { opacity: 0.3; pointer-events: none; }
+        .benefit-name { font-size: 13px; font-weight: 600; }
+        .counter-controls { display: flex; align-items: center; gap: 15px; }
+        
         .btn-count {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            border: 1px solid var(--card-border);
-            background: rgba(255, 107, 157, 0.15);
-            color: #fff;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: 0.2s;
+            width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--card-border); background: rgba(255, 107, 157, 0.15); color: #fff; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s;
         }
-
-        .btn-count:hover {
-            background: var(--color-chumtoto);
-            box-shadow: 0 0 8px var(--color-chumtoto);
-        }
-
-        .count-value {
-            font-size: 16px;
-            font-weight: bold;
-            min-width: 20px;
-            text-align: center;
-        }
+        .btn-count:hover { background: var(--color-chumtoto); box-shadow: 0 0 8px var(--color-chumtoto); }
+        .count-value { font-size: 16px; font-weight: bold; min-width: 20px; text-align: center; }
 
         /* 総計表示 */
-        .total-box {
-            margin-top: 24px;
-            background: linear-gradient(135deg, rgba(255,107,157,0.2) 0%, rgba(255,255,255,0.02) 100%);
-            border: 1px solid var(--color-chumtoto);
-            border-radius: 10px;
-            padding: 14px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 0 10px rgba(255,107,157,0.1);
-        }
+        .total-box { margin-top: 24px; background: linear-gradient(135deg, rgba(255,107,157,0.2) 0%, rgba(255,255,255,0.02) 100%); border: 1px solid var(--color-chumtoto); border-radius: 10px; padding: 14px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 0 10px rgba(255,107,157,0.1); }
+        .total-label { font-size: 12px; font-weight: bold; color: var(--text-muted); letter-spacing: 1px; }
+        .total-price { font-size: 24px; font-weight: 800; color: var(--color-chumtoto); text-shadow: 0 0 8px rgba(255,107,157,0.4); }
 
-        .total-label {
-            font-size: 12px;
-            font-weight: bold;
-            color: var(--text-muted);
-            letter-spacing: 1px;
-        }
-
-        .total-price {
-            font-size: 24px;
-            font-weight: 800;
-            color: var(--color-chumtoto);
-            text-shadow: 0 0 8px rgba(255,107,157,0.4);
-        }
-
-        .submit-btn {
-            width: 100%;
-            margin-top: 20px;
-            padding: 14px;
-            background: var(--color-chumtoto);
-            border: none;
-            border-radius: 8px;
-            color: #fff;
-            font-size: 15px;
-            font-weight: bold;
-            letter-spacing: 2px;
-            cursor: pointer;
-            transition: 0.2s;
-            box-shadow: 0 4px 12px rgba(255,107,157,0.3);
-        }
-
-        .submit-btn:hover:not(:disabled) {
-            opacity: 0.9;
-            box-shadow: 0 4px 20px rgba(255,107,157,0.5);
-        }
-
-        .submit-btn:disabled {
-            background: #4a353c;
-            color: #8a7078;
-            box-shadow: none;
-            cursor: not-allowed;
-        }
+        .submit-btn { width: 100%; margin-top: 20px; padding: 14px; background: var(--color-chumtoto); border: none; border-radius: 8px; color: #fff; font-size: 15px; font-weight: bold; letter-spacing: 2px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 12px rgba(255,107,157,0.3); }
+        .submit-btn:hover:not(:disabled) { opacity: 0.9; box-shadow: 0 4px 20px rgba(255,107,157,0.5); }
+        .submit-btn:disabled { background: #4a353c; color: #8a7078; box-shadow: none; cursor: not-allowed; }
 
         /* 下部ナビゲーション */
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--header-gradient); border-top: 1px solid rgba(255, 107, 157, 0.15); display: flex; justify-content: space-around; padding: 10px 0; z-index: 100; backdrop-filter: blur(12px); }
@@ -237,9 +87,9 @@
 <div class="container">
     <div class="form-box">
         <div class="input-group">
-    <label>DATE</label>
-    <input type="date" id="date" onclick="this.showPicker()">
-</div>
+            <label>DATE</label>
+            <input type="date" id="date" onclick="this.showPicker()">
+        </div>
 
         <div class="input-group">
             <label>EVENT NAME</label>
@@ -258,14 +108,14 @@
 
         <div class="input-group" style="margin-bottom: 24px;">
             <label class="checkbox-group" for="attendance">
-                <input type="checkbox" id="attendance" checked>
-                <span class="checkbox-label">この現場に参加する</span>
+                <input type="checkbox" id="attendance" checked onchange="toggleAttendance()">
+                <span class="checkbox-label" id="status-label">状態：参加</span>
             </label>
         </div>
 
         <label style="margin-bottom: 10px;">BENEFIT BENEFITS (特典会)</label>
         
-        <div class="benefit-row">
+        <div class="benefit-row" id="card-sign_cheki">
             <span class="benefit-name">📸 サインチェキ (¥3,000)</span>
             <div class="counter-controls">
                 <button class="btn-count" onclick="changeCount('sign_cheki', -1)">-</button>
@@ -274,7 +124,7 @@
             </div>
         </div>
 
-        <div class="benefit-row">
+        <div class="benefit-row" id="card-white_cheki">
             <span class="benefit-name">⚪ 白チェキ (¥2,000)</span>
             <div class="counter-controls">
                 <button class="btn-count" onclick="changeCount('white_cheki', -1)">-</button>
@@ -283,7 +133,7 @@
             </div>
         </div>
 
-        <div class="benefit-row">
+        <div class="benefit-row" id="card-tiktok">
             <span class="benefit-name">📱 TikTok撮影 (¥3,500)</span>
             <div class="counter-controls">
                 <button class="btn-count" onclick="changeCount('tiktok', -1)">-</button>
@@ -292,7 +142,7 @@
             </div>
         </div>
 
-        <div class="benefit-row">
+        <div class="benefit-row" id="card-kakomi">
             <span class="benefit-name">👥 囲み撮影 (¥4,000)</span>
             <div class="counter-controls">
                 <button class="btn-count" onclick="changeCount('kakomi', -1)">-</button>
@@ -301,21 +151,21 @@
             </div>
         </div>
 
-        <div class="benefit-row">
+        <div class="benefit-row" id="card-item_sign">
             <span class="benefit-name">🎒 私物サイン (¥4,500)</span>
             <div class="counter-controls">
-                <button class="btn-count" onclick="changeCount('goods_sign', -1)">-</button>
-                <span class="count-value" id="val-goods_sign">0</span>
-                <button class="btn-count" onclick="changeCount('goods_sign', 1)">+</button>
+                <button class="btn-count" onclick="changeCount('item_sign', -1)">-</button>
+                <span class="count-value" id="val-item_sign">0</span>
+                <button class="btn-count" onclick="changeCount('item_sign', 1)">+</button>
             </div>
         </div>
 
-        <div class="benefit-row">
+        <div class="benefit-row" id="card-omiyokuri">
             <span class="benefit-name">👋 お見送り (¥1,500)</span>
             <div class="counter-controls">
-                <button class="btn-count" onclick="changeCount('omijouri', -1)">-</button>
-                <span class="count-value" id="val-omijouri">0</span>
-                <button class="btn-count" onclick="changeCount('omijouri', 1)">+</button>
+                <button class="btn-count" onclick="changeCount('omiyokuri', -1)">-</button>
+                <span class="count-value" id="val-omiyokuri">0</span>
+                <button class="btn-count" onclick="changeCount('omiyokuri', 1)">+</button>
             </div>
         </div>
 
@@ -340,18 +190,37 @@ const PRICES = {
     white_cheki: { price: 2000 },
     tiktok: { price: 3500 },
     kakomi: { price: 4000 },
-    goods_sign: { price: 4500 },
-    omijouri: { price: 1500 }
+    item_sign: { price: 4500 },
+    omiyokuri: { price: 1500 }
 };
 
-let counts = { sign_cheki: 0, white_cheki: 0, tiktok: 0, kakomi: 0, goods_sign: 0, omijouri: 0 };
+let counts = { sign_cheki: 0, white_cheki: 0, tiktok: 0, kakomi: 0, item_sign: 0, oiyokuri: 0 };
 
-// URLパラメータの解析とセット
 window.onload = function() {
     const params = new URLSearchParams(window.location.search);
     if(params.get('date')) document.getElementById('date').value = params.get('date');
     if(params.get('event')) document.getElementById('event_name').value = decodeURIComponent(params.get('event'));
     if(params.get('location')) document.getElementById('location').value = decodeURIComponent(params.get('location'));
+    calc();
+}
+
+function toggleAttendance() {
+    const isAttending = document.getElementById('attendance').checked;
+    const label = document.getElementById('status-label');
+    
+    if (isAttending) {
+        label.innerText = "状態：参加";
+        Object.keys(PRICES).forEach(key => {
+            document.getElementById(`card-${key}`).classList.remove('disabled-card');
+        });
+    } else {
+        label.innerText = "状態：不参加（干した・諦めた）";
+        Object.keys(PRICES).forEach(key => {
+            counts[key] = 0;
+            document.getElementById(`val-${key}`).innerText = 0;
+            document.getElementById(`card-${key}`).classList.add('disabled-card');
+        });
+    }
     calc();
 }
 
@@ -371,8 +240,6 @@ function calc() {
 
 async function sendData() {
     const btn = document.getElementById('submit-btn');
-    
-    // ★重要：ご自身の新デプロイ版GASウェブアプリURLに書き換えてください
     const GAS_URL = 'https://script.google.com/macros/s/AKfycbw7KeuN0XckEqU9V4wRxR3O8T9Rl6cC2jQesEOpOsNJTF09ZylpVFZWJnqo0aff1YNFRw/exec';
 
     btn.disabled = true;
