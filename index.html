@@ -28,6 +28,8 @@
         .stat-block:last-child { margin-bottom: 0; }
         .stat-label { font-size: 11px; color: var(--text-muted); font-weight: bold; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
         .stat-value-money { font-size: 38px; font-weight: 900; color: #fff; text-shadow: 0 0 15px rgba(255,255,255,0.2); }
+        /* 💡 参戦率用のスタイル定義 */
+        .stat-value-rate { font-size: 34px; font-weight: 900; color: #5AC8FA; text-shadow: 0 0 12px rgba(90,200,250,0.4); }
         .stat-value-cheki { font-size: 34px; font-weight: 900; color: var(--color-chumtoto); text-shadow: 0 0 12px rgba(255,107,157,0.4); }
         .stat-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
 
@@ -68,6 +70,13 @@
             <div class="stat-label">Total Investment (生涯累計投資)</div>
             <div class="stat-value-money" id="total-money">¥0</div>
         </div>
+
+        <div class="stat-block" style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 18px;">
+            <div class="stat-label">Attendance Rate (現場参戦率)</div>
+            <div class="stat-value-rate" id="attendance-rate">0%</div>
+            <div class="stat-sub" id="attendance-breakdown">参戦: 0回 / 総現場数: 0回</div>
+        </div>
+
         <div class="stat-block" style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 18px;">
             <div class="stat-label">Total Cheki Taken (累計チェキ撮影枚数)</div>
             <div class="stat-value-cheki" id="total-cheki">0 <span style="font-size:16px;">枚</span></div>
@@ -119,7 +128,8 @@
                 document.getElementById('portal-loading').style.display = 'none';
                 document.getElementById('portalStats').style.display = 'block';
 
-                calculatePortalStats(reqHist.data);
+                // 💡 計算処理を連動させるため、両方のデータを引数で渡すようにアップデート
+                calculatePortalStats(reqHist.data, reqSched.data);
                 checkMissingEntries(reqSched.data, reqHist.data);
             }
         } catch(e) {
@@ -127,10 +137,14 @@
         }
     }
 
-    function calculatePortalStats(historyData) {
+    // 💡 参戦率の計算ロジックを追加した新・統計計算処理
+    function calculatePortalStats(historyData, scheduleData) {
         let totalMoney = 0;
         let totalSign = 0;
         let totalWhite = 0;
+        
+        let attendCount = 0; // 参加回数
+        let totalCount = historyData.length; // 記録のある総現場数
 
         historyData.forEach(row => {
             let rowTotal = parseInt(row.ticket_fee) || 0;
@@ -141,32 +155,38 @@
             totalMoney += rowTotal;
             totalSign += parseInt(row.sign_cheki) || 0;
             totalWhite += parseInt(row.white_cheki) || 0;
+
+            // 💡 状態が「参加」のデータをカウント
+            if (row.attendance === "参加") {
+                attendCount++;
+            }
         });
 
+        // 💡 参戦率（パーセンテージ）の算出
+        const ratePercent = totalCount > 0 ? Math.round((attendCount / totalCount) * 100) : 0;
+
+        // 画面表示へパッと反映
         document.getElementById('total-money').innerText = `¥${totalMoney.toLocaleString()}`;
+        document.getElementById('attendance-rate').innerText = `${ratePercent}%`;
+        document.getElementById('attendance-breakdown').innerText = `参戦: ${attendCount}回 / 総現場数: ${totalCount}回`;
         document.getElementById('total-cheki').innerHTML = `${totalSign + totalWhite} <span style="font-size:16px;">枚</span>`;
         document.getElementById('cheki-breakdown').innerText = `サイン: ${totalSign}枚 / 白: ${totalWhite}枚`;
     }
 
-    // 💡 日付の一致を保証した上で、部分一致で未入力をインテリジェントに検知する修正ロジック
     function checkMissingEntries(scheduleData, historyData) {
         const todayStr = new Date().toISOString().substring(0, 10);
         const alertList = document.getElementById('alertList');
-        alertList.innerHTML = ""; // 念のため初期化
+        alertList.innerHTML = "";
         let missingCount = 0;
 
         scheduleData.forEach(sched => {
             if (!sched.date) return;
             
-            // 今日、または過去のイベントが対象
             if (sched.date <= todayStr) {
-                
-                // 💡 日付が「完全一致」かつ、自分の入力したイベント名の中に「公式のタイトル」が「含まれている」か判定
                 const isInputted = historyData.some(h => 
                     h.date === sched.date && h.event_name.includes(sched.title)
                 );
                 
-                // 履歴に存在しない（＝未入力である）場合のみ、アラートを生成
                 if (!isInputted) {
                     missingCount++;
                     const mDate = new Date(sched.date);
@@ -186,7 +206,6 @@
             }
         });
 
-        // 警告数に応じて表示/非表示をピシッとスイッチ
         if (missingCount > 0) {
             document.getElementById('alertBox').style.display = 'block';
             document.getElementById('clearBox').style.display = 'none';
