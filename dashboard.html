@@ -3,150 +3,259 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>現場集計ダッシュボード</title>
+    <title>CHUMTOTO FIELD STATS</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f0f2f5; margin: 0; padding: 15px; }
-        .container { max-width: 600px; margin: 0 auto; }
-        h2 { text-align: center; color: #1a73e8; margin-top: 0; }
-        .nav-links { text-align: center; margin-bottom: 20px; }
-        .nav-links a { color: #1a73e8; text-decoration: none; font-size: 0.9rem; font-weight: bold; }
-        
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .stats-card { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); text-align: center; }
-        .stats-card.full { grid-column: span 2; background: #e8f0fe; }
-        .stats-label { font-size: 0.8rem; color: #666; margin-bottom: 5px; }
-        .stats-value { font-size: 1.4rem; font-weight: bold; color: #333; }
-        
-        .chart-container { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        .loading { text-align: center; color: #666; padding: 40px 0; font-weight: bold; }
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0d080a 0%, #1a1014 50%, #0d080a 100%);
+            --header-gradient: linear-gradient(180deg, #24141a 0%, rgba(36, 20, 26, 0.95) 100%);
+            --color-chumtoto: #FF6B9D;
+            --text-main: #f5f0f2;
+            --text-muted: #9e8891;
+            --card-bg: rgba(255, 107, 157, 0.05);
+            --card-border: rgba(255, 107, 157, 0.2);
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding-bottom: 90px;
+        }
+
+        header {
+            background: var(--header-gradient);
+            border-bottom: 1px solid rgba(255, 107, 157, 0.15);
+            padding: 16px 20px 12px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+            text-align: center;
+        }
+
+        h2 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #fff;
+            text-shadow: 0 0 8px rgba(255, 107, 157, 0.4);
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 16px;
+            box-sizing: border-box;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stats-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .stats-card.full {
+            grid-column: span 2;
+            background: linear-gradient(135deg, rgba(255,107,157,0.12) 0%, rgba(255,255,255,0.01) 100%);
+            border-color: rgba(255, 107, 157, 0.4);
+        }
+
+        .stats-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .stats-value {
+            font-size: 22px;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .stats-card.full .stats-value {
+            font-size: 32px;
+            color: var(--color-chumtoto);
+            text-shadow: 0 0 10px rgba(255,107,157,0.4);
+        }
+
+        .chart-box {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .loading {
+            text-align: center;
+            color: var(--color-chumtoto);
+            padding: 40px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-shadow: 0 0 6px rgba(255,107,157,0.3);
+        }
+
+        /* 下部ナビゲーション */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--header-gradient); border-top: 1px solid rgba(255, 107, 157, 0.15); display: flex; justify-content: space-around; padding: 10px 0; z-index: 100; backdrop-filter: blur(12px); }
+        .bottom-nav a { color: var(--text-muted); text-decoration: none; font-size: 10px; text-align: center; display: flex; flex-direction: column; gap: 4px; font-weight: bold; transition: color 0.2s; }
+        .bottom-nav a.active { color: var(--color-chumtoto); }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>現場集計ダッシュボード</h2>
-    <div class="nav-links">
-        <a href="index.html">➕ 現場記録を入力する画面に戻る</a>
-    </div>
+<header>
+    <h2>📊 FIELD STATS</h2>
+</header>
 
+<div class="container">
     <div class="stats-grid">
         <div class="stats-card full">
-            <div class="stats-label">遠征・オタ活 総支出</div>
+            <div class="stats-label">Total Investment (累計支出)</div>
             <div class="stats-value" id="total-all">¥0</div>
         </div>
         <div class="stats-card">
-            <div class="stats-label">今月の支出</div>
+            <div class="stats-label">This Month (今月の支出)</div>
             <div class="stats-value" id="total-month">¥0</div>
         </div>
         <div class="stats-card">
-            <div class="stats-label">現場参加率</div>
+            <div class="stats-label">Attendance Rate (参戦率)</div>
             <div class="stats-value" id="attendance-rate">0%</div>
         </div>
     </div>
 
-    <div class="chart-container">
-        <h3 style="font-size: 1rem; color: #444; margin-top: 0;">月別支出推移 (¥)</h3>
-        <div id="loading-text" class="loading">スプレッドシートからデータを計算中...</div>
+    <div class="chart-box">
+        <div id="loading-text" class="loading">ANALYZING FINANCIAL DATA...</div>
         <canvas id="expenseChart" style="display: none;"></canvas>
     </div>
 </div>
 
+<div class="bottom-nav">
+    <a href="calendar.html"><span>📅</span>CALENDAR</a>
+    <a href="dashboard.html" class="active"><span>📊</span>STATS</a>
+    <a href="index.html"><span>✍️</span>ENTRY</a>
+</div>
+
 <script>
-// 単価テーブル（集計計算用）
-const PRICES = { sign_cheki: 3000, white_cheki: 2000, tiktok: 3500, kakomi: 4000, item_sign: 0, omiyokuri: 1500 };
+// ★重要：ご自身の新デプロイ版GASウェブアプリURLに書き換えてください
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbw7KeuN0XckEqU9V4wRxR3O8T9Rl6cC2jQesEOpOsNJTF09ZylpVFZWJnqo0aff1YNFRw/exec';
 
-// ★重要：データを読み込むためのGASのURL（index.htmlと同じものを貼り付けてください）
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbzz_ulxkWibPM1bikldJ7BQFZTYCD4WP_mbw3m0gYopTHSBazTWudQamhANgaA_J4pU/exec';
-
-window.onload = async () => {
-    try {
-        // GASから全データをGETで取得（※現状のGASはPOSTしかないので、簡易的に全読み込みするための仕組みを後ほど補足します）
-        // 一旦、GAS側を「データ取得」にも対応させる必要があります。
-        
-        // ※解説：現在のGASコードは書き込み(doPost)専用なので、ダッシュボードでデータを読むために
-        // GAS側に「データを全件返す機能(doGet)」を追加する必要があります。
-        
-        // テスト表示用ロジック（GASのアップデート後に完全連動します）
-        fetchDataAndRender();
-    } catch (e) {
-        document.getElementById('loading-text').innerText = "データの読み込みに失敗しました。";
-    }
+const PRICES = {
+    sign_cheki: 2000,
+    white_cheki: 1000,
+    tiktok: 1000,
+    kakomi: 3000,
+    goods_sign: 2000,
+    omijouri: 500
 };
 
-async function fetchDataAndRender() {
-    // データ取得用にGASのURLを叩く（GETリクエスト）
-    const response = await fetch(GAS_URL + "?action=read");
-    const resData = await response.json();
-    
-    if(resData.result === "success") {
-        const rows = resData.data; // スプシから届いた全行データ
-        
-        let totalAll = 0;
-        let totalMonth = 0;
-        let attendCount = 0;
-        let totalCount = 0;
-        
-        const currentMonth = new Date().toISOString().substring(0, 7); // "2026-05"
-        const monthlyData = {}; // 月ごとの集計用オブジェクト
-
-        rows.forEach(row => {
-            if (!row.date) return;
-            totalCount++;
-            if (row.attendance === "参加") attendCount++;
-            
-            // 1行の合計金額を計算
-            let rowTotal = Number(row.ticket_fee) || 0;
-            rowTotal += (Number(row.sign_cheki) || 0) * PRICES.sign_cheki;
-            rowTotal += (Number(row.white_cheki) || 0) * PRICES.white_cheki;
-            rowTotal += (Number(row.tiktok) || 0) * PRICES.tiktok;
-            rowTotal += (Number(row.kakomi) || 0) * PRICES.kakomi;
-            rowTotal += (Number(row.item_sign) || 0) * PRICES.item_sign;
-            rowTotal += (Number(row.omiyokuri) || 0) * PRICES.omiyokuri;
-            
-            totalAll += rowTotal;
-            
-            // 今月の支出
-            if (row.date.substring(0, 7) === currentMonth) {
-                totalMonth += rowTotal;
-            }
-            
-            // 月別の集計
-            const monthKey = row.date.substring(0, 7); // "2026-01" など
-            monthlyData[monthKey] = (monthlyData[monthKey] || 0) + rowTotal;
-        });
-
-        // 画面の数字を更新
-        document.getElementById('total-all').innerText = `¥${totalAll.toLocaleString()}`;
-        document.getElementById('total-month').innerText = `¥${totalMonth.toLocaleString()}`;
-        document.getElementById('attendance-rate').innerText = totalCount > 0 ? `${Math.round((attendCount / totalCount) * 100)}%` : "0%";
-
-        // グラフ用データの整理
-        const labels = Object.keys(monthlyData).sort();
-        const chartValues = labels.map(key => monthlyData[key]);
-
-        document.getElementById('loading-text').style.display = 'none';
-        const ctx = document.getElementById('expenseChart');
-        ctx.style.display = 'block';
-
-        // Chart.jsで棒グラフを作成
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: '支出合計',
-                    data: chartValues,
-                    backgroundColor: '#1a73e8',
-                    borderRadius: 5
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: { y: { beginAtZero: true } }
-            }
-        });
+window.onload = async function() {
+    try {
+        const response = await fetch(GAS_URL + "?action=read_history");
+        const resData = await response.json();
+        if (resData.result === "success") {
+            createDashboard(resData.data);
+        }
+    } catch (e) {
+        document.getElementById('loading-text').innerText = "ERROR: FAILED TO LOAD DATA";
     }
+}
+
+function createDashboard(data) {
+    let totalAll = 0;
+    let totalMonth = 0;
+    let attendCount = 0;
+    let totalCount = data.length;
+    
+    const now = new Date();
+    const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`; // \"2026-05\"
+
+    const monthlyData = {};
+
+    data.forEach(row => {
+        if (!row.date) return;
+        
+        if (row.attendance === "参加") attendCount++;
+
+        // 1行の合計計算
+        let rowTotal = parseInt(row.ticket_fee) || 0;
+        Object.keys(PRICES).forEach(key => {
+            let count = parseInt(row[key]) || 0;
+            rowTotal += count * PRICES[key];
+        });
+
+        totalAll += rowTotal;
+
+        // 今月の支出
+        if (row.date.substring(0, 7) === currentMonth) {
+            totalMonth += rowTotal;
+        }
+        
+        // 月別の集計
+        const monthKey = row.date.substring(0, 7);
+        monthlyData[monthKey] = (monthlyData[monthKey] || 0) + rowTotal;
+    });
+
+    document.getElementById('total-all').innerText = `¥${totalAll.toLocaleString()}`;
+    document.getElementById('total-month').innerText = `¥${totalMonth.toLocaleString()}`;
+    document.getElementById('attendance-rate').innerText = totalCount > 0 ? `${Math.round((attendCount / totalCount) * 100)}%` : "0%";
+
+    const labels = Object.keys(monthlyData).sort();
+    const chartValues = labels.map(key => monthlyData[key]);
+
+    document.getElementById('loading-text').style.display = 'none';
+    const ctx = document.getElementById('expenseChart');
+    ctx.style.display = 'block';
+
+    // ダークモード仕様のChart.js設定
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: '支出合計',
+                data: chartValues,
+                backgroundColor: '#FF6B9D',
+                borderRadius: 6,
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    labels: { color: '#f5f0f2', font: { family: 'sans-serif', weight: 'bold' } }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { color: 'rgba(255, 107, 157, 0.05)' },
+                    ticks: { color: '#9e8891' }
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(255, 107, 157, 0.1)' },
+                    ticks: { color: '#9e8891' }
+                }
+            }
+        }
+    });
 }
 </script>
 </body>
