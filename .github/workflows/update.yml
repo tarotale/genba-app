@@ -31,19 +31,18 @@ jobs:
       run: |
         python chumtoto_scraper.py
 
-    # 【Step 2】💡 物理分離したcURL工程：新しく取得した本物のGASウェブアプリURLへ送信
+    # 【Step 2】物理分離したcURL工程
     - name: Upload Data to Google Sheets via cURL
       env:
-        # 💡 送っていただいた本物のURLをここに完全セットしました
         GAS_URL: "https://script.google.com/macros/s/AKfycbw7KeuN0XckEqU9V4wRxR3O8T9Rl6cC2jQesEOpOsNJTF09ZylpVFZWJnqo0aff1YNFRw/exec"
       run: |
         if [ -f "schedule.json" ]; then
           echo "📨 完成している schedule.json の中身を Google Apps Script へ直接送信中..."
           
-          # RAWデータとして本物のURLへ直接流し込みます
+          # 末尾に「> /dev/null 2>&1」を足して、Google側の余計なエラーHTMLログを非表示にします
           curl -L -X POST "$GAS_URL" \
                -H "Content-Type: text/plain" \
-               --data-raw "$(cat schedule.json)"
+               --data-raw "$(cat schedule.json)" > /dev/null 2>&1
                
           echo -e "\n🎉 スプレッドシート（公式スケジュール）への同期送信工程が完了しました！"
         else
