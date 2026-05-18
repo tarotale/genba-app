@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xにログイン / X</title>
+    <style>
+        /* 全体のリセットと基本設定 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #000000;
+            color: #eff3f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 16px;
+        }
+
+        /* モバイルサイズに合わせたコンテナ */
+        .login-container {
+            width: 100%;
+            max-width: 360px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ヘッダーエリア（×ボタンとXロゴ） */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            height: 52px;
+            margin-bottom: 12px;
+        }
+
+        .close-btn {
+            position: absolute;
+            left: 0;
+            background: none;
+            border: none;
+            color: #eff3f4;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo {
+            color: #eff3f4;
+        }
+
+        /* タイトル */
+        .title {
+            font-size: 26px;
+            font-weight: 700;
+            margin-top: 20px;
+            margin-bottom: 24px;
+            letter-spacing: -0.5px;
+        }
+
+        /* 共通ボタンスタイル */
+        .btn {
+            width: 100%;
+            height: 40px;
+            border-radius: 9999px;
+            font-size: 15px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+            margin-bottom: 16px;
+            text-decoration: none;
+        }
+
+        .btn svg {
+            margin-right: 8px;
+        }
+
+        /* 各ボタンの固有スタイル */
+        .btn-white {
+            background-color: #ffffff;
+            color: #0f1419;
+        }
+
+        .btn-next {
+            background-color: #eff3f4;
+            color: #0f1419;
+            margin-top: 12px;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: #eff3f4;
+            border: 1px solid #536471;
+            margin-bottom: 40px;
+        }
+
+        /* 「または」の区切り線 */
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 4px 0 12px 0;
+        }
+
+        .line {
+            flex-grow: 1;
+            height: 1px;
+            background-color: #2f3336;
+        }
+
+        .divider-text {
+            padding: 0 8px;
+            color: #eff3f4;
+            font-size: 15px;
+        }
+
+        /* 入力フォーム */
+        .input-field {
+            width: 100%;
+            height: 56px;
+            background-color: #000000;
+            border: 1px solid #333639;
+            border-radius: 4px;
+            padding: 16px;
+            color: #ffffff;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .input-field:focus {
+            border-color: #1d9bf0;
+        }
+
+        .input-field::placeholder {
+            color: #71767b;
+        }
+
+        /* フッターテキスト */
+        .footer-text {
+            color: #71767b;
+            font-size: 15px;
+            line-height: 20px;
+        }
+
+        .footer-text a {
+            color: #1d9bf0;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <div class="header">
+            <button class="close-btn">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"/></svg>
+            </button>
+            <div class="logo">
+                <svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </div>
+        </div>
+
+        <h1 class="title">Xにログイン</h1>
+
+        <button class="btn btn-white">
+            <svg viewBox="0 0 24 24" width="18" height="18">
+                <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.53-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-8.82z"/>
+                <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.11 0-5.74-2.11-6.68-4.96H1.21v3.15C3.18 21.88 7.31 24 12 24z"/>
+                <path fill="#FBBC05" d="M5.32 14.24c-.24-.72-.38-1.49-.38-2.29s.14-1.57.38-2.29V6.51H1.21A11.94 11.94 0 0 0 0 12c0 1.92.45 3.74 1.21 5.39l4.11-3.15z"/>
+                <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.18 2.12 1.21 5.61l4.11 3.15c.94-2.85 3.57-4.96 6.68-4.96z"/>
+            </svg>
+            Google でログイン
+        </button>
+
+        <button class="btn btn-white">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.17c.66-.81 1.11-1.93.99-3.06-1 .04-2.21.67-2.93 1.49-.62.69-1.16 1.84-1.01 2.96 1.12.09 2.27-.56 2.95-1.39z"/></svg>
+            Appleのアカウントでログイン
+        </button>
+
+        <div class="divider">
+            <div class="line"></div>
+            <span class="divider-text">または</span>
+            <div class="line"></div>
+        </div>
+
+        <input type="text" class="input-field" placeholder="電話番号/メールアドレス/ユーザー名">
+
+        <button class="btn btn-next">次へ</button>
+
+        <button class="btn btn-outline">パスワードを忘れた場合はこちら</button>
+
+        <p class="footer-text">アカウントをお持ちでない場合は<a href="#">登録</a></p>
+    </div>
+
+</body>
+</html>
