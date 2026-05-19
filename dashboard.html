@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChumToto Field Stats</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <link rel="apple-touch-icon" href="icon.png">
 
@@ -13,26 +12,38 @@
             --bg-gradient: linear-gradient(135deg, #0d080a 0%, #1a1014 50%, #0d080a 100%);
             --header-gradient: linear-gradient(180deg, #24141a 0%, rgba(36, 20, 26, 0.95) 100%);
             --color-chumtoto: #FF6B9D;
+            --color-success: #4CD964;
+            --color-warn: #FF3B30;
             --text-main: #f5f0f2;
             --text-muted: #9e8891;
-            --card-bg: rgba(255, 107, 157, 0.05);
-            --card-border: rgba(255, 107, 157, 0.2);
-            --input-bg: rgba(0, 0, 0, 0.4);
+            --card-bg: rgba(255, 107, 157, 0.04);
+            --card-border: rgba(255, 107, 157, 0.15);
         }
 
-        body { margin: 0; font-family: 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif; background: var(--bg-gradient); color: var(--text-main); min-height: 100vh; padding-bottom: 100px; }
-        
+        body {
+            margin: 0;
+            font-family: 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding-bottom: 100px;
+        }
+
+        /* 💡 ヘッダー：被りバグを防ぐフレックス配置に修正 */
         header {
             background: var(--header-gradient);
             border-bottom: 1px solid rgba(255, 107, 157, 0.15);
-            padding: 15px 20px;
+            padding: 10px 16px;
             display: flex;
             align-items: center;
+            justify-content: space-between;
             backdrop-filter: blur(12px);
             position: sticky;
             top: 0;
             z-index: 100;
-            height: 34px;
+            height: 38px;
+            box-sizing: border-box;
+            gap: 10px;
         }
 
         .back-portal-btn {
@@ -41,13 +52,12 @@
             font-size: 11px;
             font-weight: bold;
             border: 1px solid rgba(255, 107, 157, 0.3);
-            padding: 6px 10px;
+            padding: 5px 8px;
             border-radius: 6px;
             background: rgba(255, 107, 157, 0.05);
             transition: 0.2s;
-            position: absolute;
-            left: 20px;
-            z-index: 10;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
         .back-portal-btn:hover {
             background: rgba(255, 107, 157, 0.15);
@@ -55,57 +65,164 @@
 
         header h1 {
             margin: 0;
-            font-size: 15px;
+            font-size: 13px;
             font-weight: 800;
-            letter-spacing: 2px;
+            letter-spacing: 0.5px;
             color: #fff;
             text-shadow: 0 0 8px rgba(255, 107, 157, 0.4);
-            width: 100%;
-            text-align: center;
+            flex: 1;
+            text-align: right;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        .container { max-width: 500px; margin: 0 auto; padding: 16px; box-sizing: border-box; }
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 16px;
+            box-sizing: border-box;
+        }
 
-        .filter-section { display: flex; gap: 8px; margin-bottom: 16px; }
-        .filter-section select { flex: 1; background: var(--input-bg); border: 1px solid var(--card-border); color: #fff; padding: 10px; border-radius: 8px; font-weight: bold; font-size: 12px; outline: none; }
+        /* サマリーダッシュボード */
+        .stats-summary {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
 
-        .summary-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-align: center; }
-        .card.full { grid-column: span 2; text-align: left; }
-        .card-title { font-size: 11px; color: var(--text-muted); font-weight: bold; letter-spacing: 1px; margin-bottom: 4px; }
-        .card-value { font-size: 24px; font-weight: 900; color: #fff; }
-        .card.full .card-value { font-size: 32px; color: #fff; }
-        
-        .rate-value { color: #5AC8FA !important; text-shadow: 0 0 10px rgba(90,200,250,0.3); }
-        .cheki-total-value { color: var(--color-chumtoto) !important; text-shadow: 0 0 10px rgba(255,107,157,0.3); }
-        
-        .card-sub-lbl { font-size: 10px; color: var(--text-muted); margin-top: 4px; font-weight: bold; }
-        .cheki-sub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px; text-align: center; }
-        .cheki-sub-grid .card-title { font-size: 9px; }
-        .cheki-sub-grid .sub-value { font-size: 15px; font-weight: bold; color: #fff; }
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,107,157,0.08);
+            font-size: 13px;
+        }
+        .stats-row:last-child { border: none; }
+        .stats-label { color: var(--text-muted); font-weight: bold; }
+        .stats-value { font-weight: 900; color: #fff; }
 
-        .chart-box { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.03); border-radius: 16px; padding: 16px; margin-bottom: 20px; }
-        
-        .scrollable-chart-container { width: 100%; overflow-x: auto; margin-top: 10px; padding-bottom: 5px; }
-        .scrollable-chart-inner { min-width: 600px; height: 180px; }
+        .section-title {
+            font-size: 12px;
+            font-weight: bold;
+            color: var(--text-muted);
+            margin: 20px 0 10px 0;
+            letter-spacing: 1px;
+        }
 
-        .history-list { display: flex; flex-direction: column; gap: 10px; }
-        .history-item { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 14px; position: relative; }
-        .item-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: bold; color: var(--text-muted); margin-bottom: 4px; }
-        .item-title { font-size: 13px; font-weight: bold; color: #fff; margin-bottom: 6px; line-height: 1.4; }
-        .item-details { font-size: 11px; color: var(--text-muted); }
-        .badge { position: absolute; top: 12px; right: 12px; font-size: 10px; padding: 3px 8px; border-radius: 4px; font-weight: bold; }
-        .badge.attend { background: rgba(76, 217, 100, 0.15); color: #4CD964; border: 1px solid rgba(76, 217, 100, 0.3); }
-        .badge.absent { background: rgba(255, 59, 48, 0.15); color: #FF3B30; border: 1px solid rgba(255, 59, 48, 0.3); }
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
 
-        .edit-indicator { font-size: 10px; color: var(--color-chumtoto); text-decoration: underline; margin-top: 8px; display: inline-block; cursor: pointer; }
+        /* 履歴カード */
+        .history-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 14px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            position: relative;
+        }
 
-        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(19, 11, 14, 0.92); border-top: 1px solid rgba(255,107,157,0.1); display: flex; padding: 6px 0; backdrop-filter: blur(10px); z-index: 100; }
-        .nav-item { flex: 1; text-align: center; text-decoration: none; color: var(--text-muted); font-size: 10px; font-weight: bold; display: flex; flex-direction: column; gap: 2px; }
+        .card-header-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .card-date {
+            font-size: 11px;
+            font-weight: bold;
+            color: var(--text-muted);
+        }
+
+        .status-badge {
+            font-size: 9px;
+            font-weight: bold;
+            padding: 3px 6px;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+        .status-badge.attend { background: rgba(76, 217, 100, 0.15); color: var(--color-success); border: 1px solid rgba(76, 217, 100, 0.3); }
+        .status-badge.absent { background: rgba(255, 59, 48, 0.15); color: var(--color-warn); border: 1px solid rgba(255, 59, 48, 0.3); }
+
+        .card-title {
+            font-size: 13px;
+            font-weight: bold;
+            color: #fff;
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+
+        /* 下部リボン（詳細テキスト情報）のレイアウト調整 */
+        .card-details-box {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            border-top: 1px solid rgba(255, 107, 157, 0.08);
+            padding-top: 6px;
+            margin-bottom: 6px;
+        }
+
+        .card-detail-item {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .edit-link {
+            display: inline-flex;
+            align-items: center;
+            font-size: 11px;
+            color: var(--color-chumtoto);
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 2px;
+        }
+        .edit-link:hover { text-decoration: underline; }
+
+        /* ボトムナビゲーションバー */
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(19, 11, 14, 0.92);
+            border-top: 1px solid rgba(255, 107, 157, 0.1);
+            display: flex;
+            padding: 6px 0;
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 10px;
+            font-weight: bold;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
         .nav-item.active { color: var(--color-chumtoto); }
         .nav-icon { font-size: 18px; }
 
-        .loading-cover { text-align: center; color: var(--color-chumtoto); font-weight: bold; padding: 40px; letter-spacing: 2px; }
+        .loading-cover {
+            text-align: center;
+            color: var(--color-chumtoto);
+            font-weight: bold;
+            padding: 40px;
+            letter-spacing: 2px;
+        }
     </style>
 </head>
 <body>
@@ -116,53 +233,23 @@
 </header>
 
 <div class="container">
-    <div class="filter-section">
-        <select id="year-select"><option value="all">すべての年</option></select>
-        <select id="month-select"><option value="all">すべての月</option></select>
+    
+    <div id="loading-msg" class="loading-cover">Analyzing Financial Records...</div>
+
+    <div id="stats-content-area" style="display: none;">
+        <div class="section-title">Field Summary Dashboard</div>
+        <div class="stats-summary">
+            <div class="stats-row"><div class="stats-label">Total Expense</div><div class="stats-value" id="stat-total-expense">¥0</div></div>
+            <div class="stats-row"><div class="stats-label">Ticket Fees</div><div class="stats-value" id="stat-total-ticket">¥0</div></div>
+            <div class="stats-row"><div class="stats-label">Cheki Expenses</div><div class="stats-value" id="stat-total-cheki-cost">¥0</div></div>
+            <div class="stats-row"><div class="stats-label">Total Chekis</div><div class="stats-value" id="stat-total-cheki-count">0 枚</div></div>
+            <div class="stats-row"><div class="stats-label">Attendance Rate</div><div class="stats-value" id="stat-attendance-rate">0%</div></div>
+        </div>
+
+        <div class="section-title">参戦履歴一覧</div>
+        <div class="history-list" id="history-render-target"></div>
     </div>
 
-    <div id="loading-msg" class="loading-cover">Analyzing Fields...</div>
-
-    <div id="dashboard-content" style="display: none;">
-        <div class="summary-cards">
-            <div class="card full">
-                <div class="card-title" id="main-expense-label">総投資額</div>
-                <div class="card-value" id="total-main">¥0</div>
-            </div>
-
-            <div class="card">
-                <div class="card-title">Total Chekis</div>
-                <div class="card-value cheki-total-value" id="total-cheki-count">0 <span style="font-size:12px;">枚</span></div>
-                <div class="cheki-sub-grid">
-                    <div><div class="card-title">サイン</div><div class="sub-value" id="total-sign-cheki">0</div></div>
-                    <div><div class="card-title">白チェ</div><div class="sub-value" id="total-white_cheki">0</div></div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-title">Attendance Rate</div>
-                <div class="card-value rate-value" id="total-attendance-rate">0%</div>
-                <div class="card-sub-lbl" id="attendance-count-str">0回 / 0現場</div>
-            </div>
-        </div>
-
-        <div class="chart-box">
-            <div style="font-size:11px; font-weight:bold; color:var(--text-muted); margin-bottom:10px; letter-spacing:1px;">Expense Breakdown</div>
-            <canvas id="expenseChart" style="max-height: 180px;"></canvas>
-        </div>
-
-        <div class="chart-box" id="monthly-bar-box">
-            <div style="font-size:11px; font-weight:bold; color:var(--text-muted); letter-spacing:1px;">Monthly Trend</div>
-            <div class="scrollable-chart-container">
-                <div class="scrollable-chart-inner">
-                    <canvas id="monthlyBarChart"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <div style="font-size:12px; font-weight:bold; color:var(--text-muted); margin-bottom:10px; letter-spacing:1px;">参戦履歴一覧</div>
-        <div class="history-list" id="history-list-box"></div>
-    </div>
 </div>
 
 <nav class="nav-bar">
@@ -174,219 +261,97 @@
 <script>
     const GAS_URL = 'https://script.google.com/macros/s/AKfycbw7KeuN0XckEqU9V4wRxR3O8T9Rl6cC2jQesEOpOsNJTF09ZylpVFZWJnqo0aff1YNFRw/exec';
     const PRICES = { sign_cheki: 3000, white_cheki: 2000, tiktok: 3500, kakomi: 4000, item_sign: 4500, omiyokuri: 1500 };
-    let rawData = [];
-    let chartInstance = null;
-    let barChartInstance = null;
 
     window.onload = async function() {
         try {
             const response = await fetch(GAS_URL + "?action=read_history");
             const res = await response.json();
             if (res.result === "success") {
-                rawData = res.data;
                 document.getElementById('loading-msg').style.display = 'none';
-                document.getElementById('dashboard-content').style.display = 'block';
-
-                buildFilterOptions();
-                applyFilter();
+                document.getElementById('stats-content-area').style.display = 'block';
+                
+                processAndRenderStats(res.data);
             }
         } catch(e) {
-            document.getElementById('loading-msg').innerText = "Failed To Connect Databases";
+            document.getElementById('loading-msg').innerText = "Failed To Data Sync";
         }
-
-        document.getElementById('year-select').addEventListener('change', () => {
-            document.getElementById('month-select').value = 'all';
-            applyFilter();
-        });
-        document.getElementById('month-select').addEventListener('change', applyFilter);
     }
 
-    function applyFilter() {
-        const yVal = document.getElementById('year-select').value;
-        const mVal = document.getElementById('month-select').value;
-
-        let filtered = rawData;
-        let label = "総投資額";
-
-        if (mVal !== "all") {
-            filtered = rawData.filter(row => row.date && row.date.substring(0, 7) === mVal);
-            label = `${mVal.split('-')[1]}月の投資額`;
-            document.getElementById('monthly-bar-box').style.display = 'none';
-        } else {
-            document.getElementById('monthly-bar-box').style.display = 'block';
-            if (yVal !== "all") {
-                filtered = rawData.filter(row => row.date && row.date.substring(0, 4) === yVal);
-                label = `${yVal}年の投資額`;
-            }
-        }
-
-        updateSummaryCards(filtered, label);
-        renderChart(filtered);
-        renderMonthlyBarChart(filtered);
-        renderHistoryList(filtered);
-    }
-
-    function renderHistoryList(data) {
-        const box = document.getElementById('history-list-box');
-        if (data.length === 0) {
-            box.innerHTML = '<div style="color:var(--text-muted); font-size:11px; text-align:center; padding:20px;">該当日程のデータがありません</div>';
-            return;
-        }
-
-        box.innerHTML = data.map(row => {
-            const isAttend = row.attendance === "参加";
-            const badgeClass = isAttend ? "badge attend" : "badge absent";
-            const badgeText = isAttend ? "参加" : "不参加";
-            
-            let itemTotal = parseInt(row.ticket_fee) || 0;
-            Object.keys(PRICES).forEach(k => itemTotal += (parseInt(row[k]) || 0) * PRICES[k]);
-
-            return `
-                <div class="history-item">
-                    <span class="${badgeClass}">${badgeText}</span>
-                    <div class="item-header">📅 ${row.date || '不明'} @ ${row.location || '不明'}</div>
-                    <div class="item-title">${row.event_name || '名称なし現場'}</div>
-                    <div class="item-details">
-                        💰 決済額: ¥${itemTotal.toLocaleString()} (チケ代: ¥${(parseInt(row.ticket_fee)||0).toLocaleString()}) / 📸 サイン: ${row.sign_cheki||0}枚 白: ${row.white_cheki||0}枚
-                    </div>
-                    <div class="edit-indicator" onclick="location.href='entry.html?edit_row=${row.row_index}'">✏️ データを修正する</div>
-                </div>
-            `;
-        }).join('');
-    }
-
-    function updateSummaryCards(data, label) {
+    function processAndRenderStats(historyData) {
         let totalExpense = 0;
-        let signCount = 0;
-        let whiteCount = 0;
+        let totalTicket = 0;
+        let totalChekiCost = 0;
+        let totalChekiCount = 0;
         let attendCount = 0;
-        let totalRecords = data.length;
 
-        data.forEach(row => {
-            let rowTotal = (parseInt(row.ticket_fee) || 0) + Object.keys(PRICES).reduce((sum, key) => sum + (parseInt(row[key]) || 0) * PRICES[key], 0);
+        const sortedData = [...historyData].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+        const listTarget = document.getElementById('history-render-target');
+        listTarget.innerHTML = '';
+
+        sortedData.forEach(row => {
+            let ticket = parseInt(row.ticket_fee) || 0;
+            let chekiCost = 0;
+            let chekis = (parseInt(row.sign_cheki) || 0) + (parseInt(row.white_cheki) || 0);
+
+            Object.keys(PRICES).forEach(k => {
+                let cnt = parseInt(row[k]) || 0;
+                let cost = cnt * PRICES[k];
+                if (k === 'sign_cheki' || k === 'white_cheki') {
+                    chekiCost += cost;
+                } else {
+                    // 特典会その他もチェキ費用以外の物販等として合算
+                    chekiCost += cost;
+                }
+            });
+
+            let rowTotal = ticket + chekiCost;
+
             totalExpense += rowTotal;
-            signCount += parseInt(row.sign_cheki) || 0;
-            whiteCount += parseInt(row.white_cheki) || 0;
+            totalTicket += ticket;
+            totalChekiCost += chekiCost;
+            totalChekiCount += chekis;
 
             if (row.attendance === "参加") {
                 attendCount++;
             }
-        });
 
-        const ratePercent = totalRecords > 0 ? Math.round((attendCount / totalRecords) * 100) : 0;
-
-        document.getElementById('main-expense-label').innerText = label;
-        document.getElementById('total-main').innerText = `¥${totalExpense.toLocaleString()}`;
-        document.getElementById('total-sign-cheki').innerText = signCount;
-        document.getElementById('total-white_cheki').innerText = whiteCount;
-        document.getElementById('total-cheki-count').innerHTML = `${signCount + whiteCount} <span style="font-size:11px;">枚</span>`;
-        document.getElementById('total-attendance-rate').innerText = `${ratePercent}%`;
-        document.getElementById('attendance-count-str').innerText = `${attendCount}回 / ${totalRecords}現場`;
-    }
-
-    function buildFilterOptions() {
-        const years = new Set(), months = new Set();
-        rawData.forEach(row => { if (row.date) { years.add(row.date.substring(0, 4)); months.add(row.date.substring(0, 7)); } });
-        const ySel = document.getElementById('year-select'), mSel = document.getElementById('month-select');
-        Array.from(years).sort().reverse().forEach(y => ySel.add(new Option(`${y}年`, y)));
-        Array.from(months).sort().reverse().forEach(m => {
-            const [y, mm] = m.split('-');
-            mSel.add(new Option(`${y}年 ${mm}月`, m));
-        });
-    }
-
-    function renderChart(data) {
-        const ctx = document.getElementById('expenseChart').getContext('2d');
-        if (chartInstance) chartInstance.destroy();
-
-        let sums = { ticket: 0, cheki: 0, option: 0 };
-        data.forEach(row => {
-            sums.ticket += parseInt(row.ticket_fee) || 0;
-            sums.cheki += ((parseInt(row.sign_cheki) || 0) * PRICES.sign_cheki) + ((parseInt(row.white_cheki) || 0) * PRICES.white_cheki);
-            sums.option += ((parseInt(row.tiktok) || 0) * PRICES.tiktok) + ((parseInt(row.kakomi) || 0) * PRICES.kakomi) + ((parseInt(row.item_sign) || 0) * PRICES.item_sign) + ((parseInt(row.omiyokuri) || 0) * PRICES.omiyokuri);
-        });
-
-        chartInstance = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['チケット代', 'チェキ代', '他特典オプション'],
-                datasets: [{
-                    data: [sums.ticket, sums.cheki, sums.option],
-                    backgroundColor: ['#5AC8FA', '#FF6B9D', '#FFCC00'],
-                    borderWidth: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { position: 'right', labels: { color: '#9e8891', font: { weight: 'bold', size: 11 } } }
-                }
-            }
-        });
-    }
-
-    function renderMonthlyBarChart(data) {
-        const ctx = document.getElementById('monthlyBarChart').getContext('2d');
-        if (barChartInstance) barChartInstance.destroy();
-
-        const monthlyMap = {};
-        data.forEach(row => {
-            if (!row.date) return;
-            const monthStr = row.date.substring(0, 7);
+            // カード生成
+            const badgeClass = row.attendance === "参加" ? "status-badge attend" : "status-badge absent";
+            const badgeText = row.attendance || "未判定";
             
-            let rowTotal = parseInt(row.ticket_fee) || 0;
-            Object.keys(PRICES).forEach(k => {
-                rowTotal += (parseInt(row[k]) || 0) * PRICES[k];
-            });
+            // チェキの内訳文字列
+            const sCheki = parseInt(row.sign_cheki) || 0;
+            const wCheki = parseInt(row.white_cheki) || 0;
 
-            monthlyMap[monthStr] = (monthlyMap[monthStr] || 0) + rowTotal;
+            // 💡 修正：会場名を最上部ではなく、金額等と同じ並びの下部アイテム行として分離配置
+            const venueHtml = row.venue ? `<div class="card-detail-item">🏢 会場: ${row.venue}</div>` : `<div class="card-detail-item">🏢 会場: 未記録</div>`;
+
+            const cardHtml = `
+                <div class="history-card">
+                    <div class="card-header-line">
+                        <div class="card-date">📅 ${row.date || '日付未詳'}</div>
+                        <span class="${badgeClass}">${badgeText}</span>
+                    </div>
+                    <div class="card-title">${row.event_name || '名称未記録'}</div>
+                    <div class="card-details-box">
+                        ${venueHtml}
+                        <div class="card-detail-item">💰 決済額: ¥${rowTotal.toLocaleString()} (チケット: ¥${ticket.toLocaleString()})</div>
+                        <div class="card-detail-item">📸 サイン: ${sCheki}枚 / 白: ${wCheki}枚</div>
+                    </div>
+                    <a href="entry.html?mode=edit&date=${row.date}&event=${encodeURIComponent(row.event_name || '')}" class="edit-link">✏️ データを修正する</a>
+                </div>
+            `;
+            listTarget.innerHTML += cardHtml;
         });
 
-        const sortedMonths = Object.keys(monthlyMap).sort();
-        const chartLabels = sortedMonths.map(m => {
-            const [y, mm] = m.split('-');
-            return `${mm}月`;
-        });
-        const chartValues = sortedMonths.map(m => monthlyMap[m]);
-
-        barChartInstance = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: chartLabels,
-                datasets: [{
-                    label: '支出金額',
-                    data: chartValues,
-                    backgroundColor: 'rgba(255, 107, 157, 0.6)',
-                    borderColor: '#FF6B9D',
-                    borderWidth: 1.5,
-                    borderRadius: 4,
-                    barPercentage: 0.5
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
-                },
-                scales: {
-                    x: {
-                        grid: { display: false },
-                        ticks: { color: '#9e8891', font: { weight: 'bold', size: 11 } }
-                    },
-                    y: {
-                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
-                        ticks: {
-                            color: '#9e8891',
-                            font: { size: 10 },
-                            callback: function(value) {
-                                return '¥' + (value / 1000) + 'k';
-                            }
-                        }
-                    }
-                }
-            }
-        });
+        // ダッシュボード上部の数値を更新
+        const ratePercent = historyData.length > 0 ? Math.round((attendCount / historyData.length) * 100) : 0;
+        
+        document.getElementById('stat-total-expense').innerText = `¥${totalExpense.toLocaleString()}`;
+        document.getElementById('stat-total-ticket').innerText = `¥${totalTicket.toLocaleString()}`;
+        document.getElementById('stat-total-cheki-cost').innerText = `¥${totalChekiCost.toLocaleString()}`;
+        document.getElementById('stat-total-cheki-count').innerText = `${totalChekiCount} 枚`;
+        document.getElementById('stat-attendance-rate').innerText = `${ratePercent}%`;
     }
 </script>
 </body>
