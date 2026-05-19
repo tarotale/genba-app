@@ -29,7 +29,7 @@
             padding-bottom: 100px;
         }
 
-        /* 💡 ヘッダー：文字被りを防ぐフレックス配置 */
+        /* ヘッダー配置 */
         header {
             background: var(--header-gradient);
             border-bottom: 1px solid rgba(255, 107, 157, 0.15);
@@ -84,7 +84,7 @@
             box-sizing: border-box;
         }
 
-        /* 💡 期間切り替えセレクター・タブエリアのスタイル */
+        /* 期間切り替えセレクター・タブエリア */
         .filter-area {
             display: flex;
             gap: 8px;
@@ -113,13 +113,27 @@
         .stats-row {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             padding: 8px 0;
             border-bottom: 1px solid rgba(255,107,157,0.08);
             font-size: 13px;
         }
         .stats-row:last-child { border: none; }
         .stats-label { color: var(--text-muted); font-weight: bold; }
+        
+        /* チェキ内訳を右寄せ・上下に並べるためのコンテナ */
+        .stats-value-box {
+            text-align: right;
+        }
         .stats-value { font-weight: 900; color: #fff; }
+        
+        /* 💡 追加：ダッシュボード内のチェキ内訳用極小テキストスタイル */
+        .stats-sub-value {
+            font-size: 10px;
+            color: var(--text-muted);
+            font-weight: bold;
+            margin-top: 2px;
+        }
 
         .section-title {
             font-size: 12px;
@@ -262,7 +276,7 @@
                 <option value="month">月別集計 (Monthly)</option>
             </select>
             <select id="period-value-select" class="filter-control filter-select" style="display: none;" onchange="onPeriodValueChange()">
-                </select>
+            </select>
         </div>
 
         <div class="section-title">Field Summary Dashboard</div>
@@ -270,7 +284,15 @@
             <div class="stats-row"><div class="stats-label">Total Expense</div><div class="stats-value" id="stat-total-expense">¥0</div></div>
             <div class="stats-row"><div class="stats-label">Ticket Fees</div><div class="stats-value" id="stat-total-ticket">¥0</div></div>
             <div class="stats-row"><div class="stats-label">Cheki Expenses</div><div class="stats-value" id="stat-total-cheki-cost">¥0</div></div>
-            <div class="stats-row"><div class="stats-label">Total Chekis</div><div class="stats-value" id="stat-total-cheki-count">0 枚</div></div>
+            
+            <div class="stats-row">
+                <div class="stats-label">Total Chekis</div>
+                <div class="stats-value-box">
+                    <div class="stats-value" id="stat-total-cheki-count">0 枚</div>
+                    <div class="stats-sub-value" id="stat-cheki-breakdown">サイン: 0枚 / 白: 0枚</div>
+                </div>
+            </div>
+            
             <div class="stats-row"><div class="stats-label">Attendance Rate</div><div class="stats-value" id="stat-attendance-rate">0%</div></div>
         </div>
 
@@ -290,7 +312,7 @@
     const GAS_URL = 'https://script.google.com/macros/s/AKfycbw7KeuN0XckEqU9V4wRxR3O8T9Rl6cC2jQesEOpOsNJTF09ZylpVFZWJnqo0aff1YNFRw/exec';
     const PRICES = { sign_cheki: 3000, white_cheki: 2000, tiktok: 3500, kakomi: 4000, item_sign: 4500, omiyokuri: 1500 };
 
-    let globalRawData = []; // GASから取得した生の全データ
+    let globalRawData = []; 
 
     window.onload = async function() {
         try {
@@ -301,7 +323,7 @@
                 document.getElementById('stats-content-area').style.display = 'block';
                 
                 globalRawData = res.data;
-                initPeriodFilters(); // 💡 復活：集計フィルターの初期化
+                initPeriodFilters(); 
                 applyFilterAndRender();
             }
         } catch(e) {
@@ -309,7 +331,6 @@
         }
     }
 
-    // 💡 復活：データから存在する「年」や「年月」を割り出してフィルターの選択肢を自動生成するロジック
     function initPeriodFilters() {
         const typeSelect = document.getElementById('period-type-select');
         const valSelect = document.getElementById('period-value-select');
@@ -328,14 +349,13 @@
             return;
         }
 
-        // 重複のないリストを作成
         const set = new Set();
         globalRawData.forEach(row => {
             if (!row.date) return;
             if (type === 'year') {
-                set.add(row.date.substring(0, 4)); // YYYY
+                set.add(row.date.substring(0, 4)); 
             } else if (type === 'month') {
-                set.add(row.date.substring(0, 7)); // YYYY-MM
+                set.add(row.date.substring(0, 7)); 
             }
         });
 
@@ -357,7 +377,6 @@
         applyFilterAndRender();
     }
 
-    // 💡 復活：選択された期間（月別・年別）に応じてデータをフィルタリングして再計算・描画をかけるコアロジック
     function applyFilterAndRender() {
         const type = document.getElementById('period-type-select').value;
         const val = document.getElementById('period-value-select').value;
@@ -380,6 +399,10 @@
         let totalChekiCount = 0;
         let attendCount = 0;
 
+        // 💡 復活：ダッシュボード用に選択期間内のサイン、白チェキそれぞれの枚数を合計するカウンター
+        let dashboardSignChekiSum = 0;
+        let dashboardWhiteChekiSum = 0;
+
         const sortedData = [...historyData].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
         const listTarget = document.getElementById('history-render-target');
         listTarget.innerHTML = '';
@@ -387,7 +410,14 @@
         sortedData.forEach(row => {
             let ticket = parseInt(row.ticket_fee) || 0;
             let chekiCost = 0;
-            let chekis = (parseInt(row.sign_cheki) || 0) + (parseInt(row.white_cheki) || 0);
+            
+            let sCount = parseInt(row.sign_cheki) || 0;
+            let wCount = parseInt(row.white_cheki) || 0;
+            let chekis = sCount + wCount;
+
+            // 💡 期間内の内訳枚数を累積
+            dashboardSignChekiSum += sCount;
+            dashboardWhiteChekiSum += wCount;
 
             Object.keys(PRICES).forEach(k => {
                 let cnt = parseInt(row[k]) || 0;
@@ -405,14 +435,9 @@
                 attendCount++;
             }
 
-            // カードの生成
             const badgeClass = row.attendance === "参加" ? "status-badge attend" : "status-badge absent";
             const badgeText = row.attendance || "未判定";
             
-            const sCheki = parseInt(row.sign_cheki) || 0;
-            const wCheki = parseInt(row.white_cheki) || 0;
-
-            // 💡 指定通り調整：会場名を下部に独立行として並列配置
             const venueHtml = row.venue ? `<div class="card-detail-item">🏢 会場: ${row.venue}</div>` : `<div class="card-detail-item">🏢 会場: 未記録</div>`;
 
             const cardHtml = `
@@ -425,7 +450,7 @@
                     <div class="card-details-box">
                         ${venueHtml}
                         <div class="card-detail-item">💰 決済額: ¥${rowTotal.toLocaleString()} (チケット: ¥${ticket.toLocaleString()})</div>
-                        <div class="card-detail-item">📸 サイン: ${sCheki}枚 / 白: ${wCheki}枚</div>
+                        <div class="card-detail-item">📸 サイン: ${sCount}枚 / 白: ${wCount}枚</div>
                     </div>
                     <a href="entry.html?mode=edit&date=${row.date}&event=${encodeURIComponent(row.event_name || '')}" class="edit-link">✏️ データを修正する</a>
                 </div>
@@ -433,13 +458,16 @@
             listTarget.innerHTML += cardHtml;
         });
 
-        // ダッシュボード上部の数値を更新
         const ratePercent = historyData.length > 0 ? Math.round((attendCount / historyData.length) * 100) : 0;
         
         document.getElementById('stat-total-expense').innerText = `¥${totalExpense.toLocaleString()}`;
         document.getElementById('stat-total-ticket').innerText = `¥${totalTicket.toLocaleString()}`;
         document.getElementById('stat-total-cheki-cost').innerText = `¥${totalChekiCost.toLocaleString()}`;
         document.getElementById('stat-total-cheki-count').innerText = `${totalChekiCount} 枚`;
+        
+        // 💡 追加：期間フィルターに完全連動する形で、ダッシュボード上にサインと白の内訳を反映
+        document.getElementById('stat-cheki-breakdown').innerText = `サイン: ${dashboardSignChekiSum}枚 / 白: ${dashboardWhiteChekiSum}枚`;
+        
         document.getElementById('stat-attendance-rate').innerText = `${ratePercent}%`;
     }
 </script>
