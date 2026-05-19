@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChumToto Portal - COMMAND CENTER</title>
+    <title>ChumToto Portal - Command Center</title>
     
     <link rel="apple-touch-icon" href="icon.png">
 
@@ -29,6 +29,7 @@
             padding: 15px 20px;
             display: flex;
             align-items: center;
+            justify-content: center;
             backdrop-filter: blur(12px);
             position: sticky;
             top: 0;
@@ -40,212 +41,169 @@
             margin: 0;
             font-size: 15px;
             font-weight: 800;
-            letter-spacing: 3px;
+            letter-spacing: 2px;
             color: #fff;
             text-shadow: 0 0 8px rgba(255, 107, 157, 0.4);
-            width: 100%;
-            text-align: center;
         }
 
         .container { max-width: 500px; margin: 0 auto; padding: 16px; box-sizing: border-box; }
 
-        /* スタッツ集計グリッド */
-        .summary-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-align: center; }
-        .card.full { grid-column: span 2; }
-        .card-title { font-size: 11px; color: var(--text-muted); font-weight: bold; letter-spacing: 1px; margin-bottom: 4px; text-transform: uppercase; }
-        .card-value { font-size: 28px; font-weight: 900; color: #fff; }
-        .rate-value { color: #5AC8FA !important; text-shadow: 0 0 10px rgba(90,200,250,0.3); }
-        .card-sub-lbl { font-size: 10px; color: var(--text-muted); margin-top: 4px; font-weight: bold; }
-
-        /* 通知ボックスエリア */
-        .section-title { font-size: 12px; font-weight: bold; color: var(--text-muted); margin-bottom: 10px; letter-spacing: 1px; text-transform: uppercase; }
-        
-        .alert-box { background: rgba(255, 59, 48, 0.04); border: 1px solid rgba(255, 59, 48, 0.25); border-radius: 16px; padding: 16px; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(255, 59, 48, 0.05); }
-        .alert-box-title { color: var(--color-warn); font-size: 13px; font-weight: bold; display: flex; align-items: center; gap: 6px; margin-bottom: 12px; }
-        
-        .alert-list { display: flex; flex-direction: column; gap: 10px; }
-        
-        /* 💡 表示崩れを防ぐためアイテムの構造と並びを調整 */
-        .alert-item { 
-            background: rgba(0, 0, 0, 0.3); 
-            border: 1px solid rgba(255, 59, 48, 0.15); 
-            border-radius: 10px; 
-            padding: 12px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            gap: 12px;
-        }
-        .alert-info { flex: 1; min-width: 0; } /* はみ出し防止用 */
-        
-        /* 💡 日付と会場が1列でスッキリ並ぶように調整 */
-        .alert-date { 
-            font-size: 11px; 
-            font-weight: bold; 
-            color: var(--text-muted); 
-            margin-bottom: 4px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .alert-name { 
-            font-size: 12px; 
-            font-weight: bold; 
+        /* メインメニューリンク */
+        .menu-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 20px; }
+        .menu-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
             color: #fff;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            transition: 0.2s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
-        
-        /* 💡 ボタンの文字が絶対に2列に折れないよう固定幅＆サイズ微調整 */
-        .alert-btn { 
-            background: var(--color-warn); 
-            color: #fff; 
-            text-decoration: none; 
-            font-size: 11px; 
-            font-weight: bold; 
-            padding: 8px 12px; 
-            border-radius: 6px; 
-            white-space: nowrap; 
-            box-shadow: 0 2px 8px rgba(255, 59, 48, 0.3);
-            text-align: center;
+        .menu-card:hover {
+            background: rgba(255, 107, 157, 0.08);
+            border-color: rgba(255, 107, 157, 0.4);
         }
+        .menu-icon { font-size: 24px; margin-right: 14px; }
+        .menu-info { flex: 1; }
+        .menu-title { font-size: 14px; font-weight: bold; margin-bottom: 2px; letter-spacing: 0.5px; }
+        .menu-desc { font-size: 11px; color: var(--text-muted); }
+        .menu-arrow { color: var(--color-chumtoto); font-size: 12px; font-weight: bold; }
 
-        .clear-box { background: rgba(76, 217, 100, 0.04); border: 1px solid rgba(76, 217, 100, 0.25); border-radius: 16px; padding: 24px; text-align: center; margin-bottom: 20px; }
-        .clear-icon { font-size: 32px; margin-bottom: 8px; text-shadow: 0 0 10px rgba(76, 217, 100, 0.4); }
-        .clear-text { color: var(--color-success); font-size: 14px; font-weight: bold; letter-spacing: 1px; }
+        /* 警告アラートエリア */
+        .alert-container { background: rgba(255, 59, 48, 0.06); border: 1px solid rgba(255, 59, 48, 0.25); border-radius: 14px; padding: 16px; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+        .alert-header { display: flex; align-items: center; gap: 8px; color: var(--color-warn); font-size: 12px; font-weight: bold; letter-spacing: 1px; margin-bottom: 12px; }
+        .alert-list { display: flex; flex-direction: column; gap: 10px; }
+        .alert-item { background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 59, 48, 0.15); border-radius: 10px; padding: 12px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        .alert-info { flex: 1; }
+        .alert-date { font-size: 10px; font-weight: bold; color: var(--text-muted); margin-bottom: 3px; }
+        .alert-name { font-size: 12px; font-weight: bold; color: #fff; line-height: 1.4; }
+        .alert-btn { background: var(--color-warn); color: #fff; text-decoration: none; font-size: 10px; font-weight: bold; padding: 6px 10px; border-radius: 6px; white-space: nowrap; box-shadow: 0 2px 8px rgba(255,59,48,0.3); }
 
-        .loading-cover { text-align: center; color: var(--color-chumtoto); font-weight: bold; padding: 40px; letter-spacing: 2px; }
+        /* クリア状態エリア */
+        .clear-container { background: rgba(76, 217, 100, 0.06); border: 1px solid rgba(76, 217, 100, 0.25); border-radius: 14px; padding: 24px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .clear-icon { font-size: 32px; margin-bottom: 8px; }
+        .clear-title { font-size: 13px; font-weight: bold; color: var(--color-success); letter-spacing: 1px; }
 
         /* ボトムナビゲーションバー */
         .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(19, 11, 14, 0.92); border-top: 1px solid rgba(255,107,157,0.1); display: flex; padding: 6px 0; backdrop-filter: blur(10px); z-index: 100; }
         .nav-item { flex: 1; text-align: center; text-decoration: none; color: var(--text-muted); font-size: 10px; font-weight: bold; display: flex; flex-direction: column; gap: 2px; }
+        .nav-item.active { color: var(--color-chumtoto); }
         .nav-icon { font-size: 18px; }
+
+        .loading-cover { text-align: center; color: var(--color-chumtoto); font-weight: bold; padding: 50px; letter-spacing: 2px; font-size: 13px; }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>ChumToto System</h1>
+    <h1>ChumToto Field Portal</h1>
 </header>
 
 <div class="container">
-    <div id="loading-msg" class="loading-cover">CONNECTING SATELLITES...</div>
-
-    <div id="portal-content" style="display: none;">
-        <div class="section-title">Live Mission Stats</div>
-        <div class="summary-cards">
-            <div class="card full">
-                <div class="card-title">Total Attendance Rate</div>
-                <div class="card-value rate-value" id="total-attendance-rate">0%</div>
-                <div class="card-sub-lbl" id="attendance-count-str">0回 / 0現場</div>
+    
+    <div class="menu-grid">
+        <a href="calendar.html" class="menu-card">
+            <div class="menu-icon">📅</div>
+            <div class="menu-info">
+                <div class="menu-title">Official Schedule</div>
+                <div class="menu-desc">公式カレンダーの確認・現場記録へのジャンプ</div>
             </div>
-            <div class="card">
-                <div class="card-title">Total Investments</div>
-                <div class="card-value" style="font-size: 20px; padding: 5px 0;" id="total-expense">¥0</div>
+            <div class="menu-arrow">▶</div>
+        </a>
+        <a href="dashboard.html" class="menu-card">
+            <div class="menu-icon">📊</div>
+            <div class="menu-info">
+                <div class="menu-title">Field Stats</div>
+                <div class="menu-desc">総投資額・チェキ枚数・月別推移グラフの分析</div>
             </div>
-            <div class="card">
-                <div class="card-title">Total Chekis</div>
-                <div class="card-value" style="font-size: 20px; padding: 5px 0; color: var(--color-chumtoto);" id="total-cheki">0枚</div>
+            <div class="menu-arrow">▶</div>
+        </a>
+        <a href="entry.html" class="menu-card">
+            <div class="menu-icon">✍️</div>
+            <div class="menu-info">
+                <div class="menu-title">New Field Entry</div>
+                <div class="menu-desc">現場データの新規登録・手動記録</div>
             </div>
-        </div>
+            <div class="menu-arrow">▶</div>
+        </a>
+    </div>
 
-        <div class="section-title">Field Logs Check</div>
-        
-        <div class="alert-box" id="alertBox" style="display: none;">
-            <div class="alert-box-title">⚠️ 未記録の過去現場が検出されました</div>
-            <div class="alert-list" id="alertList"></div>
-        </div>
+    <div id="loading-msg" class="loading-cover">Cross-Checking Databases...</div>
 
-        <div class="clear-box" id="clearBox" style="display: none;">
-            <div class="clear-icon">⚡</div>
-            <div class="clear-text">ALL FIELDS LOGGED COMPLETE</div>
-        </div>
+    <div class="alert-container" id="alertBox" style="display: none;">
+        <div class="alert-header">⚠️ 未入力の現場が検出されました</div>
+        <div class="alert-list" id="alertList"></div>
+    </div>
+
+    <div class="clear-container" id="clearBox" style="display: none;">
+        <div class="clear-icon">🎉</div>
+        <div class="clear-title">すべての現場が記録されています</div>
     </div>
 </div>
 
 <nav class="nav-bar">
-    <a href="calendar.html" class="nav-item"><span class="nav-icon">📅</span>SCHEDULE</a>
-    <a href="dashboard.html" class="nav-item"><span class="nav-icon">📊</span>STATS</a>
-    <a href="entry.html" class="nav-item"><span class="nav-icon">✍️</span>ENTRY</a>
+    <a href="calendar.html" class="nav-item"><span class="nav-icon">📅</span>Schedule</a>
+    <a href="dashboard.html" class="nav-item"><span class="nav-icon">📊</span>Stats</a>
+    <a href="entry.html" class="nav-item"><span class="nav-icon">✍️</span>Entry</a>
 </nav>
 
 <script>
     const GAS_URL = 'https://script.google.com/macros/s/AKfycbw7KeuN0XckEqU9V4wRxR3O8T9Rl6cC2jQesEOpOsNJTF09ZylpVFZWJnqo0aff1YNFRw/exec';
-    const PRICES = { sign_cheki: 3000, white_cheki: 2000, tiktok: 3500, kakomi: 4000, item_sign: 4500, omiyokuri: 1500 };
 
     window.onload = async function() {
         try {
-            // ① 履歴と公式スケジュールの両方を並列で取得
-            const [historyRes, scheduleRes] = await Promise.all([
-                fetch(GAS_URL + "?action=read_history").then(r => r.json()),
-                fetch(GAS_URL + "?action=read_schedule").then(r => r.json())
+            const [schedRes, histRes] = await Promise.all([
+                fetch(GAS_URL + "?action=read_schedule").then(r => r.json()),
+                fetch(GAS_URL + "?action=read_history").then(r => r.json())
             ]);
 
-            if (historyRes.result === "success" && scheduleRes.result === "success") {
+            if (schedRes.result === "success" && histRes.result === "success") {
                 document.getElementById('loading-msg').style.display = 'none';
-                document.getElementById('portal-content').style.display = 'block';
-
-                // スタッツの計算と反映
-                calculateStats(historyRes.data);
-                
-                // 未記録現場のクロスチェック
-                checkMissingLogs(historyRes.data, scheduleRes.data);
+                checkMissingEntries(schedRes.data, histRes.data);
             }
-        } catch (e) {
-            document.getElementById('loading-msg').innerText = "FAILED TO SYNC COMMAND CENTER";
+        } catch(e) {
+            document.getElementById('loading-msg').innerText = "Failed To Data Sync";
         }
     }
 
-    function calculateStats(historyData) {
-        let totalExpense = 0;
-        let totalCheki = 0;
-        let attendCount = 0;
-        let totalRecords = historyData.length;
-
-        historyData.forEach(row => {
-            let rowTotal = (parseInt(row.ticket_fee) || 0) + Object.keys(PRICES).reduce((sum, key) => sum + (parseInt(row[key]) || 0) * PRICES[key], 0);
-            totalExpense += rowTotal;
-            totalCheki += (parseInt(row.sign_cheki) || 0) + (parseInt(row.white_cheki) || 0);
-            if (row.attendance === "参加") attendCount++;
-        });
-
-        const ratePercent = totalRecords > 0 ? Math.round((attendCount / totalRecords) * 100) : 0;
-
-        document.getElementById('total-attendance-rate').innerText = `${ratePercent}%`;
-        document.getElementById('attendance-count-str').innerText = `${attendCount}回 / ${totalRecords}現場`;
-        document.getElementById('total-expense').innerText = `¥${totalExpense.toLocaleString()}`;
-        document.getElementById('total-cheki').innerText = `${totalCheki}枚`;
-    }
-
-    function checkMissingLogs(historyData, scheduleData) {
+    function checkMissingEntries(scheduleData, historyData) {
         const alertList = document.getElementById('alertList');
         alertList.innerHTML = '';
 
         const today = new Date();
-        const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+        const todayStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
 
         let missingCount = 0;
-        const historyKeys = historyData.map(h => `${h.date}_${h.event_name}`);
 
         scheduleData.forEach(sched => {
             if (!sched.date) return;
+            
             if (sched.date <= todayStr) {
-                const checkKey = `${sched.date}_${sched.title}`;
-                if (!historyKeys.includes(checkKey)) {
+                
+                const isRecorded = historyData.some(h => {
+                    if (h.date !== sched.date) return false;
+                    
+                    const sTitleLower = (sched.title || "").trim().toLowerCase();
+                    const hNameLower = (h.event_name || "").trim().toLowerCase();
+                    
+                    return hNameLower.includes(sTitleLower) || sTitleLower.includes(hNameLower);
+                });
+
+                if (!isRecorded) {
                     missingCount++;
                     const mDate = new Date(sched.date);
                     const displayDate = `${mDate.getMonth() + 1}/${mDate.getDate()}`;
                     
-                    // 💡 日付・会場・イベント名がはみ出さない綺麗なカード構造に最適化
                     const itemHtml = `
                         <div class="alert-item">
                             <div class="alert-info">
-                                <div class="alert-date">📅 ${displayDate} @ ${sched.venue || '会場未定'}</div>
+                                <div class="alert-date">📅 ${displayDate} (${sched.venue || '会場未定'})</div>
                                 <div class="alert-name">${sched.title}</div>
                             </div>
-                            <a href="entry.html?date=${sched.date}&event=${encodeURIComponent(sched.title)}&location=${encodeURIComponent(sched.venue || '')}" class="alert-btn">記録！</a>
+                            <a href="entry.html?date=${sched.date}&event=${encodeURIComponent(sched.title)}&location=${encodeURIComponent(sched.venue || '')}" class="alert-btn">今すぐ記録！</a>
                         </div>
                     `;
                     alertList.innerHTML += itemHtml;
