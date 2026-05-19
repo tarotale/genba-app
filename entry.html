@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChumToto Field Entry</title>
+    <title>ChumToto - New Field Entry</title>
     
     <link rel="apple-touch-icon" href="icon.png">
 
@@ -14,25 +14,35 @@
             --color-chumtoto: #FF6B9D;
             --text-main: #f5f0f2;
             --text-muted: #9e8891;
-            --card-bg: rgba(255, 107, 157, 0.05);
-            --card-border: rgba(255, 107, 157, 0.2);
-            --input-bg: rgba(0, 0, 0, 0.3);
-            --color-update: #2196F3;
+            --card-bg: rgba(255, 107, 157, 0.04);
+            --card-border: rgba(255, 107, 157, 0.15);
+            --input-bg: rgba(0, 0, 0, 0.4);
         }
 
-        body { margin: 0; font-family: 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif; background: var(--bg-gradient); color: var(--text-main); min-height: 100vh; padding-bottom: 100px; }
-        
+        body {
+            margin: 0;
+            font-family: 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding-bottom: 100px;
+        }
+
+        /* 💡 ヘッダー：被りバグを防ぐフレックス配置に修正 */
         header {
             background: var(--header-gradient);
             border-bottom: 1px solid rgba(255, 107, 157, 0.15);
-            padding: 15px 20px;
+            padding: 10px 16px;
             display: flex;
             align-items: center;
+            justify-content: space-between;
             backdrop-filter: blur(12px);
             position: sticky;
             top: 0;
             z-index: 100;
-            height: 34px;
+            height: 38px;
+            box-sizing: border-box;
+            gap: 10px;
         }
 
         .back-portal-btn {
@@ -41,13 +51,12 @@
             font-size: 11px;
             font-weight: bold;
             border: 1px solid rgba(255, 107, 157, 0.3);
-            padding: 6px 10px;
+            padding: 5px 8px;
             border-radius: 6px;
             background: rgba(255, 107, 157, 0.05);
             transition: 0.2s;
-            position: absolute;
-            left: 20px;
-            z-index: 10;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
         .back-portal-btn:hover {
             background: rgba(255, 107, 157, 0.15);
@@ -55,58 +64,173 @@
 
         header h1 {
             margin: 0;
-            font-size: 15px;
+            font-size: 13px;
             font-weight: 800;
-            letter-spacing: 2px;
+            letter-spacing: 0.5px;
             color: #fff;
             text-shadow: 0 0 8px rgba(255, 107, 157, 0.4);
-            width: 100%;
-            text-align: center;
+            flex: 1;
+            text-align: right;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        .container { max-width: 500px; margin: 0 auto; padding: 16px; box-sizing: border-box; }
-
-        .form-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
-        
-        .form-group { margin-bottom: 16px; }
-        .form-group label { display: block; font-size: 11px; font-weight: bold; color: var(--text-muted); margin-bottom: 6px; letter-spacing: 0.5px; }
-        .form-group input[type="text"], .form-group input[type="date"], .form-group input[type="number"] {
-            width: 100%; background: var(--input-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 12px; color: #fff; font-size: 14px; box-sizing: border-box; outline: none; transition: 0.2s;
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 16px;
+            box-sizing: border-box;
         }
-        .form-group input:focus { border-color: var(--color-chumtoto); box-shadow: 0 0 8px rgba(255,107,157,0.2); }
 
-        .toggle-group { display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.2); padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.02); margin-bottom: 20px; }
-        .toggle-label { font-size: 12px; font-weight: bold; color: var(--text-main); }
+        .form-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            box-sizing: border-box;
+        }
+
+        /* 参戦トグルエリア */
+        .toggle-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            background: rgba(0,0,0,0.2);
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,107,157,0.08);
+        }
+        .toggle-label { font-size: 13px; font-weight: bold; }
         
-        /* スイッチスタイリング */
         .switch { position: relative; display: inline-block; width: 46px; height: 26px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.1); transition: .3s; border-radius: 26px; border: 1px solid rgba(255,255,255,0.05); }
-        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 2px; bottom: 2px; background-color: #fff; transition: .3s; border-radius: 50%; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #44353b; transition: .3s; border-radius: 26px; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
         input:checked + .slider { background-color: var(--color-chumtoto); }
         input:checked + .slider:before { transform: translateX(20px); }
 
-        .sub-section-title { font-size: 11px; font-weight: bold; color: var(--color-chumtoto); margin: 20px 0 10px 0; letter-spacing: 0.5px; }
+        .form-group {
+            margin-bottom: 18px;
+            box-sizing: border-box;
+        }
 
-        .counter-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
-        .counter-row { display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.03); padding: 10px 14px; border-radius: 10px; }
-        .counter-info { flex: 1; }
-        .counter-name { font-size: 13px; font-weight: bold; color: #fff; }
-        .counter-price { font-size: 10px; color: var(--text-muted); margin-top: 1px; }
-        .counter-ctrl { display: flex; align-items: center; gap: 14px; }
-        .btn-minus, .btn-plus { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--card-border); background: rgba(255,107,157,0.05); color: var(--color-chumtoto); font-size: 18px; font-weight: bold; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.1s; outline: none; }
-        .btn-minus:active, .btn-plus:active { background: rgba(255,107,157,0.2); }
-        .counter-num { font-size: 16px; font-weight: 900; color: #fff; min-width: 20px; text-align:center; }
+        .form-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: bold;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
 
-        .submit-btn { width: 100%; background: var(--color-chumtoto); color: #fff; border: none; padding: 15px; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(255,107,157,0.3); transition: 0.2s; letter-spacing: 1px; }
-        .submit-btn:disabled { background: var(--text-muted); box-shadow: none; cursor: not-allowed; }
+        /* 💡 入力ボックス：横幅はみ出しを確実に防止する防壁スタイリング */
+        .form-control {
+            width: 100%;
+            background: var(--input-bg);
+            border: 1px solid rgba(255, 107, 157, 0.25);
+            border-radius: 8px;
+            padding: 12px;
+            color: #fff;
+            font-size: 13px;
+            box-sizing: border-box; /* パディングを含めて100%幅に収める設定 */
+            font-family: inherit;
+            transition: 0.2s;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--color-chumtoto);
+            box-shadow: 0 0 8px rgba(255, 107, 157, 0.2);
+        }
 
-        .total-sticky-box { position: fixed; bottom: 58px; left: 0; right: 0; background: rgba(20, 10, 15, 0.95); border-top: 1px solid rgba(255,107,157,0.15); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(8px); z-index: 90; max-width: 500px; margin: 0 auto; box-sizing: border-box; }
-        .total-lbl { font-size: 11px; font-weight: bold; color: var(--text-muted); }
-        .total-val { font-size: 20px; font-weight: 900; color: #fff; text-shadow: 0 0 8px rgba(255,107,157,0.3); }
+        /* 特典会オプションセクション */
+        .sub-section-title {
+            font-size: 11px;
+            font-weight: bold;
+            color: var(--color-chumtoto);
+            margin: 24px 0 12px 0;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
 
-        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(19, 11, 14, 0.92); border-top: 1px solid rgba(255,107,157,0.1); display: flex; padding: 6px 0; backdrop-filter: blur(10px); z-index: 100; }
-        .nav-item { flex: 1; text-align: center; text-decoration: none; color: var(--text-muted); font-size: 10px; font-weight: bold; display: flex; flex-direction: column; gap: 2px; }
+        .option-counter-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 107, 157, 0.05);
+        }
+        .option-name { font-size: 13px; font-weight: 500; }
+        
+        .counter-controls {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .counter-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(255, 107, 157, 0.1);
+            border: 1px solid rgba(255, 107, 157, 0.3);
+            color: var(--color-chumtoto);
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            user-select: none;
+        }
+        .counter-btn:active { background: rgba(255, 107, 157, 0.25); }
+        .counter-val { font-size: 14px; font-weight: bold; width: 20px; text-align: center; }
+
+        .submit-btn {
+            width: 100%;
+            background: var(--color-chumtoto);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 14px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 107, 157, 0.3);
+            transition: 0.2s;
+        }
+        .submit-btn:active { transform: scale(0.98); opacity: 0.9; }
+
+        /* ボトムナビゲーションバー */
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(19, 11, 14, 0.92);
+            border-top: 1px solid rgba(255, 107, 157, 0.1);
+            display: flex;
+            padding: 6px 0;
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 10px;
+            font-weight: bold;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
         .nav-item.active { color: var(--color-chumtoto); }
         .nav-icon { font-size: 18px; }
     </style>
@@ -115,49 +239,100 @@
 
 <header>
     <a href="index.html" class="back-portal-btn">◀ Portal</a>
-    <h1 id="header-title">ChumToto New Field Entry</h1>
+    <h1>ChumToto New Field Entry</h1>
 </header>
 
 <div class="container">
-    <div class="form-card">
-        <div class="toggle-group">
-            <span class="toggle-label">当日の現場に参戦した</span>
+    <form id="entryForm" class="form-card" onsubmit="submitForm(event)">
+        
+        <div class="toggle-row">
+            <div class="toggle-label">当日の現場に参戦した</div>
             <label class="switch">
-                <input type="checkbox" id="attendance" checked>
+                <input type="checkbox" id="attendance" checked onchange="toggleAttendance(this.checked)">
                 <span class="slider"></span>
             </label>
         </div>
 
         <div class="form-group">
-            <label>開催日程</label>
-            <input type="date" id="date" required>
+            <label for="date">開催日程</label>
+            <input type="date" id="date" class="form-control" required>
         </div>
 
         <div class="form-group">
-            <label>イベント・現場名</label>
-            <input type="text" id="event_name" placeholder="例: 定期公演 / 対バンライブ" required>
+            <label for="event_name">イベント・現場名</label>
+            <input type="text" id="event_name" class="form-control" placeholder="例: 定期公演 / 対バンライブ" required>
         </div>
 
         <div class="form-group">
-            <label>会場・ロケーション</label>
-            <input type="text" id="location" placeholder="例: 都内ライブハウス / 各地方会場" required>
+            <label for="venue">会場・ロケーション</label>
+            <input type="text" id="venue" class="form-control" placeholder="例: 都内ライブハウス / 各地方会場">
         </div>
 
-        <div class="form-group">
-            <label>チケット代・ドリンク代（決済した総額）</label>
-            <input type="number" id="ticket_fee" placeholder="¥0" min="0">
+        <div id="financial-inputs-block">
+            <div class="form-group">
+                <label for="ticket_fee">チケット代・ドリンク代（決済した総額）</label>
+                <input type="number" id="ticket_fee" class="form-control" value="0" min="0">
+            </div>
+
+            <div class="sub-section-title">📸 特典会・物販オプションの記録</div>
+            
+            <div class="option-counter-row">
+                <div class="option-name">サインチェキ (¥3,000)</div>
+                <div class="counter-controls">
+                    <div class="counter-btn" onclick="stepCount('sign_cheki', -1)">-</div>
+                    <div class="counter-val" id="val-sign_cheki">0</div>
+                    <div class="counter-btn" onclick="stepCount('sign_cheki', 1)">+</div>
+                </div>
+            </div>
+
+            <div class="option-counter-row">
+                <div class="option-name">白チェキ (¥2,000)</div>
+                <div class="counter-controls">
+                    <div class="counter-btn" onclick="stepCount('white_cheki', -1)">-</div>
+                    <div class="counter-val" id="val-white_cheki">0</div>
+                    <div class="counter-btn" onclick="stepCount('white_cheki', 1)">+</div>
+                </div>
+            </div>
+
+            <div class="option-counter-row">
+                <div class="option-name">衣装のままTikTok (¥3,500)</div>
+                <div class="counter-controls">
+                    <div class="counter-btn" onclick="stepCount('tiktok', -1)">-</div>
+                    <div class="counter-val" id="val-tiktok">0</div>
+                    <div class="counter-btn" onclick="stepCount('tiktok', 1)">+</div>
+                </div>
+            </div>
+
+            <div class="option-counter-row">
+                <div class="option-name">囲みチェキ (¥4,000)</div>
+                <div class="counter-controls">
+                    <div class="counter-btn" onclick="stepCount('kakomi', -1)">-</div>
+                    <div class="counter-val" id="val-kakomi">0</div>
+                    <div class="counter-btn" onclick="stepCount('kakomi', 1)">+</div>
+                </div>
+            </div>
+
+            <div class="option-counter-row">
+                <div class="option-name">私物サイン券 (¥4,500)</div>
+                <div class="counter-controls">
+                    <div class="counter-btn" onclick="stepCount('item_sign', -1)">-</div>
+                    <div class="counter-val" id="val-item_sign">0</div>
+                    <div class="counter-btn" onclick="stepCount('item_sign', 1)">+</div>
+                </div>
+            </div>
+
+            <div class="option-counter-row">
+                <div class="option-name">お見送り会参加券 (¥1,500)</div>
+                <div class="counter-controls">
+                    <div class="counter-btn" onclick="stepCount('omiyokuri', -1)">-</div>
+                    <div class="counter-val" id="val-omiyokuri">0</div>
+                    <div class="counter-btn" onclick="stepCount('omiyokuri', 1)">+</div>
+                </div>
+            </div>
         </div>
 
-        <div class="sub-section-title">📸 特典会・物販オプションの記録</div>
-        <div class="counter-grid" id="counters-box"></div>
-
-        <button class="submit-btn" id="submit-btn" onclick="sendData()">Google Sheets へ保存</button>
-    </div>
-</div>
-
-<div class="total-sticky-box">
-    <span class="total-lbl">今回の推定投資総額</span>
-    <span class="total-val" id="display-total">¥0</span>
+        <button type="submit" class="submit-btn" id="submitBtn">送信してスプレッドシートへ記録</button>
+    </form>
 </div>
 
 <nav class="nav-bar">
@@ -167,131 +342,89 @@
 </nav>
 
 <script>
-    const PRICES = {
-        sign_cheki: { name: "サインチェキ", price: 3000 },
-        white_cheki: { name: "交流なし白チェキ", price: 2000 },
-        tiktok: { name: "TikTok動画撮影", price: 3500 },
-        kakomi: { name: "囲み写メ・チェキ", price: 4000 },
-        item_sign: { name: "私物サイン券", price: 4500 },
-        omiyokuri: { name: "お見送り会参加券", price: 1500 }
-    };
-
-    let counts = { sign_cheki: 0, white_cheki: 0, tiktok: 0, kakomi: 0, item_sign: 0, omiyokuri: 0 };
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbw7KeuN0XckEqU9V4wRxR3O8T9Rl6cC2jQesEOpOsNJTF09ZylpVFZWJnqo0aff1YNFRw/exec';
+    
+    // カウンター管理用オブジェクト
+    const counters = { sign_cheki: 0, white_cheki: 0, tiktok: 0, kakomi: 0, item_sign: 0, omiyokuri: 0 };
     let isEditMode = false;
-    let editRowIndex = null;
 
     window.onload = function() {
-        buildCounters();
-        
         const params = new URLSearchParams(window.location.search);
-        const pDate = params.get('date');
-        const pEvent = params.get('event');
-        const pLoc = params.get('location');
-        const pEditRow = params.get('edit_row');
-
-        if (pEditRow) {
+        
+        if (params.get('mode') === 'edit') {
             isEditMode = true;
-            editRowIndex = pEditRow;
-            document.getElementById('header-title').innerText = "ChumToto Edit Field Entry";
-            document.getElementById('submit-btn').innerText = "修正内容を確定する";
-            document.getElementById('submit-btn').style.background = "var(--color-update)";
-            fetchEditData(pEditRow);
+            document.getElementById('submitBtn').innerText = "修正内容をスプレッドシートに反映";
+        }
+
+        // クエリパラメータから自動入力
+        if (params.get('date')) document.getElementById('date').value = params.get('date');
+        if (params.get('event')) document.getElementById('event_name').value = decodeURIComponent(params.get('event'));
+        if (params.get('location')) document.getElementById('venue').value = decodeURIComponent(params.get('location'));
+    }
+
+    function stepCount(key, amount) {
+        counters[key] = Math.max(0, counters[key] + amount);
+        document.getElementById(`val-${key}`).innerText = counters[key];
+    }
+
+    function toggleAttendance(checked) {
+        const financialBlock = document.getElementById('financial-inputs-block');
+        if (checked) {
+            financialBlock.style.display = 'block';
         } else {
-            if (pDate) document.getElementById('date').value = pDate;
-            if (pEvent) document.getElementById('event_name').value = decodeURIComponent(pEvent);
-            if (pLoc) document.getElementById('location').value = decodeURIComponent(pLoc);
-            calculateTotal();
-        }
-
-        document.getElementById('ticket_fee').addEventListener('input', calculateTotal);
-    };
-
-    async function fetchEditData(rowIndex) {
-        const GAS_URL = 'https://script.google.com/macros/s/AKfycbw7KeuN0XckEqU9V4wRxR3O8T9Rl6cC2jQesEOpOsNJTF09ZylpVFZWJnqo0aff1YNFRw/exec';
-        try {
-            const response = await fetch(`${GAS_URL}?action=read_history`);
-            const res = await response.json();
-            if (res.result === "success") {
-                const targetRow = res.data.find(row => String(row.row_index) === String(rowIndex));
-                if (targetRow) {
-                    document.getElementById('date').value = targetRow.date || '';
-                    document.getElementById('event_name').value = targetRow.event_name || '';
-                    document.getElementById('location').value = targetRow.location || '';
-                    document.getElementById('ticket_fee').value = targetRow.ticket_fee || 0;
-                    document.getElementById('attendance').checked = (targetRow.attendance === "参加");
-
-                    Object.keys(counts).forEach(k => {
-                        counts[k] = parseInt(targetRow[k]) || 0;
-                        document.getElementById(`num-${k}`).innerText = counts[k];
-                    });
-                    calculateTotal();
-                }
-            }
-        } catch(e) {
-            alert("編集データの取得に失敗しました");
+            financialBlock.style.display = 'none';
+            // 不参戦時は数値をリセット
+            document.getElementById('ticket_fee').value = 0;
+            Object.keys(counters).forEach(k => {
+                counters[k] = 0;
+                document.getElementById(`val-${k}`).innerText = 0;
+            });
         }
     }
 
-    function buildCounters() {
-        const box = document.getElementById('counters-box');
-        box.innerHTML = Object.keys(PRICES).map(key => `
-            <div class="counter-row">
-                <div class="counter-info">
-                    <div class="counter-name">${PRICES[key].name}</div>
-                    <div class="counter-price">¥${PRICES[key].price.toLocaleString()} / 1枚</div>
-                </div>
-                <div class="counter-ctrl">
-                    <button class="btn-minus" onclick="step('${key}', -1)">−</button>
-                    <div class="counter-num" id="num-${key}">0</div>
-                    <button class="btn-plus" onclick="step('${key}', 1)">+</button>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    function step(key, val) {
-        counts[key] = Math.max(0, counts[key] + val);
-        document.getElementById(`num-${key}`).innerText = counts[key];
-        calculateTotal();
-    }
-
-    function calculateTotal() {
-        let total = parseInt(document.getElementById('ticket_fee').value) || 0;
-        Object.keys(PRICES).forEach(key => { total += counts[key] * PRICES[key].price; });
-        document.getElementById('display-total').innerText = `¥${total.toLocaleString()}`;
-    }
-
-    async function sendData() {
-        const btn = document.getElementById('submit-btn');
-        const GAS_URL = 'https://script.google.com/macros/s/AKfycbw7KeuN0XckEqU9V4wRxR3O8T9Rl6cC2jQesEOpOsNJTF09ZylpVFZWJnqo0aff1YNFRw/exec';
-
+    async function submitForm(event) {
+        event.preventDefault();
+        
+        const btn = document.getElementById('submitBtn');
+        const originalText = btn.innerText;
         btn.disabled = true;
-        btn.innerText = '送信中...';
+        btn.innerText = "Processing Data System...";
+
+        const attendanceVal = document.getElementById('attendance').checked ? "参加" : "不参加";
+        const dateVal = document.getElementById('date').value;
+        const eventNameVal = document.getElementById('event_name').value;
+        const venueVal = document.getElementById('venue').value;
+        const ticketFeeVal = document.getElementById('ticket_fee').value;
 
         const payload = {
-            action: isEditMode ? "update_history" : "insert_history",
-            row_index: editRowIndex,
-            date: document.getElementById('date').value,
-            event_name: document.getElementById('event_name').value,
-            location: document.getElementById('location').value,
-            ticket_fee: document.getElementById('ticket_fee').value,
-            attendance: document.getElementById('attendance').checked ? "参加" : "不参加",
-            ...counts
+            action: isEditMode ? "edit_history" : "write_history",
+            date: dateVal,
+            event_name: eventNameVal,
+            venue: venueVal,
+            attendance: attendanceVal,
+            ticket_fee: ticketFeeVal,
+            ...counters
         };
 
         try {
-            await fetch(GAS_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'text/plain' },
+            const response = await fetch(GAS_URL, {
+                method: "POST",
                 body: JSON.stringify(payload)
             });
-            alert(isEditMode ? '修正が完了しました！' : '保存完了しました！');
-            window.location.href = "index.html";
+            const res = await response.json();
+
+            if (res.result === "success") {
+                alert(isEditMode ? "現場の記録を正常に修正しました！" : "現場データを正常に記録しました！");
+                window.location.href = "index.html";
+            } else {
+                alert("システムエラーが発生しました: " + res.message);
+                btn.disabled = false;
+                btn.innerText = originalText;
+            }
         } catch(e) {
-            alert("通信エラーが発生しました");
+            alert("GASへのデータ転送に失敗しました。接続環境を確認してください。");
             btn.disabled = false;
-            btn.innerText = isEditMode ? '修正内容を確定する' : 'Google Sheets へ保存';
+            btn.innerText = originalText;
         }
     }
 </script>
