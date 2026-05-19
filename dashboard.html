@@ -29,7 +29,7 @@
             padding-bottom: 100px;
         }
 
-        /* 💡 ヘッダー：被りバグを防ぐフレックス配置に修正 */
+        /* 💡 ヘッダー：文字被りを防ぐフレックス配置 */
         header {
             background: var(--header-gradient);
             border-bottom: 1px solid rgba(255, 107, 157, 0.15);
@@ -82,6 +82,22 @@
             margin: 0 auto;
             padding: 16px;
             box-sizing: border-box;
+        }
+
+        /* 💡 期間切り替えセレクター・タブエリアのスタイル */
+        .filter-area {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        .filter-select {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 107, 157, 0.25);
+            border-radius: 6px;
+            padding: 8px;
+            color: #fff;
+            font-size: 12px;
         }
 
         /* サマリーダッシュボード */
@@ -160,7 +176,7 @@
             margin-bottom: 8px;
         }
 
-        /* 下部リボン（詳細テキスト情報）のレイアウト調整 */
+        /* 下部リボン（詳細テキスト情報）のレイアウト */
         .card-details-box {
             display: flex;
             flex-direction: column;
@@ -237,6 +253,18 @@
     <div id="loading-msg" class="loading-cover">Analyzing Financial Records...</div>
 
     <div id="stats-content-area" style="display: none;">
+        
+        <div class="section-title">Filter Period</div>
+        <div class="filter-area">
+            <select id="period-type-select" class="filter-control filter-select" onchange="onPeriodTypeChange()">
+                <option value="all">全期間通算 (All Time)</option>
+                <option value="year">年別集計 (Yearly)</option>
+                <option value="month">月別集計 (Monthly)</option>
+            </select>
+            <select id="period-value-select" class="filter-control filter-select" style="display: none;" onchange="onPeriodValueChange()">
+                </select>
+        </div>
+
         <div class="section-title">Field Summary Dashboard</div>
         <div class="stats-summary">
             <div class="stats-row"><div class="stats-label">Total Expense</div><div class="stats-value" id="stat-total-expense">¥0</div></div>
@@ -262,6 +290,8 @@
     const GAS_URL = 'https://script.google.com/macros/s/AKfycbw7KeuN0XckEqU9V4wRxR3O8T9Rl6cC2jQesEOpOsNJTF09ZylpVFZWJnqo0aff1YNFRw/exec';
     const PRICES = { sign_cheki: 3000, white_cheki: 2000, tiktok: 3500, kakomi: 4000, item_sign: 4500, omiyokuri: 1500 };
 
+    let globalRawData = []; // GASから取得した生の全データ
+
     window.onload = async function() {
         try {
             const response = await fetch(GAS_URL + "?action=read_history");
@@ -270,11 +300,77 @@
                 document.getElementById('loading-msg').style.display = 'none';
                 document.getElementById('stats-content-area').style.display = 'block';
                 
-                processAndRenderStats(res.data);
+                globalRawData = res.data;
+                initPeriodFilters(); // 💡 復活：集計フィルターの初期化
+                applyFilterAndRender();
             }
         } catch(e) {
             document.getElementById('loading-msg').innerText = "Failed To Data Sync";
         }
+    }
+
+    // 💡 復活：データから存在する「年」や「年月」を割り出してフィルターの選択肢を自動生成するロジック
+    function initPeriodFilters() {
+        const typeSelect = document.getElementById('period-type-select');
+        const valSelect = document.getElementById('period-value-select');
+        
+        typeSelect.value = "all";
+        valSelect.style.display = "none";
+    }
+
+    function onPeriodTypeChange() {
+        const type = document.getElementById('period-type-select').value;
+        const valSelect = document.getElementById('period-value-select');
+        
+        if (type === 'all') {
+            valSelect.style.display = "none";
+            applyFilterAndRender();
+            return;
+        }
+
+        // 重複のないリストを作成
+        const set = new Set();
+        globalRawData.forEach(row => {
+            if (!row.date) return;
+            if (type === 'year') {
+                set.add(row.date.substring(0, 4)); // YYYY
+            } else if (type === 'month') {
+                set.add(row.date.substring(0, 7)); // YYYY-MM
+            }
+        });
+
+        const sortedPeriods = Array.from(set).sort((a, b) => b.localeCompare(a));
+        
+        valSelect.innerHTML = '';
+        sortedPeriods.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p;
+            opt.innerText = type === 'year' ? `${p}年` : `${p.replace('-', '年')}月`;
+            valSelect.appendChild(opt);
+        });
+
+        valSelect.style.display = "block";
+        applyFilterAndRender();
+    }
+
+    function onPeriodValueChange() {
+        applyFilterAndRender();
+    }
+
+    // 💡 復活：選択された期間（月別・年別）に応じてデータをフィルタリングして再計算・描画をかけるコアロジック
+    function applyFilterAndRender() {
+        const type = document.getElementById('period-type-select').value;
+        const val = document.getElementById('period-value-select').value;
+
+        let filteredData = globalRawData;
+
+        if (type === 'year' && val) {
+            filteredData = globalRawData.filter(row => row.date && row.date.startsWith(val));
+        } else if (type === 'month' && val) {
+            filteredData = globalRawData.filter(row => row.date && row.date.startsWith(val));
+        }
+
+        processAndRenderStats(filteredData);
     }
 
     function processAndRenderStats(historyData) {
@@ -295,13 +391,7 @@
 
             Object.keys(PRICES).forEach(k => {
                 let cnt = parseInt(row[k]) || 0;
-                let cost = cnt * PRICES[k];
-                if (k === 'sign_cheki' || k === 'white_cheki') {
-                    chekiCost += cost;
-                } else {
-                    // 特典会その他もチェキ費用以外の物販等として合算
-                    chekiCost += cost;
-                }
+                chekiCost += cnt * PRICES[k];
             });
 
             let rowTotal = ticket + chekiCost;
@@ -315,15 +405,14 @@
                 attendCount++;
             }
 
-            // カード生成
+            // カードの生成
             const badgeClass = row.attendance === "参加" ? "status-badge attend" : "status-badge absent";
             const badgeText = row.attendance || "未判定";
             
-            // チェキの内訳文字列
             const sCheki = parseInt(row.sign_cheki) || 0;
             const wCheki = parseInt(row.white_cheki) || 0;
 
-            // 💡 修正：会場名を最上部ではなく、金額等と同じ並びの下部アイテム行として分離配置
+            // 💡 指定通り調整：会場名を下部に独立行として並列配置
             const venueHtml = row.venue ? `<div class="card-detail-item">🏢 会場: ${row.venue}</div>` : `<div class="card-detail-item">🏢 会場: 未記録</div>`;
 
             const cardHtml = `
