@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChumToto FIELD STATS</title>
+    <title>ChumToto Field Stats</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <link rel="apple-touch-icon" href="icon.png">
-    
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         :root {
             --bg-gradient: linear-gradient(135deg, #0d080a 0%, #1a1014 50%, #0d080a 100%);
@@ -57,7 +57,7 @@
             margin: 0;
             font-size: 15px;
             font-weight: 800;
-            letter-spacing: 3px;
+            letter-spacing: 2px;
             color: #fff;
             text-shadow: 0 0 8px rgba(255, 107, 157, 0.4);
             width: 100%;
@@ -69,11 +69,10 @@
         .filter-section { display: flex; gap: 8px; margin-bottom: 16px; }
         .filter-section select { flex: 1; background: var(--input-bg); border: 1px solid var(--card-border); color: #fff; padding: 10px; border-radius: 8px; font-weight: bold; font-size: 12px; outline: none; }
 
-        /* スタッツのグリッドレイアウト */
         .summary-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
         .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-align: center; }
         .card.full { grid-column: span 2; text-align: left; }
-        .card-title { font-size: 11px; color: var(--text-muted); font-weight: bold; letter-spacing: 1px; margin-bottom: 4px; text-transform: uppercase; }
+        .card-title { font-size: 11px; color: var(--text-muted); font-weight: bold; letter-spacing: 1px; margin-bottom: 4px; }
         .card-value { font-size: 24px; font-weight: 900; color: #fff; }
         .card.full .card-value { font-size: 32px; color: #fff; }
         
@@ -87,7 +86,6 @@
 
         .chart-box { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.03); border-radius: 16px; padding: 16px; margin-bottom: 20px; }
         
-        /* 💡 横スクロール対応のグラフコンテナ設定 */
         .scrollable-chart-container { width: 100%; overflow-x: auto; margin-top: 10px; padding-bottom: 5px; }
         .scrollable-chart-inner { min-width: 600px; height: 180px; }
 
@@ -113,8 +111,8 @@
 <body>
 
 <header>
-    <a href="index.html" class="back-portal-btn">◀ PORTAL</a>
-    <h1>FIELD STATS</h1>
+    <a href="index.html" class="back-portal-btn">◀ Portal</a>
+    <h1>ChumToto Field Stats</h1>
 </header>
 
 <div class="container">
@@ -123,7 +121,7 @@
         <select id="month-select"><option value="all">すべての月</option></select>
     </div>
 
-    <div id="loading-msg" class="loading-cover">ANALYZING FIELDS...</div>
+    <div id="loading-msg" class="loading-cover">Analyzing Fields...</div>
 
     <div id="dashboard-content" style="display: none;">
         <div class="summary-cards">
@@ -149,12 +147,12 @@
         </div>
 
         <div class="chart-box">
-            <div style="font-size:11px; font-weight:bold; color:var(--text-muted); margin-bottom:10px; letter-spacing:1px; text-transform:uppercase;">Expense Breakdown</div>
+            <div style="font-size:11px; font-weight:bold; color:var(--text-muted); margin-bottom:10px; letter-spacing:1px;">Expense Breakdown</div>
             <canvas id="expenseChart" style="max-height: 180px;"></canvas>
         </div>
 
         <div class="chart-box" id="monthly-bar-box">
-            <div style="font-size:11px; font-weight:bold; color:var(--text-muted); letter-spacing:1px; text-transform:uppercase;">Monthly Trend</div>
+            <div style="font-size:11px; font-weight:bold; color:var(--text-muted); letter-spacing:1px;">Monthly Trend</div>
             <div class="scrollable-chart-container">
                 <div class="scrollable-chart-inner">
                     <canvas id="monthlyBarChart"></canvas>
@@ -168,9 +166,9 @@
 </div>
 
 <nav class="nav-bar">
-    <a href="calendar.html" class="nav-item"><span class="nav-icon">📅</span>SCHEDULE</a>
-    <a href="dashboard.html" class="nav-item active"><span class="nav-icon">📊</span>STATS</a>
-    <a href="entry.html" class="nav-item"><span class="nav-icon">✍️</span>ENTRY</a>
+    <a href="calendar.html" class="nav-item"><span class="nav-icon">📅</span>Schedule</a>
+    <a href="dashboard.html" class="nav-item active"><span class="nav-icon">📊</span>Stats</a>
+    <a href="entry.html" class="nav-item"><span class="nav-icon">✍️</span>Entry</a>
 </nav>
 
 <script>
@@ -178,7 +176,7 @@
     const PRICES = { sign_cheki: 3000, white_cheki: 2000, tiktok: 3500, kakomi: 4000, item_sign: 4500, omiyokuri: 1500 };
     let rawData = [];
     let chartInstance = null;
-    let barChartInstance = null; // 💡 棒グラフ用のインスタンス保持
+    let barChartInstance = null;
 
     window.onload = async function() {
         try {
@@ -193,7 +191,7 @@
                 applyFilter();
             }
         } catch(e) {
-            document.getElementById('loading-msg').innerText = "FAILED TO CONNECT DATABASES";
+            document.getElementById('loading-msg').innerText = "Failed To Connect Databases";
         }
 
         document.getElementById('year-select').addEventListener('change', () => {
@@ -213,7 +211,6 @@
         if (mVal !== "all") {
             filtered = rawData.filter(row => row.date && row.date.substring(0, 7) === mVal);
             label = `${mVal.split('-')[1]}月の投資額`;
-            // 特定月が選ばれている時は月別推移グラフを非表示にする（1本しか立たず無意味なため）
             document.getElementById('monthly-bar-box').style.display = 'none';
         } else {
             document.getElementById('monthly-bar-box').style.display = 'block';
@@ -225,7 +222,7 @@
 
         updateSummaryCards(filtered, label);
         renderChart(filtered);
-        renderMonthlyBarChart(filtered); // 💡 棒グラフ描画ロジックの呼び出し
+        renderMonthlyBarChart(filtered);
         renderHistoryList(filtered);
     }
 
@@ -328,16 +325,14 @@
         });
     }
 
-    // 💡 【新規機能】月別支出の棒グラフを描画
     function renderMonthlyBarChart(data) {
         const ctx = document.getElementById('monthlyBarChart').getContext('2d');
         if (barChartInstance) barChartInstance.destroy();
 
-        // 1. データを月ごとに集計
         const monthlyMap = {};
         data.forEach(row => {
             if (!row.date) return;
-            const monthStr = row.date.substring(0, 7); // "YYYY-MM" 形式を取得
+            const monthStr = row.date.substring(0, 7);
             
             let rowTotal = parseInt(row.ticket_fee) || 0;
             Object.keys(PRICES).forEach(k => {
@@ -347,15 +342,13 @@
             monthlyMap[monthStr] = (monthlyMap[monthStr] || 0) + rowTotal;
         });
 
-        // 2. 月の配列を昇順(古い順)にソートして並べる
         const sortedMonths = Object.keys(monthlyMap).sort();
         const chartLabels = sortedMonths.map(m => {
             const [y, mm] = m.split('-');
-            return `${mm}月`; // 軸の表示を「XX月」にスマート化
+            return `${mm}月`;
         });
         const chartValues = sortedMonths.map(m => monthlyMap[m]);
 
-        // 3. グラフ生成
         barChartInstance = new Chart(ctx, {
             type: 'bar',
             data: {
@@ -374,7 +367,7 @@
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: { display: false } // ラベルは上部内訳と被るので非表示でスッキリ
+                    legend: { display: false }
                 },
                 scales: {
                     x: {
@@ -387,7 +380,7 @@
                             color: '#9e8891',
                             font: { size: 10 },
                             callback: function(value) {
-                                return '¥' + (value / 1000) + 'k'; // ¥10k などの単位にして横幅を圧縮
+                                return '¥' + (value / 1000) + 'k';
                             }
                         }
                     }
