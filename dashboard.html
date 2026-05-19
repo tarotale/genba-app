@@ -66,7 +66,7 @@
         .filter-section { display: flex; gap: 8px; margin-bottom: 16px; }
         .filter-section select { flex: 1; background: var(--input-bg); border: 1px solid var(--card-border); color: #fff; padding: 10px; border-radius: 8px; font-weight: bold; font-size: 12px; outline: none; }
 
-        /* スタッツのグリッドレイアウト（2列均等並び） */
+        /* スタッツのグリッドレイアウト */
         .summary-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
         .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-align: center; }
         .card.full { grid-column: span 2; text-align: left; }
@@ -83,6 +83,10 @@
         .cheki-sub-grid .sub-value { font-size: 15px; font-weight: bold; color: #fff; }
 
         .chart-box { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.03); border-radius: 16px; padding: 16px; margin-bottom: 20px; }
+        
+        /* 💡 横スクロール対応のグラフコンテナ設定 */
+        .scrollable-chart-container { width: 100%; overflow-x: auto; margin-top: 10px; padding-bottom: 5px; }
+        .scrollable-chart-inner { min-width: 600px; height: 180px; }
 
         .history-list { display: flex; flex-direction: column; gap: 10px; }
         .history-item { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 14px; position: relative; }
@@ -142,7 +146,17 @@
         </div>
 
         <div class="chart-box">
+            <div style="font-size:11px; font-weight:bold; color:var(--text-muted); margin-bottom:10px; letter-spacing:1px; text-transform:uppercase;">Expense Breakdown</div>
             <canvas id="expenseChart" style="max-height: 180px;"></canvas>
+        </div>
+
+        <div class="chart-box" id="monthly-bar-box">
+            <div style="font-size:11px; font-weight:bold; color:var(--text-muted); letter-spacing:1px; text-transform:uppercase;">Monthly Trend</div>
+            <div class="scrollable-chart-container">
+                <div class="scrollable-chart-inner">
+                    <canvas id="monthlyBarChart"></canvas>
+                </div>
+            </div>
         </div>
 
         <div style="font-size:12px; font-weight:bold; color:var(--text-muted); margin-bottom:10px; letter-spacing:1px;">参戦履歴一覧</div>
@@ -161,6 +175,7 @@
     const PRICES = { sign_cheki: 3000, white_cheki: 2000, tiktok: 3500, kakomi: 4000, item_sign: 4500, omiyokuri: 1500 };
     let rawData = [];
     let chartInstance = null;
+    let barChartInstance = null; // 💡 棒グラフ用のインスタンス保持
 
     window.onload = async function() {
         try {
@@ -195,13 +210,19 @@
         if (mVal !== "all") {
             filtered = rawData.filter(row => row.date && row.date.substring(0, 7) === mVal);
             label = `${mVal.split('-')[1]}月の投資額`;
-        } else if (yVal !== "all") {
-            filtered = rawData.filter(row => row.date && row.date.substring(0, 4) === yVal);
-            label = `${yVal}年の投資額`;
+            // 特定月が選ばれている時は月別推移グラフを非表示にする（1本しか立たず無意味なため）
+            document.getElementById('monthly-bar-box').style.display = 'none';
+        } else {
+            document.getElementById('monthly-bar-box').style.display = 'block';
+            if (yVal !== "all") {
+                filtered = rawData.filter(row => row.date && row.date.substring(0, 4) === yVal);
+                label = `${yVal}年の投資額`;
+            }
         }
 
         updateSummaryCards(filtered, label);
         renderChart(filtered);
+        renderMonthlyBarChart(filtered); // 💡 棒グラフ描画ロジックの呼び出し
         renderHistoryList(filtered);
     }
 
@@ -238,7 +259,6 @@
         let totalExpense = 0;
         let signCount = 0;
         let whiteCount = 0;
-        
         let attendCount = 0;
         let totalRecords = data.length;
 
@@ -255,15 +275,11 @@
 
         const ratePercent = totalRecords > 0 ? Math.round((attendCount / totalRecords) * 100) : 0;
 
-        // ドキュメント要素の書き換え
         document.getElementById('main-expense-label').innerText = label;
         document.getElementById('total-main').innerText = `¥${totalExpense.toLocaleString()}`;
         document.getElementById('total-sign-cheki').innerText = signCount;
         document.getElementById('total-white_cheki').innerText = whiteCount;
-        
-        // 💡 新設した「チェキ合計欄」に合算値をセット
         document.getElementById('total-cheki-count').innerHTML = `${signCount + whiteCount} <span style="font-size:11px;">枚</span>`;
-        
         document.getElementById('total-attendance-rate').innerText = `${ratePercent}%`;
         document.getElementById('attendance-count-str').innerText = `${attendCount}回 / ${totalRecords}現場`;
     }
@@ -304,6 +320,74 @@
                 responsive: true,
                 plugins: {
                     legend: { position: 'right', labels: { color: '#9e8891', font: { weight: 'bold', size: 11 } } }
+                }
+            }
+        });
+    }
+
+    // 💡 【新規機能】月別支出の棒グラフを描画
+    function renderMonthlyBarChart(data) {
+        const ctx = document.getElementById('monthlyBarChart').getContext('2d');
+        if (barChartInstance) barChartInstance.destroy();
+
+        // 1. データを月ごとに集計
+        const monthlyMap = {};
+        data.forEach(row => {
+            if (!row.date) return;
+            const monthStr = row.date.substring(0, 7); // "YYYY-MM" 形式を取得
+            
+            let rowTotal = parseInt(row.ticket_fee) || 0;
+            Object.keys(PRICES).forEach(k => {
+                rowTotal += (parseInt(row[k]) || 0) * PRICES[k];
+            });
+
+            monthlyMap[monthStr] = (monthlyMap[monthStr] || 0) + rowTotal;
+        });
+
+        // 2. 月の配列を昇順(古い順)にソートして並べる
+        const sortedMonths = Object.keys(monthlyMap).sort();
+        const chartLabels = sortedMonths.map(m => {
+            const [y, mm] = m.split('-');
+            return `${mm}月`; // 軸の表示を「XX月」にスマート化
+        });
+        const chartValues = sortedMonths.map(m => monthlyMap[m]);
+
+        // 3. グラフ生成
+        barChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: chartLabels,
+                datasets: [{
+                    label: '支出金額',
+                    data: chartValues,
+                    backgroundColor: 'rgba(255, 107, 157, 0.6)',
+                    borderColor: '#FF6B9D',
+                    borderWidth: 1.5,
+                    borderRadius: 4,
+                    barPercentage: 0.5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false } // ラベルは上部内訳と被るので非表示でスッキリ
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#9e8891', font: { weight: 'bold', size: 11 } }
+                    },
+                    y: {
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        ticks: {
+                            color: '#9e8891',
+                            font: { size: 10 },
+                            callback: function(value) {
+                                return '¥' + (value / 1000) + 'k'; // ¥10k などの単位にして横幅を圧縮
+                            }
+                        }
+                    }
                 }
             }
         });
