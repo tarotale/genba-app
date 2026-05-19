@@ -48,6 +48,16 @@
 
         .container { max-width: 500px; margin: 0 auto; padding: 16px; box-sizing: border-box; }
 
+        /* 💡 復元：トップページ用サマリーカードのスタイリング */
+        .summary-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .summary-mini-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 14px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-align: center; }
+        .summary-mini-card.full { grid-column: span 2; text-align: left; padding: 16px; }
+        .summary-card-title { font-size: 11px; color: var(--text-muted); font-weight: bold; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .summary-card-value { font-size: 22px; font-weight: 900; color: #fff; }
+        .summary-mini-card.full .summary-card-value { font-size: 28px; }
+        .rate-value { color: #5AC8FA !important; text-shadow: 0 0 8px rgba(90,200,250,0.3); }
+        .cheki-value { color: var(--color-chumtoto) !important; text-shadow: 0 0 8px rgba(255,107,157,0.3); }
+
         /* メインメニューリンク */
         .menu-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 20px; }
         .menu-card {
@@ -104,6 +114,23 @@
 
 <div class="container">
     
+    <div id="loading-msg" class="loading-cover">Cross-Checking Databases...</div>
+
+    <div class="summary-cards" id="portalSummaryBox" style="display: none;">
+        <div class="summary-mini-card full">
+            <div class="summary-card-title">Total Expense</div>
+            <div class="summary-card-value" id="top-total-expense">¥0</div>
+        </div>
+        <div class="summary-mini-card">
+            <div class="summary-card-title">Total Chekis</div>
+            <div class="summary-card-value cheki-value" id="top-total-cheki">0 枚</div>
+        </div>
+        <div class="summary-mini-card">
+            <div class="summary-card-title">Attendance Rate</div>
+            <div class="summary-card-value rate-value" id="top-attendance-rate">0%</div>
+        </div>
+    </div>
+    
     <div class="menu-grid">
         <a href="calendar.html" class="menu-card">
             <div class="menu-icon">📅</div>
@@ -131,8 +158,6 @@
         </a>
     </div>
 
-    <div id="loading-msg" class="loading-cover">Cross-Checking Databases...</div>
-
     <div class="alert-container" id="alertBox" style="display: none;">
         <div class="alert-header">⚠️ 未入力の現場が検出されました</div>
         <div class="alert-list" id="alertList"></div>
@@ -152,6 +177,7 @@
 
 <script>
     const GAS_URL = 'https://script.google.com/macros/s/AKfycbw7KeuN0XckEqU9V4wRxR3O8T9Rl6cC2jQesEOpOsNJTF09ZylpVFZWJnqo0aff1YNFRw/exec';
+    const PRICES = { sign_cheki: 3000, white_cheki: 2000, tiktok: 3500, kakomi: 4000, item_sign: 4500, omiyokuri: 1500 };
 
     window.onload = async function() {
         try {
@@ -162,11 +188,45 @@
 
             if (schedRes.result === "success" && histRes.result === "success") {
                 document.getElementById('loading-msg').style.display = 'none';
+                
+                // 💡 復元：トップサマリーの計算と表示
+                calculatePortalSummary(histRes.data);
+                
                 checkMissingEntries(schedRes.data, histRes.data);
             }
         } catch(e) {
             document.getElementById('loading-msg').innerText = "Failed To Data Sync";
         }
+    }
+
+    // 💡 復元：全履歴から「累計支出」「累計チェキ」「参加率」を割り出して反映するロジック
+    function calculatePortalSummary(historyData) {
+        let totalExpense = 0;
+        let totalCheki = 0;
+        let attendCount = 0;
+        const totalRecords = historyData.length;
+
+        historyData.forEach(row => {
+            let rowTotal = parseInt(row.ticket_fee) || 0;
+            Object.keys(PRICES).forEach(k => {
+                rowTotal += (parseInt(row[k]) || 0) * PRICES[k];
+            });
+            totalExpense += rowTotal;
+
+            // サインあり + 白チェキの合計枚数
+            totalCheki += (parseInt(row.sign_cheki) || 0) + (parseInt(row.white_cheki) || 0);
+
+            if (row.attendance === "参加") {
+                attendCount++;
+            }
+        });
+
+        const ratePercent = totalRecords > 0 ? Math.round((attendCount / totalRecords) * 100) : 0;
+
+        document.getElementById('top-total-expense').innerText = `¥${totalExpense.toLocaleString()}`;
+        document.getElementById('top-total-cheki').innerText = `${totalCheki} 枚`;
+        document.getElementById('top-attendance-rate').innerText = `${ratePercent}%`;
+        document.getElementById('portalSummaryBox').style.display = 'grid';
     }
 
     function checkMissingEntries(scheduleData, historyData) {
