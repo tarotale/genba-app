@@ -27,17 +27,21 @@
             padding-bottom: 100px;
         }
 
+        /* 💡 ヘッダー：被りバグを防ぐフレックス配置に修正 */
         header {
             background: var(--header-gradient);
             border-bottom: 1px solid rgba(255, 107, 157, 0.15);
-            padding: 15px 20px;
+            padding: 10px 16px;
             display: flex;
             align-items: center;
+            justify-content: space-between;
             backdrop-filter: blur(12px);
             position: sticky;
             top: 0;
             z-index: 100;
-            height: 34px;
+            height: 38px;
+            box-sizing: border-box;
+            gap: 10px;
         }
 
         .back-portal-btn {
@@ -46,13 +50,12 @@
             font-size: 11px;
             font-weight: bold;
             border: 1px solid rgba(255, 107, 157, 0.3);
-            padding: 6px 10px;
+            padding: 5px 8px;
             border-radius: 6px;
             background: rgba(255, 107, 157, 0.05);
             transition: 0.2s;
-            position: absolute;
-            left: 20px;
-            z-index: 10;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
         .back-portal-btn:hover {
             background: rgba(255, 107, 157, 0.15);
@@ -60,13 +63,16 @@
 
         header h1 {
             margin: 0;
-            font-size: 15px;
+            font-size: 13px;
             font-weight: 800;
-            letter-spacing: 2px;
+            letter-spacing: 0.5px;
             color: #fff;
             text-shadow: 0 0 8px rgba(255, 107, 157, 0.4);
-            width: 100%;
-            text-align: center;
+            flex: 1;
+            text-align: right;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .container {
@@ -192,6 +198,7 @@
             gap: 10px;
         }
 
+        /* 💡 リスト表示のカードスタイル（今日を目立たせる装飾を内包） */
         .event-card {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
@@ -200,11 +207,19 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             cursor: pointer;
             transition: 0.2s;
+            scroll-margin-top: 70px; /* スクロール時のヘッダー被り防止マージン */
         }
 
         .event-card:hover {
             background: rgba(255, 107, 157, 0.08);
             border-color: rgba(255, 107, 157, 0.5);
+        }
+
+        /* 💡 スクロールターゲット（今日）用のボーダースタイル */
+        .event-card.scroll-target {
+            border: 2px solid var(--color-chumtoto) !important;
+            background: rgba(255, 107, 157, 0.12);
+            box-shadow: 0 0 15px rgba(255, 107, 157, 0.25);
         }
 
         .event-title {
@@ -269,7 +284,7 @@
 
 <header>
     <a href="index.html" class="back-portal-btn">◀ Portal</a>
-    <h1>ChumToto Official Schedule</h1>
+    <h1>ChumToto Official Calendar</h1>
 </header>
 
 <div class="container">
@@ -393,25 +408,47 @@
         }
     }
 
-    function showSelectedDayEvents(dateStr) {
-        const listContainer = document.getElementById('event-display-list');
-        const dayEvents = scheduleEvents.filter(e => e.date === dateStr);
-        const [y, m, d] = dateStr.split('-');
-        
-        let html = `<div style="font-size:11px; font-weight:bold; color:var(--color-chumtoto); width:100%; margin-bottom:4px;">📌 ${parseInt(m)}月${parseInt(d)}日の予定 (${dayEvents.length}件)</div>`;
-        html += dayEvents.map(ev => createEventCard(ev)).join('');
-        listContainer.innerHTML = html;
-    }
-
+    // 💡 リスト表示生成＆自動スクロールロジック
     function renderListView(events) {
         const listContainer = document.getElementById('event-display-list');
         if (events.length === 0) {
             listContainer.innerHTML = '<div style="color:var(--text-muted); font-size:11px; text-align:center; width:100%;">予定されているスケジュールはありません</div>';
             return;
         }
+
+        // 今日を表す日付文字列を取得 (YYYY-MM-DD)
+        const today = new Date();
+        const todayStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+
         const sorted = [...events].sort((a,b) => (a.date || '').localeCompare(b.date || ''));
-        listContainer.innerHTML = sorted.map(ev => {
+        
+        // 最も今日に近い（今日、または今日以降で一番近い）イベントのインデックスを探す
+        let targetId = null;
+        let minDiff = Infinity;
+
+        sorted.forEach((ev, idx) => {
+            if (!ev.date) return;
+            const diff = new Date(ev.date) - today;
+            // 今日当日、もしくは今日より未来のイベントの中で一番近ければ候補にする
+            if (ev.date === todayStr) {
+                targetId = `ev-card-${idx}`;
+                minDiff = -1; // 当日確定マーク
+            } else if (diff > 0 && diff < minDiff && minDiff !== -1) {
+                minDiff = diff;
+                targetId = `ev-card-${idx}`;
+            }
+        });
+
+        // 過去のイベントしか無い場合は最後のイベントをターゲットにする
+        if (!targetId && sorted.length > 0) {
+            targetId = `ev-card-${sorted.length - 1}`;
+        }
+
+        listContainer.innerHTML = sorted.map((ev, idx) => {
             let dateBadge = '';
+            let cardId = `ev-card-${idx}`;
+            let extraClass = (cardId === targetId) ? "scroll-target" : ""; // ターゲット対象をハイライトするクラス
+
             if(ev.date) {
                 const [y, m, d] = ev.date.split('-');
                 dateBadge = `<span style="color:var(--color-chumtoto); font-weight:bold; margin-right:6px;">[${parseInt(m)}/${parseInt(d)}]</span>`;
@@ -421,13 +458,23 @@
             const clickAction = `onclick="moveToEntry('${ev.date}', '${encodeURIComponent(ev.title)}', '${encodeURIComponent(ev.venue)}')"`
 
             return `
-                <div class="event-card" ${clickAction}>
+                <div id="${cardId}" class="event-card ${extraClass}" ${clickAction}>
                     <div class="event-title">${dateBadge}${ev.title}</div>
                     ${timeInfo}
                     ${venueInfo}
                 </div>
             `;
         }).join('');
+
+        // 💡 描画直後、ターゲットに選ばれたカードまでスムースに自動スクロールさせる
+        if (targetId) {
+            setTimeout(() => {
+                const targetCard = document.getElementById(targetId);
+                if (targetCard) {
+                    targetCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            }, 100);
+        }
     }
 
     function createEventCard(ev) {
