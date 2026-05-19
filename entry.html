@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ChumToto - New Field Entry</title>
     
     <link rel="apple-touch-icon" href="icon.png">
@@ -28,7 +28,7 @@
             padding-bottom: 100px;
         }
 
-        /* 💡 ヘッダー：被りバグを防ぐフレックス配置に修正 */
+        /* ヘッダー配置 */
         header {
             background: var(--header-gradient);
             border-bottom: 1px solid rgba(255, 107, 157, 0.15);
@@ -115,6 +115,7 @@
         .form-group {
             margin-bottom: 18px;
             box-sizing: border-box;
+            width: 100%;
         }
 
         .form-group label {
@@ -126,7 +127,7 @@
             letter-spacing: 0.5px;
         }
 
-        /* 💡 入力ボックス：横幅はみ出しを確実に防止する防壁スタイリング */
+        /* 💡 フォームコントロール共通設定 */
         .form-control {
             width: 100%;
             background: var(--input-bg);
@@ -135,7 +136,7 @@
             padding: 12px;
             color: #fff;
             font-size: 13px;
-            box-sizing: border-box; /* パディングを含めて100%幅に収める設定 */
+            box-sizing: border-box;
             font-family: inherit;
             transition: 0.2s;
         }
@@ -143,6 +144,13 @@
             outline: none;
             border-color: var(--color-chumtoto);
             box-shadow: 0 0 8px rgba(255, 107, 157, 0.2);
+        }
+
+        /* 💡 iOSのSafari/LINE内ブラウザでdate入力欄が突き抜けるバグの完全修正 */
+        input[type="date"].form-control {
+            -webkit-appearance: none; /* iOS標準のスタイル干渉をリセット */
+            max-width: 100%;          /* 親要素(カード)からはみ出すのを絶対に防ぐ */
+            min-width: 0;             /* ブラウザ既定の最小幅による押し出しを無効化 */
         }
 
         /* 特典会オプションセクション */
@@ -344,7 +352,6 @@
 <script>
     const GAS_URL = 'https://script.google.com/macros/s/AKfycbw7KeuN0XckEqU9V4wRxR3O8T9Rl6cC2jQesEOpOsNJTF09ZylpVFZWJnqo0aff1YNFRw/exec';
     
-    // カウンター管理用オブジェクト
     const counters = { sign_cheki: 0, white_cheki: 0, tiktok: 0, kakomi: 0, item_sign: 0, omiyokuri: 0 };
     let isEditMode = false;
 
@@ -356,7 +363,6 @@
             document.getElementById('submitBtn').innerText = "修正内容をスプレッドシートに反映";
         }
 
-        // クエリパラメータから自動入力
         if (params.get('date')) document.getElementById('date').value = params.get('date');
         if (params.get('event')) document.getElementById('event_name').value = decodeURIComponent(params.get('event'));
         if (params.get('location')) document.getElementById('venue').value = decodeURIComponent(params.get('location'));
@@ -373,7 +379,6 @@
             financialBlock.style.display = 'block';
         } else {
             financialBlock.style.display = 'none';
-            // 不参戦時は数値をリセット
             document.getElementById('ticket_fee').value = 0;
             Object.keys(counters).forEach(k => {
                 counters[k] = 0;
