@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChumToto Portal - Command Center</title>
@@ -176,6 +178,19 @@
 </nav>
 
 <script>
+    if (("standalone" in window.navigator) && window.navigator.standalone) {
+    document.addEventListener('click', function(e) {
+        let target = e.target;
+        while (target && target.tagName !== 'A') { target = target.parentNode; }
+        if (target && target.hasAttribute('href')) {
+            let href = target.getAttribute('href');
+            if (!href.match(/^https?:\/\//) && !href.startsWith('#') && !href.startsWith('javascript:')) {
+                e.preventDefault();
+                window.location.href = href;
+            }
+        }
+    }, false);
+}
     const GAS_URL = 'https://script.google.com/macros/s/AKfycbw7KeuN0XckEqU9V4wRxR3O8T9Rl6cC2jQesEOpOsNJTF09ZylpVFZWJnqo0aff1YNFRw/exec';
     const PRICES = { sign_cheki: 3000, white_cheki: 2000, tiktok: 3500, kakomi: 4000, item_sign: 4500, omiyokuri: 1500 };
 
