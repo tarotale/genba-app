@@ -352,112 +352,208 @@
 </nav>
 
 <script>
-    if (("standalone" in window.navigator) && window.navigator.standalone) {
-    document.addEventListener('click', function(e) {
-        let target = e.target;
-        while (target && target.tagName !== 'A') { target = target.parentNode; }
-        if (target && target.hasAttribute('href')) {
-            let href = target.getAttribute('href');
-            if (!href.match(/^https?:\/\//) && !href.startsWith('#') && !href.startsWith('javascript:')) {
-                e.preventDefault();
-                window.location.href = href;
-            }
-        }
-    }, false);
-}
     const GAS_URL = 'https://script.google.com/macros/s/AKfycbw7KeuN0XckEqU9V4wRxR3O8T9Rl6cC2jQesEOpOsNJTF09ZylpVFZWJnqo0aff1YNFRw/exec';
-    
-    const counters = { sign_cheki: 0, white_cheki: 0, tiktok: 0, kakomi: 0, item_sign: 0, omiyokuri: 0 };
-    let isEditMode = false;
+    let scheduleEvents = [];
+    let viewMode = "calendar";
 
-    window.onload = function() {
-        const params = new URLSearchParams(window.location.search);
-        
-        if (params.get('mode') === 'edit') {
-            isEditMode = true;
-            document.getElementById('submitBtn').innerText = "修正内容をスプレッドシートに反映";
-        }
-
-        if (params.get('date')) document.getElementById('date').value = params.get('date');
-        if (params.get('event')) document.getElementById('event_name').value = decodeURIComponent(params.get('event'));
-        if (params.get('location')) document.getElementById('venue').value = decodeURIComponent(params.get('location'));
-    }
-
-    function stepCount(key, amount) {
-        counters[key] = Math.max(0, counters[key] + amount);
-        document.getElementById(`val-${key}`).innerText = counters[key];
-    }
-
-    function toggleAttendance(checked) {
-        const financialBlock = document.getElementById('financial-inputs-block');
-        if (checked) {
-            financialBlock.style.display = 'block';
-        } else {
-            financialBlock.style.display = 'none';
-            document.getElementById('ticket_fee').value = 0;
-            Object.keys(counters).forEach(k => {
-                counters[k] = 0;
-                document.getElementById(`val-${k}`).innerText = 0;
-            });
-        }
-    }
-
-    async function submitForm(event) {
-        event.preventDefault();
-        
-        const btn = document.getElementById('submitBtn');
-        const originalText = btn.innerText;
-        btn.disabled = true;
-        btn.innerText = "Processing Data System...";
-
-        const attendanceVal = document.getElementById('attendance').checked ? "参加" : "不参加";
-        const dateVal = document.getElementById('date').value;
-        const eventNameVal = document.getElementById('event_name').value;
-        const venueVal = document.getElementById('venue').value;
-        const ticketFeeVal = document.getElementById('ticket_fee').value;
-
-        const payload = {
-            action: isEditMode ? "edit_history" : "write_history",
-            date: dateVal,
-            event_name: eventNameVal,
-            venue: venueVal,
-            attendance: attendanceVal,
-            ticket_fee: ticketFeeVal,
-            ...counters
-        };
-
+    window.onload = async function() {
         try {
-            const response = await fetch(GAS_URL, {
-                method: "POST",
-                body: JSON.stringify(payload)
-            });
+            const response = await fetch(GAS_URL + "?action=read_schedule");
             const res = await response.json();
-
             if (res.result === "success") {
-                alert(isEditMode ? "現場の記録を正常に修正しました！" : "現場データを正常に記録しました！");
-                window.location.href = "index.html";
-            } else {
-                alert("システムエラーが発生しました: " + res.message);
-                btn.disabled = false;
-                btn.innerText = originalText;
+                scheduleEvents = res.data;
+                document.getElementById('loading-msg').style.display = 'none';
+                render(false);
             }
         } catch(e) {
-            alert("GASへのデータ転送に失敗しました。接続環境を確認してください。");
-            btn.disabled = false;
-            btn.innerText = originalText;
+            document.getElementById('loading-msg').innerText = "Failed To Data Sync";
         }
     }
-    // iOSのPWAでリンク遷移時にSafariのUIが出ないようにする対策
-if (window.navigator.standalone) {
-  document.addEventListener('click', function(event) {
-    var a = event.target.closest('a');
-    // aタグであり、かつ同じサイト内のリンクである場合
-    if (a && a.href && a.host === location.host) {
-      event.preventDefault(); // デフォルトのリンク遷移をキャンセル
-      window.location.href = a.href; // JavaScriptで無理やり画面遷移させる
+
+    function render(isListMode) {
+        const calArea = document.getElementById('calendar-view-area');
+        const listArea = document.getElementById('list-view-area');
+        const listContainer = document.getElementById('event-display-list');
+
+        if (isListMode) {
+            calArea.style.display = 'none';
+            listArea.style.display = 'block';
+            listContainer.style.display = 'flex';
+            renderListView(scheduleEvents);
+        } else {
+            calArea.style.display = 'block';
+            listArea.style.display = 'none';
+            listContainer.style.display = 'flex';
+            renderCalendarView(scheduleEvents);
+        }
     }
-  }, false);
-}
+
+    function renderCalendarView(events) {
+        const grid = document.getElementById('calendar-grid-box');
+        const lbl = document.getElementById('current-month-lbl');
+        const listContainer = document.getElementById('event-display-list');
+        grid.innerHTML = '';
+        listContainer.innerHTML = '';
+
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = today.getMonth();
+
+        lbl.innerText = `${year}年 ${month + 1}月`;
+
+        const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
+        weekdays.forEach(w => grid.innerHTML += `<div class="weekday">${w}</div>`);
+
+        const firstDay = new Date(year, month, 1).getDay();
+        const lastDate = new Date(year, month + 1, 0).getDate();
+        const prevLastDate = new Date(year, month, 0).getDate();
+
+        for (let i = firstDay - 1; i >= 0; i--) {
+            grid.innerHTML += `<div class="cal-day">${prevLastDate - i}</div>`;
+        }
+
+        let todaySet = null;
+        for (let d = 1; d <= lastDate; d++) {
+            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+            const dayEvents = events.filter(e => e.date === dateStr);
+            
+            let isToday = (d === today.getDate());
+            let dayClass = isToday ? "cal-day current-month today" : "cal-day current-month";
+            if (dayEvents.length > 0) dayClass += " has-event";
+
+            let dotHtml = dayEvents.length > 0 ? '<div class="event-dot"></div>' : '';
+            let clickAttr = dayEvents.length > 0 ? `onclick=\"showSelectedDayEvents('${dateStr}')\"` : '';
+
+            grid.innerHTML += `
+                <div class="${dayClass}" ${clickAttr}>
+                    <span>${d}</span>
+                    ${dotHtml}
+                </div>
+            `;
+            if (isToday && dayEvents.length > 0) todaySet = dateStr;
+        }
+
+        const totalCells = firstDay + lastDate;
+        const nextCells = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
+        for (let n = 1; n <= nextCells; n++) {
+            grid.innerHTML += `<div class="cal-day">${n}</div>`;
+        }
+
+        if (todaySet) {
+            showSelectedDayEvents(todaySet);
+        } else {
+            listContainer.innerHTML = '<div style="color:var(--text-muted); font-size:11px; text-align:center; width:100%; padding:10px;">本日指定の公式スケジュールはありません</div>';
+        }
+    }
+
+    function renderListView(events) {
+        const listContainer = document.getElementById('event-display-list');
+        if (events.length === 0) {
+            listContainer.innerHTML = '<div style="color:var(--text-muted); font-size:11px; text-align:center; width:100%;">予定されているスケジュールはありません</div>';
+            return;
+        }
+
+        const today = new Date();
+        const todayStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+
+        const sorted = [...events].sort((a,b) => (a.date || '').localeCompare(b.date || ''));
+        
+        let targetId = null;
+        let minDiff = Infinity;
+
+        sorted.forEach((ev, idx) => {
+            if (!ev.date) return;
+            const diff = new Date(ev.date) - today;
+            if (ev.date === todayStr) {
+                targetId = `ev-card-${idx}`;
+                minDiff = -1;
+            } else if (diff > 0 && diff < minDiff && minDiff !== -1) {
+                minDiff = diff;
+                targetId = `ev-card-${idx}`;
+            }
+        });
+
+        if (!targetId && sorted.length > 0) {
+            targetId = `ev-card-${sorted.length - 1}`;
+        }
+
+        listContainer.innerHTML = sorted.map((ev, idx) => {
+            let dateBadge = '';
+            let cardId = `ev-card-${idx}`;
+            let extraClass = (cardId === targetId) ? "scroll-target" : "";
+
+            if(ev.date) {
+                const [y, m, d] = ev.date.split('-');
+                dateBadge = `<span style="color:var(--color-chumtoto); font-weight:bold; margin-right:6px;">[${parseInt(m)}/${parseInt(d)}]</span>`;
+            }
+            const timeInfo = ev.time ? `<div class="event-info">⏰ ${ev.time}</div>` : '';
+            const venueInfo = `<div class="event-info">📍 ${ev.venue || '詳細確認'}</div>`;
+            const clickAction = `onclick="moveToEntry('${ev.date}', '${encodeURIComponent(ev.title)}', '${encodeURIComponent(ev.venue)}')"`
+
+            return `
+                <div id="${cardId}" class="event-card ${extraClass}" ${clickAction}>
+                    <div class="event-title">${dateBadge}${ev.title}</div>
+                    ${timeInfo}
+                    ${venueInfo}
+                </div>
+            `;
+        }).join('');
+
+        if (targetId) {
+            setTimeout(() => {
+                const targetCard = document.getElementById(targetId);
+                if (targetCard) {
+                    targetCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            }, 100);
+        }
+    }
+
+    function createEventCard(ev) {
+        const timeInfo = ev.time ? `<div class="event-info">⏰ ${ev.time}</div>` : '';
+        const venueInfo = `<div class="event-info">📍 ${ev.venue || '詳細確認'}</div>`;
+        const clickAction = `onclick="moveToEntry('${ev.date}', '${encodeURIComponent(ev.title)}', '${encodeURIComponent(ev.venue)}')"`
+
+        return `
+            <div class="event-card" ${clickAction}>
+                <div class="event-title">${ev.title}</div>
+                ${timeInfo}
+                ${venueInfo}
+            </div>
+        `;
+    }
+
+    function moveToEntry(date, title, venue) {
+        const targetUrl = `entry.html?date=${date}&event=${title}&location=${venue}`;
+        if (confirm(`選択した現場を記録しますか？\n\n現場：${decodeURIComponent(title)}`)) {
+            window.location.href = targetUrl;
+        }
+    }
+
+    document.getElementById('listToggle').addEventListener('click', () => {
+        viewMode = "list";
+        document.getElementById('listToggle').classList.add('active');
+        document.getElementById('calendarToggle').classList.remove('active');
+        render(true);
+    });
+
+    document.getElementById('calendarToggle').addEventListener('click', () => {
+        viewMode = "calendar";
+        document.getElementById('calendarToggle').classList.add('active');
+        document.getElementById('listToggle').classList.remove('active');
+        render(false);
+    });
+
+    // 【PWA特効薬】iOSのホーム画面起動時にSafariのUI（白い上下バー）を絶対に出さない対策
+    if (window.navigator.standalone) {
+        document.addEventListener('click', function(event) {
+            var a = event.target.closest('a');
+            if (a && a.href && a.host === location.host) {
+                event.preventDefault(); // 通常のブラウザ遷移を止める
+                window.location.href = a.href; // アプリ内遷移としてJavaScriptで処理
+            }
+        }, false);
+    }
 </script>
 </body>
 </html>
