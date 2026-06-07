@@ -103,8 +103,8 @@
             font-size: 12px;
         }
 
-        /* 💡 復活：横スクロール月別棒グラフのスタイル */
-        .chart-scroll-container {
+        /* 横スクロール月別棒グラフのスタイル */
+        .monthly-chart-scroll-box {
             display: flex;
             gap: 14px;
             overflow-x: auto;
@@ -114,9 +114,9 @@
             border-radius: 14px;
             margin-bottom: 20px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            align-items: flex-end; /* グラフの棒を下に揃える */
+            align-items: flex-end;
             min-height: 130px;
-            -webkit-overflow-scrolling: touch; /* iOSでのスクロールを滑らかにする */
+            -webkit-overflow-scrolling: touch;
         }
         .chart-bar-wrapper {
             display: flex;
@@ -235,7 +235,6 @@
             margin-bottom: 8px;
         }
 
-        /* 下部リボン（詳細テキスト情報）のレイアウト */
         .card-details-box {
             display: flex;
             flex-direction: column;
@@ -325,8 +324,7 @@
         </div>
 
         <div class="section-title">Monthly Expense Trend</div>
-        <div class="chart-scroll-container" id="monthly-chart-container">
-            </div>
+        <div class="monthly-chart-scroll-box" id="monthly-chart-container"></div>
 
         <div class="section-title">Field Summary Dashboard</div>
         <div class="stats-summary">
@@ -364,21 +362,6 @@
     let globalRawData = []; 
 
     window.onload = async function() {
-        // iOSの「ホーム画面から開いた時」に通常ブラウザへ飛ばされるのを完全に防ぐハック
-        if (("standalone" in window.navigator) && window.navigator.standalone) {
-            document.addEventListener('click', function(e) {
-                let target = e.target;
-                while (target && target.tagName !== 'A') { target = target.parentNode; }
-                if (target && target.hasAttribute('href')) {
-                    let href = target.getAttribute('href');
-                    if (!href.match(/^https?:\/\//) && !href.startsWith('#') && !href.startsWith('javascript:')) {
-                        e.preventDefault();
-                        window.location.href = href;
-                    }
-                }
-            }, false);
-        }
-
         try {
             const response = await fetch(GAS_URL + "?action=read_history");
             const res = await response.json();
@@ -465,12 +448,12 @@
         let dashboardSignChekiSum = 0;
         let dashboardWhiteChekiSum = 0;
 
-        // 💡 復活：月別推移グラフ計算用のマップ
         const monthlyAggregation = {};
-
         const sortedData = [...historyData].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
         const listTarget = document.getElementById('history-render-target');
-        listTarget.innerHTML = '';
+        
+        // パフォーマンス対策：HTML文字列を一括生成するための配列
+        const cardsHtmlArray = [];
 
         sortedData.forEach(row => {
             let ticket = parseInt(row.ticket_fee) || 0;
@@ -499,7 +482,6 @@
                 attendCount++;
             }
 
-            // 💡 グラフ用：月ごとの総支出を合算（YYYY-MMキー）
             if (row.date && row.date.length >= 7) {
                 const monthKey = row.date.substring(0, 7);
                 monthlyAggregation[monthKey] = (monthlyAggregation[monthKey] || 0) + rowTotal;
@@ -507,7 +489,6 @@
 
             const badgeClass = row.attendance === "参加" ? "status-badge attend" : "status-badge absent";
             const badgeText = row.attendance || "未判定";
-            
             const venueHtml = row.venue ? `<div class="card-detail-item">🏢 会場: ${row.venue}</div>` : `<div class="card-detail-item">🏢 会場: 未記録</div>`;
 
             const cardHtml = `
@@ -525,10 +506,13 @@
                     <a href="entry.html?mode=edit&date=${row.date}&event=${encodeURIComponent(row.event_name || '')}" class="edit-link">✏️ データを修正する</a>
                 </div>
             `;
-            listTarget.innerHTML += cardHtml;
+            cardsHtmlArray.push(cardHtml);
         });
 
-        // ダッシュボード上のテキスト更新
+        // DOMへ一括流し込み
+        listTarget.innerHTML = cardsHtmlArray.join('');
+
+        // ダッシュボード更新
         const ratePercent = historyData.length > 0 ? Math.round((attendCount / historyData.length) * 100) : 0;
         document.getElementById('stat-total-expense').innerText = `¥${totalExpense.toLocaleString()}`;
         document.getElementById('stat-total-ticket').innerText = `¥${totalTicket.toLocaleString()}`;
@@ -537,59 +521,54 @@
         document.getElementById('stat-cheki-breakdown').innerText = `サイン: ${dashboardSignChekiSum}枚 / 白: ${dashboardWhiteChekiSum}枚`;
         document.getElementById('stat-attendance-rate').innerText = `${ratePercent}%`;
 
-        // 💡 復活：月別棒グラフのレンダリング処理
         renderMonthlyChart(monthlyAggregation);
     }
 
-    // 💡 復活：集計データマップから横スクロールUI用のHTMLを生成する関数
     function renderMonthlyChart(chartDataMap) {
         const chartContainer = document.getElementById('monthly-chart-container');
         chartContainer.innerHTML = '';
 
-        const months = Object.keys(chartDataMap).sort((a, b) => a.localeCompare(b)); // 時系列（古い順）に並べる
+        const months = Object.keys(chartDataMap).sort((a, b) => a.localeCompare(b));
 
         if (months.length === 0) {
             chartContainer.innerHTML = '<div style="color:var(--text-muted); font-size:11px; padding:20px; width:100%; text-align:center;">推移データがありません</div>';
             return;
         }
 
-        // 棒の高さを割合計算するための最高支出額（MAX値）を検出
         const maxVal = Math.max(...Object.values(chartDataMap), 1);
-        const maxBarHeight = 70; // 棒グラフの最大高さを70pxに設定
+        const maxBarHeight = 70;
 
-        months.forEach(m => {
+        const barsHtmlArray = months.map(m => {
             const amount = chartDataMap[m];
-            // 高さを計算（最低でも5px確保）
             const calculatedHeight = Math.max(Math.round((amount / maxVal) * maxBarHeight), 5);
-            // 表示用の月名（2026-05 -> 26/05）
             const shortLabel = m.substring(2).replace('-', '/');
 
-            const barHtml = `
+            return `
                 <div class="chart-bar-wrapper">
                     <div class="chart-value">¥${amount.toLocaleString()}</div>
                     <div class="chart-bar" style="height: ${calculatedHeight}px;"></div>
                     <div class="chart-label">${shortLabel}</div>
                 </div>
             `;
-            chartContainer.innerHTML += barHtml;
         });
 
-        // グラフ描画後、最新の月（一番右側）へ自動でスクロールさせておく
+        chartContainer.innerHTML = barsHtmlArray.join('');
+
         setTimeout(() => {
             chartContainer.scrollLeft = chartContainer.scrollWidth;
         }, 100);
     }
-    // iOSのPWAでリンク遷移時にSafariのUIが出ないようにする対策
-if (window.navigator.standalone) {
-  document.addEventListener('click', function(event) {
-    var a = event.target.closest('a');
-    // aタグであり、かつ同じサイト内のリンクである場合
-    if (a && a.href && a.host === location.host) {
-      event.preventDefault(); // デフォルトのリンク遷移をキャンセル
-      window.location.href = a.href; // JavaScriptで無理やり画面遷移させる
+
+    // 【PWA特効薬】iOSホーム画面起動時に通常ブラウザ（Safari）へ飛ばされるのを完全に防ぐ
+    if (window.navigator.standalone) {
+        document.addEventListener('click', function(event) {
+            var a = event.target.closest('a');
+            if (a && a.href && a.host === location.host) {
+                event.preventDefault();
+                window.location.href = a.href;
+            }
+        }, false);
     }
-  }, false);
-}
 </script>
 </body>
 </html>
