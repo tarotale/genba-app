@@ -357,7 +357,7 @@
 
 <script>
     const GAS_URL = 'https://script.google.com/macros/s/AKfycbw7KeuN0XckEqU9V4wRxR3O8T9Rl6cC2jQesEOpOsNJTF09ZylpVFZWJnqo0aff1YNFRw/exec';
-    const PRICES = { sign_cheki: 3000, white_cheki: 2000, tiktok: 3500, kakomi: 4000, item_sign: 4500, omiyokuri: 1500 };
+    const PRICES = { sign_cheki: 3000, white_cheki: 2000, tiktok: 3500, kakomi: 4000, kakomi_shame: 5000, item_sign: 4500, omiyokuri: 1500 };
 
     let globalRawData = []; 
 
@@ -478,7 +478,7 @@
             totalChekiCost += chekiCost;
             totalChekiCount += chekis;
 
-            if (row.attendance === "参加") {
+            if (row.attendance === "参戦" || row.attendance === "参加") {
                 attendCount++;
             }
 
@@ -487,7 +487,7 @@
                 monthlyAggregation[monthKey] = (monthlyAggregation[monthKey] || 0) + rowTotal;
             }
 
-            const badgeClass = row.attendance === "参加" ? "status-badge attend" : "status-badge absent";
+            const badgeClass = (row.attendance === "参戦" || row.attendance === "参加") ? "status-badge attend" : "status-badge absent";
             const badgeText = row.attendance || "未判定";
             const venueHtml = row.venue ? `<div class="card-detail-item">🏢 会場: ${row.venue}</div>` : `<div class="card-detail-item">🏢 会場: 未記録</div>`;
 
@@ -503,7 +503,7 @@
                         <div class="card-detail-item">💰 決済額: ¥${rowTotal.toLocaleString()} (チケット: ¥${ticket.toLocaleString()})</div>
                         <div class="card-detail-item">📸 サイン: ${sCount}枚 / 白: ${wCount}枚</div>
                     </div>
-                    <a href="entry.html?mode=edit&date=${row.date}&event=${encodeURIComponent(row.event_name || '')}" class="edit-link">✏️ データを修正する</a>
+                    <a href="entry.html?mode=edit&row_index=${row.row_index}&date=${row.date}&event=${encodeURIComponent(row.event_name || '')}&location=${encodeURIComponent(row.venue || row.location || '')}&attendance=${encodeURIComponent(row.attendance || '')}&ticket_fee=${row.ticket_fee || 0}&sign_cheki=${row.sign_cheki || 0}&white_cheki=${row.white_cheki || 0}&tiktok=${row.tiktok || 0}&kakomi=${row.kakomi || 0}&kakomi_shame=${row.kakomi_shame || 0}&item_sign=${row.item_sign || 0}&omiyokuri=${row.omiyokuri || 0}" class="edit-link">✏️ データを修正する</a>
                 </div>
             `;
             cardsHtmlArray.push(cardHtml);

@@ -192,7 +192,7 @@
     }, false);
 }
     const GAS_URL = 'https://script.google.com/macros/s/AKfycbw7KeuN0XckEqU9V4wRxR3O8T9Rl6cC2jQesEOpOsNJTF09ZylpVFZWJnqo0aff1YNFRw/exec';
-    const PRICES = { sign_cheki: 3000, white_cheki: 2000, tiktok: 3500, kakomi: 4000, item_sign: 4500, omiyokuri: 1500 };
+    const PRICES = { sign_cheki: 3000, white_cheki: 2000, tiktok: 3500, kakomi: 4000, kakomi_shame: 5000, item_sign: 4500, omiyokuri: 1500 };
 
     window.onload = async function() {
         try {
@@ -231,7 +231,7 @@
             // サインあり + 白チェキの合計枚数
             totalCheki += (parseInt(row.sign_cheki) || 0) + (parseInt(row.white_cheki) || 0);
 
-            if (row.attendance === "参加") {
+            if (row.attendance === "参戦" || row.attendance === "参加") {
                 attendCount++;
             }
         });

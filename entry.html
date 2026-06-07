@@ -364,6 +364,10 @@
 <script>
     const GAS_URL = 'https://script.google.com/macros/s/AKfycbw7KeuN0XckEqU9V4wRxR3O8T9Rl6cC2jQesEOpOsNJTF09ZylpVFZWJnqo0aff1YNFRw/exec';
 
+    // 💡 編集モード管理（dashboard の「修正する」から row_index 付きで来たとき）
+    let EDIT_MODE = false;
+    let EDIT_ROW_INDEX = null;
+
     // 💡 各オプションの単価設定
     const PRICES = {
         sign_cheki: 3000,
@@ -389,12 +393,40 @@
     // 画面が読み込まれたときの処理
     window.onload = function() {
         const params = new URLSearchParams(window.location.search);
-        
-        // カレンダー（Schedule）画面から日付やイベント名を引き継いで遷移してきた場合の自動入力
+
+        // 🆕 編集モード判定（dashboard から row_index 付きで来た場合は上書き更新）
+        if (params.get('mode') === 'edit' && params.get('row_index')) {
+            EDIT_MODE = true;
+            EDIT_ROW_INDEX = params.get('row_index');
+            const btn = document.getElementById('submitBtn');
+            if (btn) btn.innerText = "修正内容を上書き保存";
+            const h1 = document.querySelector('h1');
+            if (h1) h1.innerText = "ChumToto Field Entry（修正）";
+        }
+
+        // カレンダー（Schedule）画面や修正リンクから日付やイベント名を引き継いで遷移してきた場合の自動入力
         if (params.get('date')) document.getElementById('date').value = params.get('date');
         if (params.get('event')) document.getElementById('event_name').value = decodeURIComponent(params.get('event'));
         if (params.get('location')) document.getElementById('venue').value = decodeURIComponent(params.get('location'));
-        
+
+        // 🆕 参戦/不参戦の復元
+        if (params.get('attendance')) {
+            const att = decodeURIComponent(params.get('attendance'));
+            const isAttend = att !== "不参戦" && att !== "不参加";
+            document.getElementById('attendance').checked = isAttend;
+            toggleAttendance(isAttend);
+        }
+
+        // 🆕 チケット代・チェキ枚数の復元（編集時に未入力で上書き消失しないように）
+        if (params.get('ticket_fee')) document.getElementById('ticket_fee').value = parseInt(params.get('ticket_fee')) || 0;
+        for (let key in counts) {
+            if (params.get(key) !== null) {
+                counts[key] = parseInt(params.get(key)) || 0;
+                const el = document.getElementById(`val-${key}`);
+                if (el) el.innerText = counts[key];
+            }
+        }
+
         // パラメータがない場合は自動で今日の日付をセット
         if (!document.getElementById('date').value) {
             const today = new Date();
@@ -454,7 +486,7 @@
 
         // GASに送るデータオブジェクトの構築
         const payload = {
-            action: "write_entry",
+            action: EDIT_MODE ? "update_history" : "write_entry",
             date: date,
             attendance: attendance ? "参戦" : "不参戦",
             event_name: event_name,
@@ -470,6 +502,9 @@
             total_fee: ticket_fee + total_cheki_fee
         };
 
+        // 🆕 編集モードのときは上書き対象の行番号を付与
+        if (EDIT_MODE) payload.row_index = EDIT_ROW_INDEX;
+
         try {
             const response = await fetch(GAS_URL, {
                 method: 'POST',
@@ -477,16 +512,16 @@
             });
             const res = await response.json();
             
-            if (res.result === "success") {
-                alert("スプレッドシートに記録しました！");
-                window.location.href = "index.html"; 
+            if (res.status === "success" || res.result === "success") {
+                alert(EDIT_MODE ? "修正内容を上書きしました！" : "スプレッドシートに記録しました！");
+                window.location.href = EDIT_MODE ? "dashboard.html" : "index.html";
             } else {
                 alert("エラーが発生しました: " + (res.message || "不明なエラー"));
             }
         } catch (e) {
             // GASのCORS仕様で稀にエラー扱いに見えても送信完了しているケースがあるため、柔軟に逃がす
-            alert("データを送信しました。ポータルに戻ります。");
-            window.location.href = "index.html";
+            alert("データを送信しました。戻ります。");
+            window.location.href = EDIT_MODE ? "dashboard.html" : "index.html";
         } finally {
             submitBtn.disabled = false;
             submitBtn.innerText = "送信してスプレッドシートへ記録";
