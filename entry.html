@@ -4,7 +4,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>ChumToto - New Field Entry</title>
     
     <link rel="apple-touch-icon" href="icon.png">
@@ -35,6 +35,7 @@
             background: var(--header-gradient);
             border-bottom: 1px solid rgba(255, 107, 157, 0.15);
             padding: 10px 16px;
+            padding-top: calc(10px + env(safe-area-inset-top));
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -225,6 +226,7 @@
             border-top: 1px solid rgba(255, 107, 157, 0.1);
             display: flex;
             padding: 6px 0;
+            padding-bottom: calc(6px + env(safe-area-inset-bottom));
             backdrop-filter: blur(10px);
             z-index: 100;
         }

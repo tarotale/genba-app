@@ -4,7 +4,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>ChumToto Portal - Command Center</title>
     
     <link rel="apple-touch-icon" href="icon.png">
@@ -29,6 +29,7 @@
             background: var(--header-gradient);
             border-bottom: 1px solid rgba(255, 107, 157, 0.15);
             padding: 15px 20px;
+            padding-top: calc(15px + env(safe-area-inset-top));
             display: flex;
             align-items: center;
             justify-content: center;
@@ -100,7 +101,7 @@
         .clear-title { font-size: 13px; font-weight: bold; color: var(--color-success); letter-spacing: 1px; }
 
         /* ボトムナビゲーションバー */
-        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(19, 11, 14, 0.92); border-top: 1px solid rgba(255,107,157,0.1); display: flex; padding: 6px 0; backdrop-filter: blur(10px); z-index: 100; }
+        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(19, 11, 14, 0.92); border-top: 1px solid rgba(255,107,157,0.1); display: flex; padding: 6px 0; padding-bottom: calc(6px + env(safe-area-inset-bottom)); backdrop-filter: blur(10px); z-index: 100; }
         .nav-item { flex: 1; text-align: center; text-decoration: none; color: var(--text-muted); font-size: 10px; font-weight: bold; display: flex; flex-direction: column; gap: 2px; }
         .nav-item.active { color: var(--color-chumtoto); }
         .nav-icon { font-size: 18px; }
