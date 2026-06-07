@@ -526,6 +526,17 @@
         document.getElementById('listToggle').classList.remove('active');
         render(false);
     });
+    // iOSのPWAでリンク遷移時にSafariのUIが出ないようにする対策
+if (window.navigator.standalone) {
+  document.addEventListener('click', function(event) {
+    var a = event.target.closest('a');
+    // aタグであり、かつ同じサイト内のリンクである場合
+    if (a && a.href && a.host === location.host) {
+      event.preventDefault(); // デフォルトのリンク遷移をキャンセル
+      window.location.href = a.href; // JavaScriptで無理やり画面遷移させる
+    }
+  }, false);
+}
 </script>
 </body>
 </html>
