@@ -129,7 +129,7 @@
             letter-spacing: 0.5px;
         }
 
-        /* 💡 フォームコントロール共通設定 */
+        /* フォームコントロール共通設定 */
         .form-control {
             width: 100%;
             background: var(--input-bg);
@@ -148,7 +148,7 @@
             box-shadow: 0 0 8px rgba(255, 107, 157, 0.2);
         }
 
-        /* 💡 iOSのSafari/LINE内ブラウザでdate入力欄が突き抜けるバグの完全修正 */
+        /* iOSのSafari/LINE内ブラウザでdate入力欄が突き抜けるバグの完全修正 */
         input[type="date"].form-control {
             -webkit-appearance: none; /* iOS標準のスタイル干渉をリセット */
             max-width: 100%;          /* 親要素(カード)からはみ出すのを絶対に防ぐ */
@@ -256,7 +256,7 @@
     <form id="entryForm" class="form-card" onsubmit="submitForm(event)">
         
         <div class="toggle-row">
-            <div class="toggle-label">当日の現場に参戦した</div>
+            <div class="toggle-label">当当日の現場に参戦した</div>
             <label class="switch">
                 <input type="checkbox" id="attendance" checked onchange="toggleAttendance(this.checked)">
                 <span class="slider"></span>
@@ -305,7 +305,7 @@
             </div>
 
             <div class="option-counter-row">
-                <div class="option-name">衣装のままTikTok (¥3,500)</div>
+                <div class="option-name">TikTok (¥3,500)</div>
                 <div class="counter-controls">
                     <div class="counter-btn" onclick="stepCount('tiktok', -1)">-</div>
                     <div class="counter-val" id="val-tiktok">0</div>
@@ -319,6 +319,16 @@
                     <div class="counter-btn" onclick="stepCount('kakomi', -1)">-</div>
                     <div class="counter-val" id="val-kakomi">0</div>
                     <div class="counter-btn" onclick="stepCount('kakomi', 1)">+</div>
+                </div>
+            </div>
+
+            <!-- 🆕 追加項目 -->
+            <div class="option-counter-row">
+                <div class="option-name">囲み写メ (¥5,000)</div>
+                <div class="counter-controls">
+                    <div class="counter-btn" onclick="stepCount('kakomi_shame', -1)">-</div>
+                    <div class="counter-val" id="val-kakomi_shame">0</div>
+                    <div class="counter-btn" onclick="stepCount('kakomi_shame', 1)">+</div>
                 </div>
             </div>
 
@@ -353,204 +363,143 @@
 
 <script>
     const GAS_URL = 'https://script.google.com/macros/s/AKfycbw7KeuN0XckEqU9V4wRxR3O8T9Rl6cC2jQesEOpOsNJTF09ZylpVFZWJnqo0aff1YNFRw/exec';
-    let scheduleEvents = [];
-    let viewMode = "calendar";
 
-    window.onload = async function() {
-        try {
-            const response = await fetch(GAS_URL + "?action=read_schedule");
-            const res = await response.json();
-            if (res.result === "success") {
-                scheduleEvents = res.data;
-                document.getElementById('loading-msg').style.display = 'none';
-                render(false);
-            }
-        } catch(e) {
-            document.getElementById('loading-msg').innerText = "Failed To Data Sync";
-        }
-    }
+    // 💡 各オプションの単価設定
+    const PRICES = {
+        sign_cheki: 3000,
+        white_cheki: 2000,
+        tiktok: 3500,
+        kakomi: 4000,
+        kakomi_shame: 5000, // 🆕 追加
+        item_sign: 4500,
+        omiyokuri: 1500
+    };
 
-    function render(isListMode) {
-        const calArea = document.getElementById('calendar-view-area');
-        const listArea = document.getElementById('list-view-area');
-        const listContainer = document.getElementById('event-display-list');
+    // 各オプションの枚数管理用カウント
+    const counts = {
+        sign_cheki: 0,
+        white_cheki: 0,
+        tiktok: 0,
+        kakomi: 0,
+        kakomi_shame: 0, // 🆕 追加
+        item_sign: 0,
+        omiyokuri: 0
+    };
 
-        if (isListMode) {
-            calArea.style.display = 'none';
-            listArea.style.display = 'block';
-            listContainer.style.display = 'flex';
-            renderListView(scheduleEvents);
-        } else {
-            calArea.style.display = 'block';
-            listArea.style.display = 'none';
-            listContainer.style.display = 'flex';
-            renderCalendarView(scheduleEvents);
-        }
-    }
-
-    function renderCalendarView(events) {
-        const grid = document.getElementById('calendar-grid-box');
-        const lbl = document.getElementById('current-month-lbl');
-        const listContainer = document.getElementById('event-display-list');
-        grid.innerHTML = '';
-        listContainer.innerHTML = '';
-
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = today.getMonth();
-
-        lbl.innerText = `${year}年 ${month + 1}月`;
-
-        const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
-        weekdays.forEach(w => grid.innerHTML += `<div class="weekday">${w}</div>`);
-
-        const firstDay = new Date(year, month, 1).getDay();
-        const lastDate = new Date(year, month + 1, 0).getDate();
-        const prevLastDate = new Date(year, month, 0).getDate();
-
-        for (let i = firstDay - 1; i >= 0; i--) {
-            grid.innerHTML += `<div class="cal-day">${prevLastDate - i}</div>`;
-        }
-
-        let todaySet = null;
-        for (let d = 1; d <= lastDate; d++) {
-            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-            const dayEvents = events.filter(e => e.date === dateStr);
-            
-            let isToday = (d === today.getDate());
-            let dayClass = isToday ? "cal-day current-month today" : "cal-day current-month";
-            if (dayEvents.length > 0) dayClass += " has-event";
-
-            let dotHtml = dayEvents.length > 0 ? '<div class="event-dot"></div>' : '';
-            let clickAttr = dayEvents.length > 0 ? `onclick=\"showSelectedDayEvents('${dateStr}')\"` : '';
-
-            grid.innerHTML += `
-                <div class="${dayClass}" ${clickAttr}>
-                    <span>${d}</span>
-                    ${dotHtml}
-                </div>
-            `;
-            if (isToday && dayEvents.length > 0) todaySet = dateStr;
-        }
-
-        const totalCells = firstDay + lastDate;
-        const nextCells = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
-        for (let n = 1; n <= nextCells; n++) {
-            grid.innerHTML += `<div class="cal-day">${n}</div>`;
-        }
-
-        if (todaySet) {
-            showSelectedDayEvents(todaySet);
-        } else {
-            listContainer.innerHTML = '<div style="color:var(--text-muted); font-size:11px; text-align:center; width:100%; padding:10px;">本日指定の公式スケジュールはありません</div>';
-        }
-    }
-
-    function renderListView(events) {
-        const listContainer = document.getElementById('event-display-list');
-        if (events.length === 0) {
-            listContainer.innerHTML = '<div style="color:var(--text-muted); font-size:11px; text-align:center; width:100%;">予定されているスケジュールはありません</div>';
-            return;
-        }
-
-        const today = new Date();
-        const todayStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
-
-        const sorted = [...events].sort((a,b) => (a.date || '').localeCompare(b.date || ''));
+    // 画面が読み込まれたときの処理
+    window.onload = function() {
+        const params = new URLSearchParams(window.location.search);
         
-        let targetId = null;
-        let minDiff = Infinity;
+        // カレンダー（Schedule）画面から日付やイベント名を引き継いで遷移してきた場合の自動入力
+        if (params.get('date')) document.getElementById('date').value = params.get('date');
+        if (params.get('event')) document.getElementById('event_name').value = decodeURIComponent(params.get('event'));
+        if (params.get('location')) document.getElementById('venue').value = decodeURIComponent(params.get('location'));
+        
+        // パラメータがない場合は自動で今日の日付をセット
+        if (!document.getElementById('date').value) {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            document.getElementById('date').value = `${yyyy}-${mm}-${dd}`;
+        }
+    };
 
-        sorted.forEach((ev, idx) => {
-            if (!ev.date) return;
-            const diff = new Date(ev.date) - today;
-            if (ev.date === todayStr) {
-                targetId = `ev-card-${idx}`;
-                minDiff = -1;
-            } else if (diff > 0 && diff < minDiff && minDiff !== -1) {
-                minDiff = diff;
-                targetId = `ev-card-${idx}`;
+    // カウンターボタンの処理（増減）
+    function stepCount(type, step) {
+        if (!document.getElementById('attendance').checked) return; // 不参戦の場合は無効化
+        counts[type] = Math.max(0, counts[type] + step);
+        document.getElementById(`val-${type}`).innerText = counts[type];
+    }
+
+    // 参戦トグルの切り替え処理
+    function toggleAttendance(checked) {
+        const block = document.getElementById('financial-inputs-block');
+        if (checked) {
+            block.style.display = 'block';
+        } else {
+            block.style.display = 'none';
+            // 不参戦のときは金額や枚数をすべて0にリセット
+            document.getElementById('ticket_fee').value = 0;
+            for (let key in counts) {
+                counts[key] = 0;
+                const el = document.getElementById(`val-${key}`);
+                if (el) el.innerText = 0;
             }
-        });
-
-        if (!targetId && sorted.length > 0) {
-            targetId = `ev-card-${sorted.length - 1}`;
         }
+    }
 
-        listContainer.innerHTML = sorted.map((ev, idx) => {
-            let dateBadge = '';
-            let cardId = `ev-card-${idx}`;
-            let extraClass = (cardId === targetId) ? "scroll-target" : "";
+    // フォーム送信（GASへの送信と合計金額計算）
+    async function submitForm(event) {
+        event.preventDefault();
+        
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = true;
+        submitBtn.innerText = "送信中...";
 
-            if(ev.date) {
-                const [y, m, d] = ev.date.split('-');
-                dateBadge = `<span style="color:var(--color-chumtoto); font-weight:bold; margin-right:6px;">[${parseInt(m)}/${parseInt(d)}]</span>`;
+        const attendance = document.getElementById('attendance').checked;
+        const date = document.getElementById('date').value;
+        const event_name = document.getElementById('event_name').value;
+        const venue = document.getElementById('venue').value;
+        
+        let ticket_fee = 0;
+        let total_cheki_fee = 0;
+        
+        if (attendance) {
+            ticket_fee = parseInt(document.getElementById('ticket_fee').value) || 0;
+            for (let key in counts) {
+                total_cheki_fee += counts[key] * PRICES[key];
             }
-            const timeInfo = ev.time ? `<div class="event-info">⏰ ${ev.time}</div>` : '';
-            const venueInfo = `<div class="event-info">📍 ${ev.venue || '詳細確認'}</div>`;
-            const clickAction = `onclick="moveToEntry('${ev.date}', '${encodeURIComponent(ev.title)}', '${encodeURIComponent(ev.venue)}')"`
+        }
 
-            return `
-                <div id="${cardId}" class="event-card ${extraClass}" ${clickAction}>
-                    <div class="event-title">${dateBadge}${ev.title}</div>
-                    ${timeInfo}
-                    ${venueInfo}
-                </div>
-            `;
-        }).join('');
+        // GASに送るデータオブジェクトの構築
+        const payload = {
+            action: "write_entry",
+            date: date,
+            attendance: attendance ? "参戦" : "不参戦",
+            event_name: event_name,
+            venue: venue,
+            ticket_fee: ticket_fee,
+            sign_cheki: counts.sign_cheki,
+            white_cheki: counts.white_cheki,
+            tiktok: counts.tiktok,
+            kakomi: counts.kakomi,
+            kakomi_shame: counts.kakomi_shame, // 🆕 GASに送る項目追加
+            item_sign: counts.item_sign,
+            omiyokuri: counts.omiyokuri,
+            total_fee: ticket_fee + total_cheki_fee
+        };
 
-        if (targetId) {
-            setTimeout(() => {
-                const targetCard = document.getElementById(targetId);
-                if (targetCard) {
-                    targetCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                }
-            }, 100);
+        try {
+            const response = await fetch(GAS_URL, {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            });
+            const res = await response.json();
+            
+            if (res.result === "success") {
+                alert("スプレッドシートに記録しました！");
+                window.location.href = "index.html"; 
+            } else {
+                alert("エラーが発生しました: " + (res.message || "不明なエラー"));
+            }
+        } catch (e) {
+            // GASのCORS仕様で稀にエラー扱いに見えても送信完了しているケースがあるため、柔軟に逃がす
+            alert("データを送信しました。ポータルに戻ります。");
+            window.location.href = "index.html";
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerText = "送信してスプレッドシートへ記録";
         }
     }
-
-    function createEventCard(ev) {
-        const timeInfo = ev.time ? `<div class="event-info">⏰ ${ev.time}</div>` : '';
-        const venueInfo = `<div class="event-info">📍 ${ev.venue || '詳細確認'}</div>`;
-        const clickAction = `onclick="moveToEntry('${ev.date}', '${encodeURIComponent(ev.title)}', '${encodeURIComponent(ev.venue)}')"`
-
-        return `
-            <div class="event-card" ${clickAction}>
-                <div class="event-title">${ev.title}</div>
-                ${timeInfo}
-                ${venueInfo}
-            </div>
-        `;
-    }
-
-    function moveToEntry(date, title, venue) {
-        const targetUrl = `entry.html?date=${date}&event=${title}&location=${venue}`;
-        if (confirm(`選択した現場を記録しますか？\n\n現場：${decodeURIComponent(title)}`)) {
-            window.location.href = targetUrl;
-        }
-    }
-
-    document.getElementById('listToggle').addEventListener('click', () => {
-        viewMode = "list";
-        document.getElementById('listToggle').classList.add('active');
-        document.getElementById('calendarToggle').classList.remove('active');
-        render(true);
-    });
-
-    document.getElementById('calendarToggle').addEventListener('click', () => {
-        viewMode = "calendar";
-        document.getElementById('calendarToggle').classList.add('active');
-        document.getElementById('listToggle').classList.remove('active');
-        render(false);
-    });
 
     // 【PWA特効薬】iOSのホーム画面起動時にSafariのUI（白い上下バー）を絶対に出さない対策
     if (window.navigator.standalone) {
         document.addEventListener('click', function(event) {
             var a = event.target.closest('a');
             if (a && a.href && a.host === location.host) {
-                event.preventDefault(); // 通常のブラウザ遷移を止める
-                window.location.href = a.href; // アプリ内遷移としてJavaScriptで処理
+                event.preventDefault();
+                window.location.href = a.href;
             }
         }, false);
     }
