@@ -331,15 +331,36 @@
             <div class="stats-row"><div class="stats-label">Total Expense</div><div class="stats-value" id="stat-total-expense">¥0</div></div>
             <div class="stats-row"><div class="stats-label">Ticket Fees</div><div class="stats-value" id="stat-total-ticket">¥0</div></div>
             <div class="stats-row"><div class="stats-label">Cheki Expenses</div><div class="stats-value" id="stat-total-cheki-cost">¥0</div></div>
-            
+
             <div class="stats-row">
-                <div class="stats-label">Total Chekis</div>
-                <div class="stats-value-box">
-                    <div class="stats-value" id="stat-total-cheki-count">0 枚</div>
-                    <div class="stats-sub-value" id="stat-cheki-breakdown">サイン: 0枚 / 白: 0枚</div>
-                </div>
+                <div class="stats-label">サインチェキ</div>
+                <div class="stats-value" id="stat-sign-cheki">0 枚</div>
             </div>
-            
+            <div class="stats-row">
+                <div class="stats-label">白チェキ</div>
+                <div class="stats-value" id="stat-white-cheki">0 枚</div>
+            </div>
+            <div class="stats-row">
+                <div class="stats-label">TikTok</div>
+                <div class="stats-value" id="stat-tiktok">0 回</div>
+            </div>
+            <div class="stats-row">
+                <div class="stats-label">囲みチェキ</div>
+                <div class="stats-value" id="stat-kakomi">0 回</div>
+            </div>
+            <div class="stats-row">
+                <div class="stats-label">囲み写メ</div>
+                <div class="stats-value" id="stat-kakomi-shame">0 回</div>
+            </div>
+            <div class="stats-row">
+                <div class="stats-label">私物サイン券</div>
+                <div class="stats-value" id="stat-item-sign">0 回</div>
+            </div>
+            <div class="stats-row">
+                <div class="stats-label">お見送り会</div>
+                <div class="stats-value" id="stat-omiyokuri">0 回</div>
+            </div>
+
             <div class="stats-row"><div class="stats-label">Attendance Rate</div><div class="stats-value" id="stat-attendance-rate">0%</div></div>
         </div>
 
@@ -445,8 +466,7 @@
         let totalChekiCount = 0;
         let attendCount = 0;
 
-        let dashboardSignChekiSum = 0;
-        let dashboardWhiteChekiSum = 0;
+        const itemTotals = { sign_cheki: 0, white_cheki: 0, tiktok: 0, kakomi: 0, kakomi_shame: 0, item_sign: 0, omiyokuri: 0 };
 
         const monthlyAggregation = {};
         const sortedData = [...historyData].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
@@ -463,12 +483,10 @@
             let wCount = parseInt(row.white_cheki) || 0;
             let chekis = sCount + wCount;
 
-            dashboardSignChekiSum += sCount;
-            dashboardWhiteChekiSum += wCount;
-
             Object.keys(PRICES).forEach(k => {
                 let cnt = parseInt(row[k]) || 0;
                 chekiCost += cnt * PRICES[k];
+                itemTotals[k] += cnt;
             });
 
             let rowTotal = ticket + chekiCost;
@@ -517,8 +535,13 @@
         document.getElementById('stat-total-expense').innerText = `¥${totalExpense.toLocaleString()}`;
         document.getElementById('stat-total-ticket').innerText = `¥${totalTicket.toLocaleString()}`;
         document.getElementById('stat-total-cheki-cost').innerText = `¥${totalChekiCost.toLocaleString()}`;
-        document.getElementById('stat-total-cheki-count').innerText = `${totalChekiCount} 枚`;
-        document.getElementById('stat-cheki-breakdown').innerText = `サイン: ${dashboardSignChekiSum}枚 / 白: ${dashboardWhiteChekiSum}枚`;
+        document.getElementById('stat-sign-cheki').innerText = `${itemTotals.sign_cheki} 枚`;
+        document.getElementById('stat-white-cheki').innerText = `${itemTotals.white_cheki} 枚`;
+        document.getElementById('stat-tiktok').innerText = `${itemTotals.tiktok} 回`;
+        document.getElementById('stat-kakomi').innerText = `${itemTotals.kakomi} 回`;
+        document.getElementById('stat-kakomi-shame').innerText = `${itemTotals.kakomi_shame} 回`;
+        document.getElementById('stat-item-sign').innerText = `${itemTotals.item_sign} 回`;
+        document.getElementById('stat-omiyokuri').innerText = `${itemTotals.omiyokuri} 回`;
         document.getElementById('stat-attendance-rate').innerText = `${ratePercent}%`;
 
         renderMonthlyChart(monthlyAggregation);
