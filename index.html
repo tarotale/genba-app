@@ -93,6 +93,7 @@
         .alert-date { font-size: 10px; font-weight: bold; color: var(--text-muted); margin-bottom: 3px; }
         .alert-name { font-size: 12px; font-weight: bold; color: #fff; line-height: 1.4; }
         .alert-btn { background: var(--color-warn); color: #fff; text-decoration: none; font-size: 10px; font-weight: bold; padding: 6px 10px; border-radius: 6px; white-space: nowrap; box-shadow: 0 2px 8px rgba(255,59,48,0.3); }
+        .alert-del-btn { background: transparent; color: var(--text-muted); border: 1px solid rgba(255,255,255,0.18); font-size: 10px; font-weight: bold; padding: 6px 8px; border-radius: 6px; white-space: nowrap; cursor: pointer; }
 
         /* クリア状態エリア */
         .clear-container { background: rgba(76, 217, 100, 0.06); border: 1px solid rgba(76, 217, 100, 0.25); border-radius: 14px; padding: 24px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
@@ -279,6 +280,7 @@
                                 <div class="alert-name">${sched.title}</div>
                             </div>
                             <a href="entry.html?date=${sched.date}&event=${encodeURIComponent(sched.title)}&location=${encodeURIComponent(sched.venue || '')}" class="alert-btn">今すぐ記録！</a>
+                            ${sched.row_index !== undefined ? `<button onclick="deleteScheduleFromAlert(${sched.row_index}, '${encodeURIComponent(sched.title)}')" class="alert-del-btn">🗑️ 中止</button>` : ''}
                         </div>
                     `;
                     alertList.innerHTML += itemHtml;
@@ -290,6 +292,24 @@
             document.getElementById('alertBox').style.display = 'block';
         } else {
             document.getElementById('clearBox').style.display = 'block';
+        }
+    }
+
+    // 🗑️ アラートから予定を削除（中止・リスケ対応）
+    async function deleteScheduleFromAlert(rowIndex, encodedTitle) {
+        const title = decodeURIComponent(encodedTitle);
+        if (!confirm(`この予定を公式スケジュールから削除しますか？\n\n${title}\n\n※中止・リスケされた予定の削除に使ってください。`)) return;
+        try {
+            await fetch(GAS_URL, {
+                method: "POST",
+                body: JSON.stringify({ action: "delete_schedule", row_index: rowIndex })
+            });
+            alert("削除しました。ポータルを再読み込みします。");
+            location.reload();
+        } catch (e) {
+            // GASのCORS仕様で例外に見えても削除自体は通っていることが多いので再読込
+            alert("削除リクエストを送信しました。再読み込みします。");
+            location.reload();
         }
     }
 </script>
