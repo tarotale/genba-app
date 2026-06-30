@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>ChumToto Field Stats</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -23,6 +23,7 @@
             --card-border: rgba(255, 107, 157, 0.15);
         }
 
+        html { background: #0d080a; }
         body {
             margin: 0;
             font-family: 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
@@ -37,6 +38,7 @@
             background: var(--header-gradient);
             border-bottom: 1px solid rgba(255, 107, 157, 0.15);
             padding: 10px 16px;
+            padding-top: calc(10px + env(safe-area-inset-top));
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -44,7 +46,7 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            height: 38px;
+            min-height: 38px;
             box-sizing: border-box;
             gap: 10px;
         }
@@ -271,6 +273,7 @@
             border-top: 1px solid rgba(255, 107, 157, 0.1);
             display: flex;
             padding: 6px 0;
+            padding-bottom: calc(6px + env(safe-area-inset-bottom));
             backdrop-filter: blur(10px);
             z-index: 100;
         }
@@ -340,7 +343,13 @@
                 </div>
             </div>
             
-            <div class="stats-row"><div class="stats-label">Attendance Rate</div><div class="stats-value" id="stat-attendance-rate">0%</div></div>
+            <div class="stats-row">
+                <div class="stats-label">Attendance Rate</div>
+                <div class="stats-value-box">
+                    <div class="stats-value" id="stat-attendance-rate">0%</div>
+                    <div class="stats-sub-value" id="stat-attendance-detail">全 0 現場 / 参戦 0</div>
+                </div>
+            </div>
         </div>
 
         <div class="section-title">参戦履歴一覧</div>
@@ -448,6 +457,16 @@
         let dashboardSignChekiSum = 0;
         let dashboardWhiteChekiSum = 0;
 
+        // 🆕 全特典会の種類別累計（チェキ以外も含めて内訳表示する）
+        const TOKUTEN_LABELS = {
+            sign_cheki: "サイン", white_cheki: "白", twoshot: "ツーショット",
+            tiktok: "TikTok", kakomi: "囲み", kakomi_shame: "囲み写メ",
+            item_sign: "私物サイン", omiyokuri: "お見送り"
+        };
+        const CHEKI_PHOTO_KEYS = ["sign_cheki", "white_cheki", "twoshot", "tiktok", "kakomi", "kakomi_shame"];
+        const tokutenSums = {};
+        Object.keys(TOKUTEN_LABELS).forEach(k => tokutenSums[k] = 0);
+
         const monthlyAggregation = {};
         const sortedData = [...historyData].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
         const listTarget = document.getElementById('history-render-target');
@@ -461,10 +480,13 @@
             
             let sCount = parseInt(row.sign_cheki) || 0;
             let wCount = parseInt(row.white_cheki) || 0;
-            let chekis = sCount + wCount;
+            let chekis = CHEKI_PHOTO_KEYS.reduce((s, k) => s + (parseInt(row[k]) || 0), 0);
 
             dashboardSignChekiSum += sCount;
             dashboardWhiteChekiSum += wCount;
+
+            // 🆕 種類別の累計を加算
+            Object.keys(TOKUTEN_LABELS).forEach(k => { tokutenSums[k] += parseInt(row[k]) || 0; });
 
             Object.keys(PRICES).forEach(k => {
                 let cnt = parseInt(row[k]) || 0;
@@ -518,8 +540,15 @@
         document.getElementById('stat-total-ticket').innerText = `¥${totalTicket.toLocaleString()}`;
         document.getElementById('stat-total-cheki-cost').innerText = `¥${totalChekiCost.toLocaleString()}`;
         document.getElementById('stat-total-cheki-count').innerText = `${totalChekiCount} 枚`;
-        document.getElementById('stat-cheki-breakdown').innerText = `サイン: ${dashboardSignChekiSum}枚 / 白: ${dashboardWhiteChekiSum}枚`;
+        // 🆕 チェキ以外も含めた種類別の累計内訳（0枚の種類は非表示）
+        const breakdownStr = Object.keys(TOKUTEN_LABELS)
+            .filter(k => tokutenSums[k] > 0)
+            .map(k => `${TOKUTEN_LABELS[k]}:${tokutenSums[k]}`)
+            .join(" / ") || "記録なし";
+        document.getElementById('stat-cheki-breakdown').innerText = breakdownStr;
         document.getElementById('stat-attendance-rate').innerText = `${ratePercent}%`;
+        // 🆕 現場数・参戦数の実数も表示
+        document.getElementById('stat-attendance-detail').innerText = `全 ${historyData.length} 現場 / 参戦 ${attendCount}`;
 
         renderMonthlyChart(monthlyAggregation);
     }
