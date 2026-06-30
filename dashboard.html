@@ -190,6 +190,29 @@
             letter-spacing: 1px;
         }
 
+        .att-filter-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        .att-filter-btn {
+            flex: 1;
+            background: rgba(255, 107, 157, 0.06);
+            color: var(--text-muted);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 9px 0;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .att-filter-btn.active {
+            background: var(--color-chumtoto);
+            color: #fff;
+            border-color: var(--color-chumtoto);
+        }
+
         .history-list {
             display: flex;
             flex-direction: column;
@@ -335,12 +358,9 @@
             <div class="stats-row"><div class="stats-label">Ticket Fees</div><div class="stats-value" id="stat-total-ticket">¥0</div></div>
             <div class="stats-row"><div class="stats-label">Cheki Expenses</div><div class="stats-value" id="stat-total-cheki-cost">¥0</div></div>
             
-            <div class="stats-row">
-                <div class="stats-label">Total Chekis</div>
-                <div class="stats-value-box">
-                    <div class="stats-value" id="stat-total-cheki-count">0 枚</div>
-                    <div class="stats-sub-value" id="stat-cheki-breakdown">サイン: 0枚 / 白: 0枚</div>
-                </div>
+            <div class="stats-row" style="flex-direction: column; align-items: stretch;">
+                <div class="stats-label" style="margin-bottom: 12px;">特典会 内訳</div>
+                <div id="tokuten-breakdown-list" style="display: flex; flex-direction: column; gap: 8px;"></div>
             </div>
             
             <div class="stats-row">
@@ -353,6 +373,11 @@
         </div>
 
         <div class="section-title">参戦履歴一覧</div>
+        <div class="att-filter-bar">
+            <button class="att-filter-btn active" data-att="all" onclick="setAttendanceFilter('all')">すべて</button>
+            <button class="att-filter-btn" data-att="参戦" onclick="setAttendanceFilter('参戦')">参戦</button>
+            <button class="att-filter-btn" data-att="不参戦" onclick="setAttendanceFilter('不参戦')">不参戦</button>
+        </div>
         <div class="history-list" id="history-render-target"></div>
     </div>
 
@@ -432,6 +457,16 @@
         applyFilterAndRender();
     }
 
+    // 🆕 参戦/不参戦の絞り込み状態（履歴一覧のみに作用。集計値は期間フィルタのまま）
+    let attendanceFilter = 'all';
+    function setAttendanceFilter(val) {
+        attendanceFilter = val;
+        document.querySelectorAll('.att-filter-btn').forEach(b => {
+            b.classList.toggle('active', b.dataset.att === val);
+        });
+        applyFilterAndRender();
+    }
+
     function applyFilterAndRender() {
         const type = document.getElementById('period-type-select').value;
         const val = document.getElementById('period-value-select').value;
@@ -460,7 +495,7 @@
         // 🆕 全特典会の種類別累計（チェキ以外も含めて内訳表示する）
         const TOKUTEN_LABELS = {
             sign_cheki: "サイン", white_cheki: "白", twoshot: "ツーショット",
-            tiktok: "TikTok", kakomi: "囲み", kakomi_shame: "囲み写メ",
+            tiktok: "TikTok", kakomi: "囲み写メ(4000)", kakomi_shame: "囲み写メ(5000)",
             item_sign: "私物サイン", omiyokuri: "お見送り"
         };
         const CHEKI_PHOTO_KEYS = ["sign_cheki", "white_cheki", "twoshot", "tiktok", "kakomi", "kakomi_shame"];
@@ -500,7 +535,8 @@
             totalChekiCost += chekiCost;
             totalChekiCount += chekis;
 
-            if (row.attendance === "参戦" || row.attendance === "参加") {
+            const isAttend = (row.attendance === "参戦" || row.attendance === "参加");
+            if (isAttend) {
                 attendCount++;
             }
 
@@ -509,7 +545,7 @@
                 monthlyAggregation[monthKey] = (monthlyAggregation[monthKey] || 0) + rowTotal;
             }
 
-            const badgeClass = (row.attendance === "参戦" || row.attendance === "参加") ? "status-badge attend" : "status-badge absent";
+            const badgeClass = isAttend ? "status-badge attend" : "status-badge absent";
             const badgeText = row.attendance || "未判定";
             const venueHtml = row.venue ? `<div class="card-detail-item">🏢 会場: ${row.venue}</div>` : `<div class="card-detail-item">🏢 会場: 未記録</div>`;
 
@@ -528,7 +564,11 @@
                     <a href="entry.html?mode=edit&row_index=${row.row_index}&date=${row.date}&event=${encodeURIComponent(row.event_name || '')}&location=${encodeURIComponent(row.venue || row.location || '')}&attendance=${encodeURIComponent(row.attendance || '')}&ticket_fee=${row.ticket_fee || 0}&sign_cheki=${row.sign_cheki || 0}&white_cheki=${row.white_cheki || 0}&twoshot=${row.twoshot || 0}&tiktok=${row.tiktok || 0}&kakomi=${row.kakomi || 0}&kakomi_shame=${row.kakomi_shame || 0}&item_sign=${row.item_sign || 0}&omiyokuri=${row.omiyokuri || 0}" class="edit-link">✏️ データを修正する</a>
                 </div>
             `;
-            cardsHtmlArray.push(cardHtml);
+            // 🆕 参戦/不参戦フィルタに合致する記録だけ一覧に表示（集計値には全件反映済み）
+            const matchesFilter = (attendanceFilter === 'all')
+                || (attendanceFilter === '参戦' && isAttend)
+                || (attendanceFilter === '不参戦' && !isAttend);
+            if (matchesFilter) cardsHtmlArray.push(cardHtml);
         });
 
         // DOMへ一括流し込み
@@ -539,13 +579,14 @@
         document.getElementById('stat-total-expense').innerText = `¥${totalExpense.toLocaleString()}`;
         document.getElementById('stat-total-ticket').innerText = `¥${totalTicket.toLocaleString()}`;
         document.getElementById('stat-total-cheki-cost').innerText = `¥${totalChekiCost.toLocaleString()}`;
-        document.getElementById('stat-total-cheki-count').innerText = `${totalChekiCount} 枚`;
-        // 🆕 チェキ以外も含めた種類別の累計内訳（0枚の種類は非表示）
-        const breakdownStr = Object.keys(TOKUTEN_LABELS)
-            .filter(k => tokutenSums[k] > 0)
-            .map(k => `${TOKUTEN_LABELS[k]}:${tokutenSums[k]}`)
-            .join(" / ") || "記録なし";
-        document.getElementById('stat-cheki-breakdown').innerText = breakdownStr;
+        // 🆕 特典会の種類別累計を縦並びで表示（全種類を常時表示）
+        const breakdownRows = Object.keys(TOKUTEN_LABELS).map(k => `
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="color: var(--text-muted); font-size: 13px;">${TOKUTEN_LABELS[k]}</span>
+                <span style="color: var(--text-main); font-size: 15px; font-weight: 700;">${tokutenSums[k]}<span style="font-size:11px; color: var(--text-muted); font-weight:400;"> 枚</span></span>
+            </div>
+        `).join('');
+        document.getElementById('tokuten-breakdown-list').innerHTML = breakdownRows;
         document.getElementById('stat-attendance-rate').innerText = `${ratePercent}%`;
         // 🆕 現場数・参戦数の実数も表示
         document.getElementById('stat-attendance-detail').innerText = `全 ${historyData.length} 現場 / 参戦 ${attendCount}`;
