@@ -469,9 +469,13 @@
             const timeInfo = ev.time ? `<div class="event-info">⏰ ${ev.time}</div>` : '';
             const venueInfo = `<div class="event-info">📍 ${ev.venue || '詳細確認'}</div>`;
             const clickAction = `onclick="moveToEntry('${ev.date}', '${encodeURIComponent(ev.title)}', '${encodeURIComponent(ev.venue)}')"`
+            const delBtn = (ev.row_index !== undefined)
+                ? `<button onclick="event.stopPropagation(); deleteSchedule(${ev.row_index}, '${encodeURIComponent(ev.title)}')" style="position:absolute; top:8px; right:8px; background:rgba(255,59,48,0.12); color:#ff5b52; border:1px solid rgba(255,59,48,0.3); border-radius:6px; font-size:11px; padding:4px 8px; cursor:pointer;">🗑️</button>`
+                : '';
 
             return `
-                <div id="${cardId}" class="event-card ${extraClass}" ${clickAction}>
+                <div id="${cardId}" class="event-card ${extraClass}" style="position:relative;" ${clickAction}>
+                    ${delBtn}
                     <div class="event-title">${dateBadge}${ev.title}</div>
                     ${timeInfo}
                     ${venueInfo}
@@ -507,6 +511,32 @@
         const targetUrl = `entry.html?date=${date}&event=${title}&location=${venue}`;
         if (confirm(`選択した現場を記録しますか？\n\n現場：${decodeURIComponent(title)}`)) {
             window.location.href = targetUrl;
+        }
+    }
+
+    // 🗑️ 公式スケジュールの予定を削除（中止・リスケ対応）
+    async function deleteSchedule(rowIndex, encodedTitle) {
+        const title = decodeURIComponent(encodedTitle);
+        if (!confirm(`この予定を公式スケジュールから削除しますか？\n\n${title}\n\n※中止・リスケされた予定の削除に使ってください。`)) return;
+        try {
+            await fetch(GAS_URL, {
+                method: "POST",
+                body: JSON.stringify({ action: "delete_schedule", row_index: rowIndex })
+            });
+            alert("削除しました。スケジュールを再読み込みします。");
+            // 最新の row_index を取り直すため、再フェッチしてから再描画
+            const response = await fetch(GAS_URL + "?action=read_schedule");
+            const res = await response.json();
+            if (res.result === "success") {
+                scheduleEvents = res.data;
+                render(viewMode === "list");
+            } else {
+                location.reload();
+            }
+        } catch (e) {
+            // GASのCORS仕様で例外に見えても削除自体は通っていることが多いので再読込
+            alert("削除リクエストを送信しました。再読み込みします。");
+            location.reload();
         }
     }
 
