@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChumToto Field Stats</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -11,7 +11,6 @@
     <link rel="apple-touch-icon" href="icon.png">
 
     <style>
-        html { background: #0d080a; }
         :root {
             --bg-gradient: linear-gradient(135deg, #0d080a 0%, #1a1014 50%, #0d080a 100%);
             --header-gradient: linear-gradient(180deg, #24141a 0%, rgba(36, 20, 26, 0.95) 100%);
@@ -38,7 +37,6 @@
             background: var(--header-gradient);
             border-bottom: 1px solid rgba(255, 107, 157, 0.15);
             padding: 10px 16px;
-            padding-top: calc(10px + env(safe-area-inset-top));
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -46,7 +44,7 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            min-height: 38px;
+            height: 38px;
             box-sizing: border-box;
             gap: 10px;
         }
@@ -273,7 +271,6 @@
             border-top: 1px solid rgba(255, 107, 157, 0.1);
             display: flex;
             padding: 6px 0;
-            padding-bottom: calc(6px + env(safe-area-inset-bottom));
             backdrop-filter: blur(10px);
             z-index: 100;
         }
@@ -334,36 +331,15 @@
             <div class="stats-row"><div class="stats-label">Total Expense</div><div class="stats-value" id="stat-total-expense">¥0</div></div>
             <div class="stats-row"><div class="stats-label">Ticket Fees</div><div class="stats-value" id="stat-total-ticket">¥0</div></div>
             <div class="stats-row"><div class="stats-label">Cheki Expenses</div><div class="stats-value" id="stat-total-cheki-cost">¥0</div></div>
-
+            
             <div class="stats-row">
-                <div class="stats-label">サインチェキ</div>
-                <div class="stats-value" id="stat-sign-cheki">0 枚</div>
+                <div class="stats-label">Total Chekis</div>
+                <div class="stats-value-box">
+                    <div class="stats-value" id="stat-total-cheki-count">0 枚</div>
+                    <div class="stats-sub-value" id="stat-cheki-breakdown">サイン: 0枚 / 白: 0枚</div>
+                </div>
             </div>
-            <div class="stats-row">
-                <div class="stats-label">白チェキ</div>
-                <div class="stats-value" id="stat-white-cheki">0 枚</div>
-            </div>
-            <div class="stats-row">
-                <div class="stats-label">TikTok</div>
-                <div class="stats-value" id="stat-tiktok">0 回</div>
-            </div>
-            <div class="stats-row">
-                <div class="stats-label">囲みチェキ</div>
-                <div class="stats-value" id="stat-kakomi">0 回</div>
-            </div>
-            <div class="stats-row">
-                <div class="stats-label">囲み写メ</div>
-                <div class="stats-value" id="stat-kakomi-shame">0 回</div>
-            </div>
-            <div class="stats-row">
-                <div class="stats-label">私物サイン券</div>
-                <div class="stats-value" id="stat-item-sign">0 回</div>
-            </div>
-            <div class="stats-row">
-                <div class="stats-label">お見送り会</div>
-                <div class="stats-value" id="stat-omiyokuri">0 回</div>
-            </div>
-
+            
             <div class="stats-row"><div class="stats-label">Attendance Rate</div><div class="stats-value" id="stat-attendance-rate">0%</div></div>
         </div>
 
@@ -381,7 +357,7 @@
 
 <script>
     const GAS_URL = 'https://script.google.com/macros/s/AKfycbw7KeuN0XckEqU9V4wRxR3O8T9Rl6cC2jQesEOpOsNJTF09ZylpVFZWJnqo0aff1YNFRw/exec';
-    const PRICES = { sign_cheki: 3000, white_cheki: 2000, tiktok: 3500, kakomi: 4000, kakomi_shame: 5000, item_sign: 4500, omiyokuri: 1500 };
+    const PRICES = { sign_cheki: 3000, white_cheki: 2000, twoshot: 3000, tiktok: 3500, kakomi: 4000, kakomi_shame: 5000, item_sign: 4500, omiyokuri: 1500 };
 
     let globalRawData = []; 
 
@@ -469,7 +445,8 @@
         let totalChekiCount = 0;
         let attendCount = 0;
 
-        const itemTotals = { sign_cheki: 0, white_cheki: 0, tiktok: 0, kakomi: 0, kakomi_shame: 0, item_sign: 0, omiyokuri: 0 };
+        let dashboardSignChekiSum = 0;
+        let dashboardWhiteChekiSum = 0;
 
         const monthlyAggregation = {};
         const sortedData = [...historyData].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
@@ -486,10 +463,12 @@
             let wCount = parseInt(row.white_cheki) || 0;
             let chekis = sCount + wCount;
 
+            dashboardSignChekiSum += sCount;
+            dashboardWhiteChekiSum += wCount;
+
             Object.keys(PRICES).forEach(k => {
                 let cnt = parseInt(row[k]) || 0;
                 chekiCost += cnt * PRICES[k];
-                itemTotals[k] += cnt;
             });
 
             let rowTotal = ticket + chekiCost;
@@ -524,7 +503,7 @@
                         <div class="card-detail-item">💰 決済額: ¥${rowTotal.toLocaleString()} (チケット: ¥${ticket.toLocaleString()})</div>
                         <div class="card-detail-item">📸 サイン: ${sCount}枚 / 白: ${wCount}枚</div>
                     </div>
-                    <a href="entry.html?mode=edit&row_index=${row.row_index}&date=${row.date}&event=${encodeURIComponent(row.event_name || '')}&location=${encodeURIComponent(row.venue || row.location || '')}&attendance=${encodeURIComponent(row.attendance || '')}&ticket_fee=${row.ticket_fee || 0}&sign_cheki=${row.sign_cheki || 0}&white_cheki=${row.white_cheki || 0}&tiktok=${row.tiktok || 0}&kakomi=${row.kakomi || 0}&kakomi_shame=${row.kakomi_shame || 0}&item_sign=${row.item_sign || 0}&omiyokuri=${row.omiyokuri || 0}" class="edit-link">✏️ データを修正する</a>
+                    <a href="entry.html?mode=edit&row_index=${row.row_index}&date=${row.date}&event=${encodeURIComponent(row.event_name || '')}&location=${encodeURIComponent(row.venue || row.location || '')}&attendance=${encodeURIComponent(row.attendance || '')}&ticket_fee=${row.ticket_fee || 0}&sign_cheki=${row.sign_cheki || 0}&white_cheki=${row.white_cheki || 0}&twoshot=${row.twoshot || 0}&tiktok=${row.tiktok || 0}&kakomi=${row.kakomi || 0}&kakomi_shame=${row.kakomi_shame || 0}&item_sign=${row.item_sign || 0}&omiyokuri=${row.omiyokuri || 0}" class="edit-link">✏️ データを修正する</a>
                 </div>
             `;
             cardsHtmlArray.push(cardHtml);
@@ -538,13 +517,8 @@
         document.getElementById('stat-total-expense').innerText = `¥${totalExpense.toLocaleString()}`;
         document.getElementById('stat-total-ticket').innerText = `¥${totalTicket.toLocaleString()}`;
         document.getElementById('stat-total-cheki-cost').innerText = `¥${totalChekiCost.toLocaleString()}`;
-        document.getElementById('stat-sign-cheki').innerText = `${itemTotals.sign_cheki} 枚`;
-        document.getElementById('stat-white-cheki').innerText = `${itemTotals.white_cheki} 枚`;
-        document.getElementById('stat-tiktok').innerText = `${itemTotals.tiktok} 回`;
-        document.getElementById('stat-kakomi').innerText = `${itemTotals.kakomi} 回`;
-        document.getElementById('stat-kakomi-shame').innerText = `${itemTotals.kakomi_shame} 回`;
-        document.getElementById('stat-item-sign').innerText = `${itemTotals.item_sign} 回`;
-        document.getElementById('stat-omiyokuri').innerText = `${itemTotals.omiyokuri} 回`;
+        document.getElementById('stat-total-cheki-count').innerText = `${totalChekiCount} 枚`;
+        document.getElementById('stat-cheki-breakdown').innerText = `サイン: ${dashboardSignChekiSum}枚 / 白: ${dashboardWhiteChekiSum}枚`;
         document.getElementById('stat-attendance-rate').innerText = `${ratePercent}%`;
 
         renderMonthlyChart(monthlyAggregation);
