@@ -4,13 +4,12 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ChumToto - New Field Entry</title>
     
     <link rel="apple-touch-icon" href="icon.png">
 
     <style>
-        html { background: #0d080a; }
         :root {
             --bg-gradient: linear-gradient(135deg, #0d080a 0%, #1a1014 50%, #0d080a 100%);
             --header-gradient: linear-gradient(180deg, #24141a 0%, rgba(36, 20, 26, 0.95) 100%);
@@ -36,7 +35,6 @@
             background: var(--header-gradient);
             border-bottom: 1px solid rgba(255, 107, 157, 0.15);
             padding: 10px 16px;
-            padding-top: calc(10px + env(safe-area-inset-top));
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -44,7 +42,7 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            min-height: 38px;
+            height: 38px;
             box-sizing: border-box;
             gap: 10px;
         }
@@ -227,7 +225,6 @@
             border-top: 1px solid rgba(255, 107, 157, 0.1);
             display: flex;
             padding: 6px 0;
-            padding-bottom: calc(6px + env(safe-area-inset-bottom));
             backdrop-filter: blur(10px);
             z-index: 100;
         }
@@ -259,7 +256,7 @@
     <form id="entryForm" class="form-card" onsubmit="submitForm(event)">
         
         <div class="toggle-row">
-            <div class="toggle-label">当日の現場に参戦した</div>
+            <div class="toggle-label">当当日の現場に参戦した</div>
             <label class="switch">
                 <input type="checkbox" id="attendance" checked onchange="toggleAttendance(this.checked)">
                 <span class="slider"></span>
@@ -304,6 +301,15 @@
                     <div class="counter-btn" onclick="stepCount('white_cheki', -1)">-</div>
                     <div class="counter-val" id="val-white_cheki">0</div>
                     <div class="counter-btn" onclick="stepCount('white_cheki', 1)">+</div>
+                </div>
+            </div>
+
+            <div class="option-counter-row">
+                <div class="option-name">ツーショット写メ (¥3,000)</div>
+                <div class="counter-controls">
+                    <div class="counter-btn" onclick="stepCount('twoshot', -1)">-</div>
+                    <div class="counter-val" id="val-twoshot">0</div>
+                    <div class="counter-btn" onclick="stepCount('twoshot', 1)">+</div>
                 </div>
             </div>
 
@@ -375,6 +381,7 @@
     const PRICES = {
         sign_cheki: 3000,
         white_cheki: 2000,
+        twoshot: 3000, // 🆕 ツーショット写メ
         tiktok: 3500,
         kakomi: 4000,
         kakomi_shame: 5000, // 🆕 追加
@@ -386,6 +393,7 @@
     const counts = {
         sign_cheki: 0,
         white_cheki: 0,
+        twoshot: 0, // 🆕 ツーショット写メ
         tiktok: 0,
         kakomi: 0,
         kakomi_shame: 0, // 🆕 追加
@@ -497,6 +505,7 @@
             ticket_fee: ticket_fee,
             sign_cheki: counts.sign_cheki,
             white_cheki: counts.white_cheki,
+            twoshot: counts.twoshot, // 🆕 ツーショット写メ
             tiktok: counts.tiktok,
             kakomi: counts.kakomi,
             kakomi_shame: counts.kakomi_shame, // 🆕 GASに送る項目追加
