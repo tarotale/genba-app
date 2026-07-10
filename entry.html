@@ -361,6 +361,15 @@
                     <div class="counter-btn" onclick="stepCount('omiyokuri', 1)">+</div>
                 </div>
             </div>
+
+            <div class="option-counter-row">
+                <div class="option-name">釣り堀 (¥2,000)</div>
+                <div class="counter-controls">
+                    <div class="counter-btn" onclick="stepCount('tsuribori', -1)">-</div>
+                    <div class="counter-val" id="val-tsuribori">0</div>
+                    <div class="counter-btn" onclick="stepCount('tsuribori', 1)">+</div>
+                </div>
+            </div>
         </div>
 
         <button type="submit" class="submit-btn" id="submitBtn">送信してスプレッドシートへ記録</button>
@@ -389,7 +398,8 @@
         kakomi: 4000,
         kakomi_shame: 5000, // 🆕 追加
         item_sign: 4500,
-        omiyokuri: 1500
+        omiyokuri: 1500,
+        tsuribori: 2000
     };
 
     // 各オプションの枚数管理用カウント
@@ -401,7 +411,8 @@
         kakomi: 0,
         kakomi_shame: 0, // 🆕 追加
         item_sign: 0,
-        omiyokuri: 0
+        omiyokuri: 0,
+        tsuribori: 0
     };
 
     // 画面が読み込まれたときの処理
@@ -514,6 +525,7 @@
             kakomi_shame: counts.kakomi_shame, // 🆕 GASに送る項目追加
             item_sign: counts.item_sign,
             omiyokuri: counts.omiyokuri,
+            tsuribori: counts.tsuribori,
             total_fee: ticket_fee + total_cheki_fee
         };
 

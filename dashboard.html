@@ -391,7 +391,7 @@
 
 <script>
     const GAS_URL = 'https://script.google.com/macros/s/AKfycbw7KeuN0XckEqU9V4wRxR3O8T9Rl6cC2jQesEOpOsNJTF09ZylpVFZWJnqo0aff1YNFRw/exec';
-    const PRICES = { sign_cheki: 3000, white_cheki: 2000, twoshot: 3000, tiktok: 3500, kakomi: 4000, kakomi_shame: 5000, item_sign: 4500, omiyokuri: 1500 };
+    const PRICES = { sign_cheki: 3000, white_cheki: 2000, twoshot: 3000, tiktok: 3500, kakomi: 4000, kakomi_shame: 5000, item_sign: 4500, omiyokuri: 1500, tsuribori: 2000 };
 
     let globalRawData = []; 
 
@@ -496,7 +496,7 @@
         const TOKUTEN_LABELS = {
             sign_cheki: "サイン", white_cheki: "白", twoshot: "ツーショット",
             tiktok: "TikTok", kakomi: "囲み写メ(4000)", kakomi_shame: "囲み写メ(5000)",
-            item_sign: "私物サイン", omiyokuri: "お見送り"
+            item_sign: "私物サイン", omiyokuri: "お見送り", tsuribori: "釣り堀"
         };
         const CHEKI_PHOTO_KEYS = ["sign_cheki", "white_cheki", "twoshot", "tiktok", "kakomi", "kakomi_shame"];
         const tokutenSums = {};
@@ -561,7 +561,7 @@
                         <div class="card-detail-item">💰 決済額: ¥${rowTotal.toLocaleString()} (チケット: ¥${ticket.toLocaleString()})</div>
                         <div class="card-detail-item">📸 サイン: ${sCount}枚 / 白: ${wCount}枚</div>
                     </div>
-                    <a href="entry.html?mode=edit&row_index=${row.row_index}&date=${row.date}&event=${encodeURIComponent(row.event_name || '')}&location=${encodeURIComponent(row.venue || row.location || '')}&attendance=${encodeURIComponent(row.attendance || '')}&ticket_fee=${row.ticket_fee || 0}&sign_cheki=${row.sign_cheki || 0}&white_cheki=${row.white_cheki || 0}&twoshot=${row.twoshot || 0}&tiktok=${row.tiktok || 0}&kakomi=${row.kakomi || 0}&kakomi_shame=${row.kakomi_shame || 0}&item_sign=${row.item_sign || 0}&omiyokuri=${row.omiyokuri || 0}" class="edit-link">✏️ データを修正する</a>
+                    <a href="entry.html?mode=edit&row_index=${row.row_index}&date=${row.date}&event=${encodeURIComponent(row.event_name || '')}&location=${encodeURIComponent(row.venue || row.location || '')}&attendance=${encodeURIComponent(row.attendance || '')}&ticket_fee=${row.ticket_fee || 0}&sign_cheki=${row.sign_cheki || 0}&white_cheki=${row.white_cheki || 0}&twoshot=${row.twoshot || 0}&tiktok=${row.tiktok || 0}&kakomi=${row.kakomi || 0}&kakomi_shame=${row.kakomi_shame || 0}&item_sign=${row.item_sign || 0}&omiyokuri=${row.omiyokuri || 0}&tsuribori=${row.tsuribori || 0}" class="edit-link">✏️ データを修正する</a>
                 </div>
             `;
             // 🆕 参戦/不参戦フィルタに合致する記録だけ一覧に表示（集計値には全件反映済み）
