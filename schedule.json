@@ -1,4 +1,131 @@
 {
   "action": "sync_schedule",
-  "events": []
+  "events": [
+    {
+      "group": "ChumToto",
+      "date": "2026-09-05",
+      "start": "2026-09-05",
+      "title": "【イベント開催】ChumToto「眠り、眠ら、眠れスト。」リリースイベント＠テラスモール松戸",
+      "venue": "■会場内外でのアーティストの入待ち、出待ち等の待機行為はご遠慮下さい。",
+      "time": "2026.09.05",
+      "url": "https://chumtoto.jp/event/2304/"
+    },
+    {
+      "group": "ChumToto",
+      "date": "2026-09-06",
+      "start": "2026-09-06",
+      "title": "【ライブ開催】女性限定イベント「ちゃーむず♡リミテッド Vol.2〜Girls’ちゃむタイム〜」＠高円寺HIGH",
+      "venue": "高円寺HIGH",
+      "time": "開場13:00 / 開演13:30",
+      "url": "https://chumtoto.jp/event/2157/"
+    },
+    {
+      "group": "ChumToto",
+      "date": "2026-09-06",
+      "start": "2026-09-06",
+      "title": "【ライブ開催】男性限定イベント「ちゃーむず♡リミテッド Vol.2〜Boys’ちゃむタイム〜」＠高円寺HIGH",
+      "venue": "高円寺HIGH",
+      "time": "開場16:30 / 開演17:00",
+      "url": "https://chumtoto.jp/event/2161/"
+    },
+    {
+      "group": "ChumToto",
+      "date": "2026-09-12",
+      "start": "2026-09-12",
+      "title": "【ライブ出演】ChumToto「眠り、眠ら、眠れスト。」リリースイベント＠ららぽーと新三郷",
+      "venue": "■会場は商業施設内となります。イベントに参加されないお客様も多数おられます。どうぞご留意願います。",
+      "time": "2026.09.12",
+      "url": "https://chumtoto.jp/event/2323/"
+    },
+    {
+      "group": "ChumToto",
+      "date": "2026-09-15",
+      "start": "2026-09-15",
+      "title": "【ライブ開催】柏葉れん生誕ライブ「偏♡気儘」＠SPACE ODD",
+      "venue": "SPACE ODD",
+      "time": "開場 18:15／開演 19:00",
+      "url": "https://chumtoto.jp/event/2084/"
+    },
+    {
+      "group": "ChumToto",
+      "date": "2026-09-22",
+      "start": "2026-09-22",
+      "title": "【ライブ出演】「SPARK 2026 in YAMANAKAKO」＠山中湖交流プラザきらら",
+      "venue": "山中湖交流プラザきらら",
+      "time": "開場9:00 / 開演10:00",
+      "url": "https://chumtoto.jp/event/2290/"
+    },
+    {
+      "group": "ChumToto",
+      "date": "2026-09-23",
+      "start": "2026-09-23",
+      "title": "【ライブ出演】ディアステージ研究生定期ライブvol.4「ChumToto先輩、研究させてください！」＠Twinbox AKIHABARA",
+      "venue": "Twinbox AKIHABARA",
+      "time": "開場18:00 / 開演18:30",
+      "url": "https://chumtoto.jp/event/2017/"
+    },
+    {
+      "group": "ChumToto",
+      "date": "2026-09-27",
+      "start": "2026-09-27",
+      "title": "【イベント開催】ChumToto「眠り、眠ら、眠れスト。」リリースイベント＠タワーレコード川崎店",
+      "venue": "■会場内外でのアーティストの入待ち、出待ち等の待機行為はご遠慮下さい。",
+      "time": "2026.09.27",
+      "url": "https://chumtoto.jp/event/2308/"
+    },
+    {
+      "group": "ChumToto",
+      "date": "2026-09-30",
+      "start": "2026-09-30",
+      "title": "【イベント開催】柏葉れん/宮原梓イベント「Gothic✝iDOL」＠秋葉原ディアステージ",
+      "venue": "秋葉原ディアステージ (〒101-0021 東京都千代田区外神田3-10-9 DEMPAビル)",
+      "time": "OPEN 18:00 CLOSE 22:00",
+      "url": "https://chumtoto.jp/event/2328/"
+    },
+    {
+      "group": "ChumToto",
+      "date": "2026-10-04",
+      "start": "2026-10-04",
+      "title": "【ライブ出演】YOKOSO SHIZUOKA SP DAY2＠ARTIE/LIVLIV",
+      "venue": "ARTIE/LIVLIV",
+      "time": "OPEN/ START　11:30/12:15",
+      "url": "https://chumtoto.jp/event/2136/"
+    },
+    {
+      "group": "ChumToto",
+      "date": "2026-10-04",
+      "start": "2026-10-04",
+      "title": "【イベント出演】「しずおか大好き怪談 in しずおか大好きまつり」@Bolo",
+      "venue": "Bolo",
+      "time": "OPEN/ START　15:00/15:30",
+      "url": "https://chumtoto.jp/event/2297/"
+    },
+    {
+      "group": "ChumToto",
+      "date": "2026-10-22",
+      "start": "2026-10-22",
+      "title": "【ライブ出演】「DEARSTAGE SHOWCASE 2026 AUTUMN supported by JAタウン」＠Spotify O-EAST",
+      "venue": "Spotify O-EAST",
+      "time": "OPEN/ START　17:00/18:00",
+      "url": "https://chumtoto.jp/event/2270/"
+    },
+    {
+      "group": "ChumToto",
+      "date": "2026-10-25",
+      "start": "2026-10-25",
+      "title": "【ライブ開催】ChumTotoワンマンライブ「ちゃむわーるど -NEW AREA-」",
+      "venue": "harevutai",
+      "time": "開場16:15 / 開演17:00",
+      "url": "https://chumtoto.jp/event/2067/"
+    },
+    {
+      "group": "ChumToto",
+      "date": "2026-11-22",
+      "start": "2026-11-22",
+      "title": "【ライブ出演】「マンスリーナビゲーターGIRLS LIVE」@J-SQUARE SHINAGAWA",
+      "venue": "J-SQUARE品川",
+      "time": "OPEN/ START　12:00/12:30",
+      "url": "https://chumtoto.jp/event/2283/"
+    }
+  ]
 }
