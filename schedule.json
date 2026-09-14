@@ -122,10 +122,19 @@
       "group": "ChumToto",
       "date": "2026-10-11",
       "start": "2026-10-11",
-      "title": "【イベント開催】ChumTotoミニライブ＆特典会イベント「まるっと、ちゃむタイム」at秋葉原ディアステージ",
+      "title": "【イベント開催】ChumTotoライブ＆特典会イベント「まるっと、ちゃむタイム-NEW AREA-」at秋葉原ディアステージ",
       "venue": "秋葉原ディアステージ (〒101-0021 東京都千代田区外神田3-10-9 DEMPAビル)",
       "time": "＜1部＞OPEN 17:00 ＜2部＞OPEN 19:00",
       "url": "https://chumtoto.jp/event/2374/"
+    },
+    {
+      "group": "ChumToto",
+      "date": "2026-10-18",
+      "start": "2026-10-18",
+      "title": "【イベント出演】「新潟産業大学第38回 紅葉祭」＠新潟産業大学講堂",
+      "venue": "新潟産業大学講堂",
+      "time": "13:45入場開始/14:15開演",
+      "url": "https://chumtoto.jp/event/2384/"
     },
     {
       "group": "ChumToto",
@@ -144,6 +153,15 @@
       "venue": "harevutai",
       "time": "開場16:15 / 開演17:00",
       "url": "https://chumtoto.jp/event/2067/"
+    },
+    {
+      "group": "ChumToto",
+      "date": "2026-11-03",
+      "start": "2026-11-03",
+      "title": "【ライブ出演】＠JAM×アイドル横丁presents「秋葉原アイドルサーキットvol.6」＠秋葉原エリア",
+      "venue": "秋葉原エリア",
+      "time": "開場10:45 / 開演11:30",
+      "url": "https://chumtoto.jp/event/2380/"
     },
     {
       "group": "ChumToto",
