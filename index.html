@@ -232,8 +232,8 @@
             });
             totalExpense += rowTotal;
 
-            // サインあり + 白チェキの合計枚数
-            totalCheki += (parseInt(row.sign_cheki) || 0) + (parseInt(row.white_cheki) || 0);
+            // サインチェキ（¥3,000／¥2,000）+ 白チェキ + 集合ワイドチェキの合計枚数
+            totalCheki += (parseInt(row.sign_cheki) || 0) + (parseInt(row.sign_cheki_2000) || 0) + (parseInt(row.white_cheki) || 0) + (parseInt(row.wide_cheki) || 0);
 
             if (row.attendance === "参戦" || row.attendance === "参加") {
                 attendCount++;
